@@ -12,7 +12,7 @@ div {
   border-color: ${props => props.theme.border}; 
 }
 
-h2 {
+h1, h2, h3, h4 {
   font-weight: 500;
 }
 `

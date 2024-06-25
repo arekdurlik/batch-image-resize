@@ -7,3 +7,7 @@ export const fontStack = css`
 export const monoFontStack = css`
   font-family: 'Input Mono', 'Menlo', 'Inconsolata', 'Roboto Mono', monospace;
 `;
+
+export const transitions = {
+  button: '0.25s'
+}

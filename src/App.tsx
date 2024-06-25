@@ -1,23 +1,28 @@
 import { GlobalStyles } from './styles/globalStyles'
-import { AppWrapper } from './components/layout'
-import { Sidebar } from './components/sidebar'
-import { ThemeProvider } from 'styled-components'
+import { StyleSheetManager, ThemeProvider } from 'styled-components'
 import { useState } from 'react'
 import { darkTheme, lightTheme } from './styles/themes'
-import { MainView } from './components/mainView'
+import { Navbar } from './components/Navbar'
+import { AppWrapper } from './components/styled/layout'
+import { Sidebar } from './components/Sidebar'
+import { MainView } from './components/MainView'
 
 function App() {
   const [theme, setTheme] = useState('light');
 
   return (
-    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <AppWrapper>
+    <StyleSheetManager shouldForwardProp={() => true}>
+      <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
         <GlobalStyles/>
-        <Sidebar/>
-        <MainView/>
-      </AppWrapper>
-    </ThemeProvider>
+        <AppWrapper>
+          <Navbar/>
+          <Sidebar/>
+          <MainView/>
+        </AppWrapper>
+      </ThemeProvider>
+    </StyleSheetManager>
   )
 }
 
 export default App
+
