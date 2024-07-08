@@ -1,7 +1,9 @@
 export const lightTheme = {
-  background: '#eeeeee',
-  text: '#222',
-  border: '#bbb'
+  background: '#fafafa',
+  text: '#292b2c',
+  border: '#c2c6ce',
+  inputBackground: '#f1f5fc',
+  inputBackgroundHover: '#e3e8f3' 
 }
 
 export const darkTheme = {

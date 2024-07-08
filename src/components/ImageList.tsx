@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { useAppStore } from '../store/appStore'
 
 export function ImageList() {
-  const { images } = useAppStore()
+  const { images } = useAppStore();
 
   return <List>
     <tbody>
@@ -12,7 +12,7 @@ export function ImageList() {
           <Thumbnail src={URL.createObjectURL(image.file)}/>
         </Data>
         <Data>
-        <b>File name:</b>{image.file.name}
+          <b>File name:</b>{image.file.name}
         </Data>
         <Data>
           {image.width}X{image.height}
@@ -33,6 +33,8 @@ overflow-clip-margin: unset;
 const List = styled.table`
 height: max-content;
 width: 100%;
+border-collapse: separate;
+border-spacing: 0;
 `
 
 const Item = styled.tr`
@@ -40,9 +42,11 @@ padding: 10px;
 align-items: center;
 gap: 10px;
 width: 100%;
-border-bottom: 1px solid ${props => props.theme.border};
+margin-bottom: 5px;
+
 `
 
 const Data = styled.td`
-
+border: 1px solid ${props => props.theme.border};
+border-radius: 10px;
 `

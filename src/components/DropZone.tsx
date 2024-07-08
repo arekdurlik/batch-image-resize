@@ -1,21 +1,22 @@
 import { useCallback } from 'react'
 import { FileRejection, useDropzone } from 'react-dropzone'
 import { useAppStore } from '../store/appStore'
+import styled from 'styled-components'
 
 export function DropZone() {
-  const { addImage } = useAppStore();
+  const api = useAppStore(state => state.api);
 
   const onDrop = useCallback((acceptedFiles : File[], fileRejections: FileRejection[]) => {
     if (fileRejections.length) {
       console.error('rejected');
       return;
     }
-    acceptedFiles.forEach((file, index) => {
+    acceptedFiles.forEach((file) => {
       
       const img = new Image();
       img.onload = () => {
         const object = { file, width: img.width, height: img.height };
-        addImage(object);
+        api.addImage(object);
       }
       img.src = URL.createObjectURL(file);
     })
@@ -27,13 +28,17 @@ export function DropZone() {
   } });
 
   return (
-    <div {...getRootProps()}>
+    <Wrapper {...getRootProps()}>
       <input {...getInputProps()} />
       {
         isDragActive ?
           <p>Drop the files here ...</p> :
           <p>Drag 'n' drop some files here, or click to select files</p>
       }
-    </div>
+    </Wrapper>
   )
 }
+
+const Wrapper = styled.div`
+height: 100%;
+`

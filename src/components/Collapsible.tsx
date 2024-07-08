@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import { animated, config, useSpring } from '@react-spring/web'
+import { animated, useSpring } from '@react-spring/web'
 
 type Props = {
   open: boolean
