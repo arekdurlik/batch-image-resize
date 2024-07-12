@@ -15,6 +15,7 @@ export type VariantUpdate = Partial<Omit<Variant, 'id'>>;
 type AppStore = {
   images: Data[]
   variants: Variant[]
+  quality: number | string
   indexAsName: boolean
   prefix: string
   suffix: string
@@ -25,6 +26,7 @@ type AppStore = {
     setVariantPrefix: (id: string, prefix: string) => void
     setVariantSuffix: (id: string, suffix: string) => void
     removeVariant: (variant: Variant) => void
+    setQuality: (quality: number | string) => void
     setIndexAsName: (indexAsName: boolean) => void
     setPrefix: (prefix: string) => void
     setSuffix: (suffix: string) => void
@@ -50,6 +52,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     prefix: '',
     suffix: '_400w'
   }],
+  quality: 100,
   indexAsName: false,
   prefix: '',
   suffix: '',
@@ -70,6 +73,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       variants.splice(index, 1);
       set({ variants });
     },
+    setQuality: (quality) => set({ quality }),
     setIndexAsName: (indexAsName) => set({ indexAsName }),
     setPrefix: (prefix) => set({ prefix }),
     setSuffix: (suffix) => set({ suffix }),

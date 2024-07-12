@@ -12,6 +12,7 @@ const resizer = new pica({ features: ['js', 'wasm', 'ww']});
 export function Export() {
   const images = useAppStore(state => state.images);
   const variants = useAppStore(state => state.variants);
+  const quality = useAppStore(state => state.quality);
 
   function loadImage(file: File): Promise<HTMLImageElement> {
     return new Promise(resolve => {
@@ -55,7 +56,8 @@ export function Export() {
   function canvasToBlob(image: HTMLCanvasElement): Promise<Blob> {
     return new Promise(resolve => {
       try {
-        const blob = resizer.toBlob(image, 'image/jpeg', 80);
+        const q = quality === '' ? 1 : Number(quality)/100;
+        const blob = resizer.toBlob(image, 'image/jpeg', q);
         resolve(blob);
       } catch {
         throw new Error('Failed to convert image to blob.');
