@@ -5,12 +5,14 @@ import { TextInput } from '../../../inputs/TextInput'
 import { HorizontalInputGroup, VerticalInputGroup } from '../../../inputs/styled'
 import { IoMdTrash } from 'react-icons/io'
 import styled from 'styled-components'
+import { Checkbox } from '../../../inputs/Checkbox'
 
 export function Variant(variant: VariantType & { index: number }) {
   const [prefix, setPrefix] = useState(variant.prefix);
   const [suffix, setSuffix] = useState(variant.suffix);
   const [width, setWidth] = useState(variant.width ?? '');
   const [height, setHeight] = useState(variant.height ?? '');
+  const [crop, setCrop] = useState(variant.crop ?? false);
   const api = useAppStore(state => state.api);
   const timeoutId = useRef<NodeJS.Timeout>();
 
@@ -68,6 +70,11 @@ export function Variant(variant: VariantType & { index: number }) {
         <TextInput label='Width' value={width ?? ''} onChange={handleWidth} onBlur={updateStoreValues}/>
         <TextInput label='Height' value={height ?? ''} onChange={handleHeight} onBlur={updateStoreValues} />
       </HorizontalInputGroup>
+      <Checkbox label='Crop into square' checked={crop} onChange={(e) => {
+        const value = e.target.checked;
+        setCrop(value);
+        api.setVariantCrop(variant.id, value);
+      }}/>
     </SideBarSection>
   </SectionGroup>
 }

@@ -8,9 +8,10 @@ export type Variant = {
   height?: number
   prefix: string
   suffix: string
+  crop: boolean
 };
 
-export type VariantUpdate = Partial<Omit<Variant, 'id'>>;
+export type VariantUpdate = keyof Partial<Omit<Variant, 'id'>>;
 
 type AppStore = {
   images: Data[]
@@ -20,25 +21,27 @@ type AppStore = {
   prefix: string
   suffix: string
   api: {
-    addVariant: (variant: Variant) => void
-    setVariantWidth: (id: string, width: number | undefined) => void
-    setVariantHeight: (id: string, height: number | undefined) => void
-    setVariantPrefix: (id: string, prefix: string) => void
-    setVariantSuffix: (id: string, suffix: string) => void
-    removeVariant: (variant: Variant) => void
+    addImage: (image: Data) => void
+    setImageFiles: (images: Data[]) => void
     setQuality: (quality: number | string) => void
     setIndexAsName: (indexAsName: boolean) => void
     setPrefix: (prefix: string) => void
     setSuffix: (suffix: string) => void
-    setImageFiles: (images: Data[]) => void
-    addImage: (image: Data) => void
+
+    addVariant: (variant: Variant) => void
+    removeVariant: (variant: Variant) => void
+    setVariantWidth: (id: string, width: number | undefined) => void
+    setVariantHeight: (id: string, height: number | undefined) => void
+    setVariantPrefix: (id: string, prefix: string) => void
+    setVariantSuffix: (id: string, suffix: string) => void
+    setVariantCrop: (id: string, crop: boolean) => void
   }
 };
 
-function updateVariant(id: string, field: string, value?: string | number) {
+function updateVariant(id: string, field: VariantUpdate, value?: string | number | boolean) {
   const variants = useAppStore.getState().variants;
   const index = variants.findIndex(v => v.id === id);
-  variants[index] = { ...variants[index], [field]: value };
+  variants[index] = { ...variants[index], [field as string]: value };
 
   useAppStore.setState({ variants });
 }
@@ -50,38 +53,43 @@ export const useAppStore = create<AppStore>((set, get) => ({
     width: 400,
     height: undefined,
     prefix: '',
-    suffix: '_400w'
+    suffix: '_400w',
+    crop: false
   }],
   quality: 100,
   indexAsName: false,
   prefix: '',
   suffix: '',
   api: {
+    // GLOBAL
+    addImage: (image) => {
+      const images = get().images;
+      images.push(image);
+
+      set({ images })
+    },
     setImageFiles: (images) => set({ images }),
+    setQuality: (quality) => set({ quality }),
+    setIndexAsName: (indexAsName) => set({ indexAsName }),
+    setPrefix: (prefix) => set({ prefix }),
+    setSuffix: (suffix) => set({ suffix }),
+
+    // VARIANT
     addVariant: (variant) => {
       const variants = [...get().variants];
       variants.push(variant);
       set({ variants });
     },
-    setVariantWidth: (id, width)    => updateVariant(id, 'width', width),
-    setVariantHeight: (id, height)  => updateVariant(id, 'height', height),
-    setVariantPrefix: (id, prefix)  => updateVariant(id, 'prefix', prefix),
-    setVariantSuffix: (id, suffix)  => updateVariant(id, 'suffix', suffix),
     removeVariant: (variant) => {
       const variants = get().variants;
       const index = variants.findIndex(v => v.id === variant.id);
       variants.splice(index, 1);
       set({ variants });
     },
-    setQuality: (quality) => set({ quality }),
-    setIndexAsName: (indexAsName) => set({ indexAsName }),
-    setPrefix: (prefix) => set({ prefix }),
-    setSuffix: (suffix) => set({ suffix }),
-    addImage: (image) => {
-      const images = get().images;
-      images.push(image);
-
-      set({ images })
-  },
+    setVariantWidth: (id, width)    => updateVariant(id, 'width', width),
+    setVariantHeight: (id, height)  => updateVariant(id, 'height', height),
+    setVariantPrefix: (id, prefix)  => updateVariant(id, 'prefix', prefix),
+    setVariantSuffix: (id, suffix)  => updateVariant(id, 'suffix', suffix),
+    setVariantCrop: (id, crop)      => updateVariant(id, 'crop', crop)
   }
 }));

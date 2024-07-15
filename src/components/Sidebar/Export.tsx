@@ -26,7 +26,35 @@ export function Export() {
     });
   }
 
-  function imageToCanvas(image: HTMLImageElement, width?: number, height?: number): Promise<HTMLCanvasElement> {
+  function cropImageToSquare(image: HTMLImageElement): Promise<HTMLCanvasElement> {
+    return new Promise(resolve => {
+      try {
+        const destCanvas = document.createElement('canvas');
+        const destContext = destCanvas.getContext('2d')!;
+
+        const isHorizontal = image.width > image.height;
+        const squareSideLength = isHorizontal ? image.height : image.width;
+
+        destCanvas.width = destCanvas.height = squareSideLength;
+
+        let startX = 0;
+        let startY = 0;
+
+        if (isHorizontal) {
+          startX = (image.width / 2) - (squareSideLength / 2);
+        } else {
+          startY = (image.height / 2) - (squareSideLength / 2);
+        }
+
+        destContext.drawImage(image, startX, startY, squareSideLength, squareSideLength, 0, 0, squareSideLength, squareSideLength);
+        resolve(destCanvas);
+      } catch {
+        throw new Error('Failed to crop image.');
+      }
+    })
+  }
+
+  function resizeImage(image: HTMLCanvasElement | HTMLImageElement, width?: number, height?: number): Promise<HTMLCanvasElement> {
     return new Promise(resolve => {
       try {
         const offScreenCanvas = document.createElement('canvas');
@@ -70,11 +98,15 @@ export function Export() {
 
     for (let i = 0; i < images.length; i++) {
       for (let j = 0; j < variants.length; j++) {
-        const { prefix, suffix, width, height } = variants[j];
+        const { prefix, suffix, width, height, crop } = variants[j];
         const file = images[i].file;
-
         const image = await loadImage(file);
-        const resized = await imageToCanvas(image, width, height);
+
+        let cropped: HTMLCanvasElement | HTMLImageElement = image;
+        if (crop) cropped = await cropImageToSquare(image);
+
+        const resized = await resizeImage(cropped, width, height);
+
         const blob = await canvasToBlob(resized);
         promises.push(new Promise((resolve) => resolve({ blob, name: file.name, prefix, suffix })));
       }
