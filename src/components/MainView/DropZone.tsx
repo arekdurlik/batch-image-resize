@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { FileRejection, useDropzone } from 'react-dropzone'
-import { useAppStore } from '../store/appStore'
+import { useAppStore } from '../../store/appStore'
 import styled from 'styled-components'
 
 export function DropZone() {
@@ -15,8 +15,7 @@ export function DropZone() {
       
       const img = new Image();
       img.onload = () => {
-        const object = { file, width: img.width, height: img.height };
-        api.addImage(object);
+        api.addInputImage(file, img.width, img.height);
       }
       img.src = URL.createObjectURL(file);
     })
@@ -28,17 +27,19 @@ export function DropZone() {
   } });
 
   return (
-    <Wrapper {...getRootProps()}>
+    <Wrapper {...getRootProps()} $isDragActive={isDragActive}>
       <input {...getInputProps()} />
       {
         isDragActive ?
           <p>Drop the files here ...</p> :
-          <p>Drag 'n' drop some files here, or click to select files</p>
+          <p>Drag and drop files here, or click to select files</p>
       }
     </Wrapper>
   )
 }
 
-const Wrapper = styled.div`
-height: 100%;
+const Wrapper = styled.div<{ $isDragActive: boolean }>`
+position: absolute;
+inset: 0;
+z-index: ${props => props.$isDragActive ? 2 : 0};
 `

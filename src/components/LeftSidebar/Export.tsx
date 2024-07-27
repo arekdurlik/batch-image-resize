@@ -106,8 +106,8 @@ export function Export() {
         if (crop) cropped = await cropImageToSquare(image);
 
         const resized = await resizeImage(cropped, width, height);
-
         const blob = await canvasToBlob(resized);
+        
         promises.push(new Promise((resolve) => resolve({ blob, name: file.name, prefix, suffix })));
       }
     }

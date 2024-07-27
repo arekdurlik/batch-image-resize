@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import { animated, useSpring } from '@react-spring/web'
+import { animated, easings, useSpring } from '@react-spring/web'
 
 type Props = {
   open: boolean
@@ -12,9 +12,8 @@ export function Collapsible({ open, startOpen, children }: Props) {
   const ref = useRef<HTMLDivElement>(null!)
 
   const [style, api] = useSpring(() => ({ height: startOpen ? 'auto' : 0, config: {
-    tension: 500,
-    friction: 50,
-    bounce: 0
+    duration: 250,
+    easing: easings.easeInOutQuad
   } }));
 
   useEffect(() => {
@@ -22,10 +21,16 @@ export function Collapsible({ open, startOpen, children }: Props) {
     api.start({ height: 0 })
     api.start({ height: ref.current.scrollHeight })
   } else {
+    // set to closed if startOpen === false
+    if (style.height.get() === 'auto') {
+      api.set({ height: 0 });
+      return;
+    }
+
     api.start({ height: ref.current.scrollHeight })
     api.start({ height: 0 })
    }
-  }, [open])
+  }, [api, open, style.height]);
 
   return <Container ref={ref} style={style}>{children}</Container>
 }

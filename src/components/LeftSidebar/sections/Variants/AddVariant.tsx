@@ -11,7 +11,8 @@ export function AddVariant() {
       width: undefined,
       height: undefined,
       prefix: '',
-      suffix: ''
+      suffix: '',
+      crop: false
     })
   }
   return <Button onClick={handleAdd}><IoMdAdd/>Add</Button>

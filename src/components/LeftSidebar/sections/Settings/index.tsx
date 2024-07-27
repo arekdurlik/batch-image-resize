@@ -26,7 +26,7 @@ export function Settings() {
     api.setQuality(numValue);
   }
   return <>
-    <SectionHeader style={{ marginTop: 40 }}>
+    <SectionHeader style={{ marginTop: 39 }}>
       <SectionTitle>Settings</SectionTitle>
     </SectionHeader>
     <SectionGroup>

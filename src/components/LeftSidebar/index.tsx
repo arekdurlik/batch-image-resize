@@ -3,7 +3,7 @@ import { Settings } from './sections/Settings'
 import { Variants } from './sections/Variants'
 import { Export } from './Export'
 
-export function Sidebar() {
+export function LeftSidebar() {
 
   return <Container>
     <Content>
@@ -28,7 +28,7 @@ background-position: 0% 50%;
 const Container = styled.div`
 position: relative;
 height: 100%;
-width: 17rem;
+width: 20rem;
 display: flex;
 flex-direction: column;
 justify-content: space-between;

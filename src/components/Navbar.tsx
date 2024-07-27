@@ -13,5 +13,5 @@ width: 100%;
 border-bottom: 1px solid ${props => props.theme.border};
 backdrop-filter: blur(70px);
 background-color: ${props => `${props.theme.background}` + '99'};
-z-index: 1;
+z-index: 10;
 `
