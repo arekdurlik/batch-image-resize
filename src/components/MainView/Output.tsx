@@ -1,6 +1,7 @@
 import { ImageList } from './ImageList'
 import { SectionHeader, SectionTitle } from '../styled/globals'
 import styled from 'styled-components'
+import { OutputImageList } from './ImageList/OutputImageList'
 
 export function Output() {
   return (
@@ -11,7 +12,7 @@ export function Output() {
         </SectionHeader>
       </FixedTitle>
       <Wrapper>
-        <ImageList type='output'/>
+        <OutputImageList/>
       </Wrapper>
     </>
   )

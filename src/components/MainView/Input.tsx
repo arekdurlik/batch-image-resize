@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { DropZone } from './DropZone'
-import { ImageList } from './ImageList'
 import { SectionHeader, SectionTitle } from '../styled/globals'
+import { InputImageList } from './ImageList/InputImageList'
 
 export function Input() {
   return (
@@ -12,7 +12,7 @@ export function Input() {
         </SectionHeader>
       </FixedTitle>
       <Wrapper>
-        <ImageList type='input'/>
+        <InputImageList/>
         <DropZone/>
       </Wrapper>
     </>

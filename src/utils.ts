@@ -88,7 +88,8 @@ export async function processImage(file: File, quality: number, width: number | 
   if (crop) cropped = await cropImageToSquare(image);
 
   const resized = await resizeImage(cropped, width, height);
-  const extension = getFileExtension(file.name);
+
+  const extension = quality < 1 ? 'jpeg' : getFileExtension(file.name);
 
   return canvasToBlob(resized, quality, extension);
 }

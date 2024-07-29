@@ -11,14 +11,22 @@ export function DropZone() {
       console.error('rejected');
       return;
     }
-    acceptedFiles.forEach((file) => {
+
+    const images: { file: File, width: number, height: number }[] = [];
+
+    acceptedFiles.forEach((file, index) => {
       
       const img = new Image();
       img.onload = () => {
-        api.addInputImage(file, img.width, img.height);
+        images.push({ file, width: img.width, height: img.height })
+        
+        if (index === acceptedFiles.length - 1) {
+          api.addInputImages(images);
+        }
       }
       img.src = URL.createObjectURL(file);
-    })
+    });
+
 
   }, []);
   const { getRootProps, getInputProps, isDragActive} = useDropzone({ onDrop, accept: {
