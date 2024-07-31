@@ -53,7 +53,7 @@ padding: 4px;
     position: absolute;
     inset: 0;
     pointer-events: none;
-    border-radius: 5px;
+    border-radius: ${props => props.theme.borderRadius};
     background-color:#35aeff;
     opacity: 0;
     transition: 50ms;
@@ -81,7 +81,7 @@ user-select: none;
 `
 export const Image = styled.img`
 max-height: 100px;
-border-radius: 5px;
+border-radius: ${props => props.theme.borderRadius};
 z-index: 2;
 overflow-clip-margin: none;
 `

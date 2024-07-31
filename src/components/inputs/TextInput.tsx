@@ -38,17 +38,18 @@ const Input = styled.input`
 font-weight: 400;
 background-color: ${props => props.theme.inputBackground};
 border: 1px solid ${props => props.theme.border};
-border-radius: 0.25rem;
+border-radius: ${props => props.theme.borderRadius};
 padding: 3px 6px;
 width: 100%;
+min-height: 30px;
 transition: border-color 150ms;
 
 &:focus {
-  border-color: #0075ff;
+  border-color: ${props => props.theme.blue};
   box-shadow: 
-    inset 1px 1px #0075ff, 
-    inset 1px -1px #0075ff, 
-    inset -1px -1px #0075ff, 
-    inset -1px 1px #0075ff;
+    inset 1px 1px ${props => props.theme.blue}, 
+    inset 1px -1px ${props => props.theme.blue}, 
+    inset -1px -1px ${props => props.theme.blue}, 
+    inset -1px 1px ${props => props.theme.blue};
 }
 `

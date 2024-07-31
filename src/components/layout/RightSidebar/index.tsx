@@ -13,9 +13,9 @@ export function RightSidebar() {
 
 export const AnimatedBackground = styled.div`
 transition: background 500ms;
-background: linear-gradient(45deg, #e0e0e0, ${props => props.theme.background}, ${props => props.theme.background}, ${props => props.theme.background});
-background-size: 200% 100%;
-background-position: 0% 50%;
+background: linear-gradient(45deg, #e0e0e0, ${props => props.theme.background}, ${props => props.theme.background});
+background-size: 200% 200%;
+background-position: 0% 0%;
 
 &:hover {
   background-position: 100% 50%;

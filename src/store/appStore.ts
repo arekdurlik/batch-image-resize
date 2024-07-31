@@ -4,15 +4,6 @@ import { processImage } from '../utils'
 import { changeFilename, filenameToJpg, insertVariantDataToFilename, isJpg } from '../helpers'
 import { InputImageData, OutputImageData, Variant, VariantUpdate } from './types'
 
-function updateVariant(id: string, field: VariantUpdate, value?: string | number | boolean) {
-  const variants = useAppStore.getState().variants;
-  const index = variants.findIndex(v => v.id === id);
-  variants[index] = { ...variants[index], [field as string]: value };
-  
-  useAppStore.setState({ variants });
-  regenerateVariantOutputImages(id);
-}
-
 async function regenerateAllOutputImages() {
   const inputImages = useAppStore.getState().inputImages;
   const outputImages: OutputImageData[] = [];
@@ -22,31 +13,34 @@ async function regenerateAllOutputImages() {
     outputImages.push(...images);
   }
   
-  useAppStore.setState({ outputImages });
+  return outputImages;
 }
 
-async function regenerateVariantOutputImages(variantId: string) {
-  const variant = useAppStore.getState().variants.find(v => v.id = variantId);
-
-  if (!variant) {
-    throw new Error(`Variant with id ${variantId} not found.`);
-  }
-
+// global index to cancel current regeneration before starting new one
+let regenerateVariantOutputImagesIndex = 0;
+async function regenerateVariantOutputImages(variant: Variant) {
+  regenerateVariantOutputImagesIndex += 1;
+  const currentIndex = regenerateVariantOutputImagesIndex;
+  
   const inputImages = useAppStore.getState().inputImages;
-  const outputImages: OutputImageData[] = useAppStore.getState().outputImages;
+  const outputImages: OutputImageData[] = [...useAppStore.getState().outputImages];
 
   for (let i = 0; i < outputImages.length; i++) {
-    if (outputImages[i].variantId === variantId) {
+    if (outputImages[i].variantId === variant.id) {
       const inputImage = inputImages.find(img => img.id === outputImages[i].inputImageId);
 
       if (!inputImage) {
-        throw new Error(`Variant with id ${variantId} not found.`);
+        throw new Error(`Variant with id ${variant.id} not found.`);
       }
       
       outputImages[i] = await generateOutputImage(inputImage, variant);
     }
+
+    if (currentIndex !== regenerateVariantOutputImagesIndex) {
+      return false;
+    }
   }
-  useAppStore.setState({ outputImages });
+  return outputImages;
 }
 
 async function generateOutputImageVariants(inputImage: InputImageData) {
@@ -123,6 +117,7 @@ async function generateOutputImage(inputImage: InputImageData, variant: Variant)
 type AppStore = {
   inputImages: InputImageData[]
   addingInputImages: boolean
+  totalInputImagesSize: number
   outputImages: OutputImageData[]
   addingOutputImages: boolean
   variants: Variant[]
@@ -142,6 +137,7 @@ type AppStore = {
 
     addVariant: (variant: Variant) => void
     removeVariant: (variant: Variant) => void
+    updateVariant: (id: string, field: VariantUpdate, value?: string | number | boolean) => void
     setVariantWidth: (id: string, width: number | undefined) => void
     setVariantHeight: (id: string, height: number | undefined) => void
     setVariantPrefix: (id: string, prefix: string) => void
@@ -153,6 +149,7 @@ type AppStore = {
 export const useAppStore = create<AppStore>((set, get) => ({
   inputImages: [],
   addingInputImages: false,
+  totalInputImagesSize: 0,
   outputImages: [],
   addingOutputImages: false,
   variants: [{
@@ -192,12 +189,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
       
       inputImages.push(newImage);
       
-      set({ inputImages, addingInputImages: false });
+      set({ 
+        inputImages, 
+        addingInputImages: false, 
+        totalInputImagesSize: get().totalInputImagesSize + file.size 
+      });
 
       generateOutputImageVariants(newImage);
     },
     addInputImages: async (images) => {
-      const inputImages = get().inputImages;
+      const inputImages = [...get().inputImages];
       const indexAsName = get().indexAsName;
       
       set({ addingInputImages: true });
@@ -221,11 +222,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
           } as InputImageData;
           
           inputImages.push(newImage);
-          set({ inputImages });
+
+          set({ 
+            inputImages, 
+            totalInputImagesSize: get().totalInputImagesSize + file.size 
+          });
         }
   
         for (let i = 0; i < inputImages.length; i++) {
-          const outputImages = get().outputImages;
+          const outputImages = [...get().outputImages];
           const images = await generateOutputImageVariants(inputImages[i]);
           outputImages.push(...images);
           set({ outputImages });
@@ -237,18 +242,30 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
     },
     setImageFiles: (inputImages) => set({ inputImages }),
-    setQuality: (quality) => {
+    setQuality: async (quality) => {
       set({ quality })
-      regenerateAllOutputImages();
+
+      const outputImages = await regenerateAllOutputImages();
+
+      set({ outputImages });
     },
     setIndexAsName: (indexAsName) => set({ indexAsName }),
     setPrefix: (prefix) => set({ prefix }),
     setSuffix: (suffix) => set({ suffix }),
 
-    addVariant: (variant) => {
+    addVariant: async (variant) => {
       const variants = [...get().variants];
+      const inputImages = get().inputImages;
+      
       variants.push(variant);
       set({ variants });
+      
+      for (let i = 0; i < inputImages.length; i++) {
+        const outputImages = get().outputImages;
+        const image = await generateOutputImage(inputImages[i], variant);
+        outputImages.push(image);
+        set({ outputImages });
+      }
     },
     removeVariant: (variant) => {
       const variants = get().variants;
@@ -256,10 +273,66 @@ export const useAppStore = create<AppStore>((set, get) => ({
       variants.splice(index, 1);
       set({ variants });
     },
-    setVariantWidth: (id, width)    => updateVariant(id, 'width', width),
-    setVariantHeight: (id, height)  => updateVariant(id, 'height', height),
-    setVariantPrefix: (id, prefix)  => updateVariant(id, 'prefix', prefix),
-    setVariantSuffix: (id, suffix)  => updateVariant(id, 'suffix', suffix),
-    setVariantCrop: (id, crop)      => updateVariant(id, 'crop', crop)
+    updateVariant: async (id: string, field: VariantUpdate, value?: string | number | boolean) => {
+      const variants = get().variants;
+      const index = variants.findIndex(v => v.id === id);
+      
+      if (index === undefined) {
+        throw new Error(`Variant with id ${id} not found.`);
+      }
+      
+      variants[index] = { ...variants[index], [field as string]: value };
+      
+      set({ variants }); 
+      
+      const outputImages = await regenerateVariantOutputImages(variants[index]);
+      
+      if (outputImages) {
+        set({ outputImages });
+      }
+    },
+    setVariantWidth: (id, width)    => get().api.updateVariant(id, 'width', width),
+    setVariantHeight: (id, height)  => get().api.updateVariant(id, 'height', height),
+    setVariantPrefix: (id, prefix) => {
+      setVariantPrefixAndSuffix(id, prefix, undefined);
+    },
+    setVariantSuffix: (id, suffix) => {
+      setVariantPrefixAndSuffix(id, undefined, suffix);
+    },
+    setVariantCrop: (id, crop)      => get().api.updateVariant(id, 'crop', crop)
   }
 }));
+
+const setVariantPrefixAndSuffix = function(id: string, prefix: string | undefined, suffix: string | undefined) {
+  const variants = [...useAppStore.getState().variants];
+  
+  const variantIndex = variants.findIndex(v => v.id === id);
+      
+  if (variantIndex === undefined) {
+    throw new Error(`Variant with id ${id} not found.`);
+  }
+
+  if (prefix !== undefined) {
+    variants[variantIndex].prefix = prefix;
+  }
+  
+  if (suffix !== undefined) {
+    variants[variantIndex].suffix = suffix;
+  }
+
+  useAppStore.setState({ variants });
+
+  const outputImages = [...useAppStore.getState().outputImages];
+
+  outputImages.forEach(image => {
+    if (image.variantId === variants[variantIndex].id) {
+      image.filename.value = insertVariantDataToFilename(
+        image.inputImageFilename,
+        variants[variantIndex].prefix,
+        variants[variantIndex].suffix
+      );
+    }
+  });
+
+  useAppStore.setState({ outputImages });
+}

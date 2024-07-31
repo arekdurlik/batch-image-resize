@@ -1,5 +1,5 @@
-import { useAppStore } from '../../../../store/appStore'
-import { SectionHeader, SectionTitle } from '../../../styled/globals'
+import { useAppStore } from '../../../../../store/appStore'
+import { SectionHeader, SectionTitle } from '../../../../styled/globals'
 import { AddVariant } from './AddVariant'
 import { Variant } from './Variant'
 

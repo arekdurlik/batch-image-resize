@@ -1,6 +1,6 @@
-import { useAppStore } from '../../../../store/appStore'
-import { Button } from '../../../styled/globals'
 import { IoMdAdd } from "react-icons/io";
+import { useAppStore } from '../../../../../store/appStore'
+import { Button } from '../../../../styled/globals'
 
 export function AddVariant() {
   const api = useAppStore(state => state.api);

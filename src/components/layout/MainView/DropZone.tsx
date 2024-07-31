@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { FileRejection, useDropzone } from 'react-dropzone'
-import { useAppStore } from '../../store/appStore'
+import { useAppStore } from '../../../store/appStore'
 import styled from 'styled-components'
 
 export function DropZone() {

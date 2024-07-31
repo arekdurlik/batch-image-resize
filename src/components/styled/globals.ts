@@ -3,12 +3,14 @@ import { transitions } from '../../styles/shared'
 
 export const Button = styled.button`
   border: 1px solid ${props => props.theme.border};
-  border-radius: 0.4rem;
+  border-radius: ${props => props.theme.borderRadius};
   background-color: ${props => props.theme.inputBackground};
   color: ${props => props.theme.text};
   padding: 3px 10px;
   font-weight: 500;
+  min-height: 30px;
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 5px;
   width: fit-content;
@@ -18,6 +20,16 @@ export const Button = styled.button`
   &:hover {
     background-color: ${props => props.theme.inputBackgroundHover};
     cursor: pointer;
+  }
+
+  &:focus {
+  border-color: ${props => props.theme.blue};
+  box-shadow: 
+    inset 1px 1px ${props => props.theme.blue}, 
+    inset 1px -1px ${props => props.theme.blue}, 
+    inset -1px -1px ${props => props.theme.blue}, 
+    inset -1px 1px ${props => props.theme.blue};
+    z-index: 1;
   }
 
   svg {

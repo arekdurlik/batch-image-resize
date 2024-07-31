@@ -1,17 +1,15 @@
 import JSZip from 'jszip'
-import { useAppStore } from '../../store/appStore'
-import { Button } from '../styled/globals'
 import styled from 'styled-components'
-import { OutputImageData } from '../../store/types'
+import { OutputImageData } from '../../../store/types'
+import { useAppStore } from '../../../store/appStore'
+import { Button } from '../../styled/globals'
+import { useMemo } from 'react'
+import { bytesToSizeFormatted } from '../../../helpers'
 
 export function Export() {
-  const { outputImages, inputImages } = useAppStore();
-  const totalInputBytes = inputImages.reduce((a, b) => a + b.image.full.size, 0)
-  const totalOutputBytes = outputImages.reduce((a, b) => a + b.image.full.size, 0)
-  const totalInputMb = totalInputBytes * 0.000001;
-  const totalOutputMb = totalOutputBytes * 0.000001;
-  const totalInputMbFormatted = `${Math.round(totalInputMb * 100) / 100}mb`;
-  const totalOutputMbFormatted = `${Math.round(totalOutputMb * 100) / 100}mb`;
+  const { outputImages, totalInputImagesSize } = useAppStore();
+  const totalInputBytes = totalInputImagesSize;
+  const totalOutputBytes = useMemo(() => outputImages.reduce((a, b) => a + b.image.full.size, 0), [outputImages]);
   
   function zipItUp(zip: JSZip, outputImages: OutputImageData[]): Promise<JSZip[]> {
     const promises: Promise<JSZip>[] = [];
@@ -48,7 +46,9 @@ export function Export() {
   }
 
   return <Wrapper>
-    {totalOutputMb > 0 && `${totalInputMbFormatted} → ≈${totalOutputMbFormatted}`}
+    {totalOutputBytes > 0 && 
+      `${bytesToSizeFormatted(totalInputBytes)} → ≈${bytesToSizeFormatted(totalOutputBytes)}`
+    }
     <StyledButton onClick={handleClick}>
       Export
     </StyledButton>

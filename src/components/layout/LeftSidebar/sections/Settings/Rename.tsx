@@ -1,9 +1,9 @@
 import { ChangeEvent, useState } from 'react'
-import { TextInput } from '../../../inputs/TextInput'
-import { useAppStore } from '../../../../store/appStore'
-import { Collapsible } from '../../../Collapsible'
-import { Checkbox } from '../../../inputs/Checkbox'
-import { VerticalInputGroup } from '../../../inputs/styled'
+import { Checkbox } from '../../../../inputs/Checkbox'
+import { Collapsible } from '../../../../Collapsible'
+import { VerticalInputGroup } from '../../../../inputs/styled'
+import { TextInput } from '../../../../inputs/TextInput'
+import { useAppStore } from '../../../../../store/appStore'
 
 export function Rename() {
   const [on, setOn] = useState(false);

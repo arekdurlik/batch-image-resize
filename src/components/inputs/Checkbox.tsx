@@ -10,13 +10,15 @@ type Props = {
 export function Checkbox({ label, checked, onChange, style }: Props) {
 
   return <Container style={style}>
-    <input
-      name={label}
-      type='checkbox'
-      checked={checked}
-      onChange={onChange}
-    />
-    {label &&<Label htmlFor={label}>{label}</Label>}
+    <Label>
+      <input
+        name={label}
+        type='checkbox'
+        checked={checked}
+        onChange={onChange}
+      />
+      <span>{label}</span>
+    </Label>
   </Container>
 }
 
@@ -29,4 +31,7 @@ font-weight: 500;
 
 const Label = styled.label`
 font-weight: 500;
+user-select: none;
+display: flex;
+gap: 5px;
 `

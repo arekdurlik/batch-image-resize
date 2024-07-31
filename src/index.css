@@ -20,8 +20,8 @@ input, button, textarea, select {
   font: inherit;
 }
 
-input, textarea {
-  outline: none;
+input, textarea, div, button {
+  outline: transparent;
 }
 
 p, h1, h2, h3, h4, h5, h6 {

@@ -14,7 +14,7 @@ export function Resizer({ onReset }: { onReset?: () => void }) {
   }
 
   return <>
-    <PanelResizeHandle style={{ zIndex: 1 }} onDragging={setDragging} />
+    <PanelResizeHandle style={{ zIndex: 5, position: 'relative', top: 4 }} onDragging={setDragging} />
     <StyledHandle>
       <ResizerWrapper onDoubleClick={handleDoubleClick} className={cancelHover ? 'no-hover' : ''}>
         <ResizerHandle $dragging={dragging} />
@@ -28,7 +28,6 @@ position: relative;
 width: 100%;
 height: 1px;
 background-color: ${props => props.theme.border};
-top: 0px;
 transition: 150ms;
 
 ${props => props.$dragging && `
@@ -40,22 +39,22 @@ ${props => props.$dragging && `
 
 const ResizerWrapper = styled.div`
 position: absolute;
-top: -5px;
+top: 0px;
 left: 0;
 right: 0;
-bottom: -1px;
+bottom: 0px;
 width: 100%;
 display: flex;
 align-items: center;
 justify-content: center;
+height: 10px;
+z-index: 4;
 
 &:hover {
   ${ResizerHandle} {
     height: 5px;
-    top: 0px;
     background-color: #41a9ee;
     transition-delay: 300ms;
-  }
 }
 
 &.no-hover {
@@ -64,6 +63,7 @@ justify-content: center;
     background-color: ${props => props.theme.border};
     transition-delay: 0ms;
   }
+}
 }
 `
 
