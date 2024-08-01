@@ -18,12 +18,29 @@ export function Rename() {
   }
   
   return <>
-    <Checkbox label='Rename all' checked={on} onChange={() => setOn(v => !v)}/>
+    <Checkbox 
+      label='Rename all' 
+      checked={on} 
+      onChange={() => setOn(v => !v)}
+    />
     <Collapsible open={on} startOpen={true}>
       <VerticalInputGroup>
-        <Checkbox label='Index as name' checked={indexAsName} onChange={() => api.setIndexAsName(!indexAsName)} style={{ marginTop: 10 }}/>
-        <TextInput label='Prefix' value={prefix} onChange={handlePrefix}/>
-        <TextInput label='Suffix' value={suffix} onChange={handleSuffix}/>
+        <Checkbox 
+          label='Index as name' 
+          checked={indexAsName} 
+          onChange={() => api.setIndexAsName(!indexAsName)} 
+          style={{ marginTop: 10 }}
+        />
+        <TextInput 
+          label='Prefix' 
+          value={prefix} 
+          onChange={handlePrefix}
+        />
+        <TextInput 
+          label='Suffix' 
+          value={suffix} 
+          onChange={handleSuffix}
+        />
       </VerticalInputGroup>
     </Collapsible>
   </>

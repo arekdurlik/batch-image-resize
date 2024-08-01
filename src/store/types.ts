@@ -40,6 +40,7 @@ export type ImageData = InputImageData | OutputImageData;
 
 export type Variant = {
   id: string
+  index: number
   width?: number
   height?: number
   prefix: string

@@ -18,6 +18,11 @@ export function getFileExtension(filename: string) {
   return filename.substring(lastPeriod + 1);
 }
 
+export function removeFileExtension(filename: string) {
+  const lastPeriod = filename.lastIndexOf('.');
+  return filename.substring(0, lastPeriod);
+}
+
 export function isJpg(filename: string) {
   return ['jpg', 'jpeg', 'jfif'].includes(getFileExtension(filename));
 }
@@ -55,4 +60,8 @@ export function bytesToSizeFormatted(bytes: number) {
   const size = bytes * (kb ? 0.001 : 0.000001);
 
   return `${Math.round(size * 100) / 100}${kb ? 'kb' : 'mb'}`;
+}
+
+export function difference(a: number, b: number) {
+  return Math.abs(a - b);
 }

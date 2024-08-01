@@ -1,37 +1,47 @@
 import styled from 'styled-components'
 import { DropZone } from './DropZone'
-import { SectionHeader, SectionTitle } from '../../styled/globals'
 import { useAppStore } from '../../../store/appStore'
 import { ImageList } from './ImageList'
+import { SectionHeader, SectionTitle } from '../../styled'
+import { useMemo } from 'react'
+
+const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 export function InputImageList() {
   const images = useAppStore(state => state.inputImages);
   useAppStore(state => state.totalInputImagesSize); // reload images
 
+  const sortedImages = useMemo(() => (
+    images.sort((a, b) => collator.compare(a.filename, b.filename))
+  ), [images]);
+
   return (
-    <>
+    <Wrapper>
       <FixedTitle>
         <SectionHeader>
           <SectionTitle>Input images</SectionTitle>
         </SectionHeader>
       </FixedTitle>
-      <Wrapper>
-        <ImageList images={images}/>
+      <ImageListWrapper>
+        <ImageList images={sortedImages}/>
         <DropZone/>
-      </Wrapper>
-    </>
+      </ImageListWrapper>
+    </Wrapper>
   )
 }
 
+const Wrapper = styled.div`
+flex: 1;
+display: flex;
+flex-direction: column;
+height: 100%;
+`
+
 const FixedTitle = styled.div`
-position: absolute;
-z-index: 3;
-background: linear-gradient(to top, var(--bgColor-default-transparent), var(--bgColor-default) 85%);
 width: 100%;
 `
-const Wrapper = styled.div`
-overflow-y: scroll;
+const ImageListWrapper = styled.div`
 position: relative;
-height: calc(100% - 50px);
-margin-top: 50px;
+overflow-y: scroll;
+height: 100%;
 `

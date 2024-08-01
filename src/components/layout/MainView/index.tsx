@@ -12,17 +12,19 @@ export function MainView() {
     panelGroup.current.setLayout([50, 50]);
   }
 
-  return <Wrapper>
-    <PanelGroup ref={panelGroup} direction="vertical">
-      <Panel minSize={10}>
-        <InputImageList/>
-      </Panel>
-      <Resizer onReset={handleReset}/>
-      <Panel minSize={10}>
-        <OutputImageList/>
-      </Panel>
-    </PanelGroup>
-  </Wrapper>
+  return (
+    <Wrapper>
+      <PanelGroup ref={panelGroup} direction="vertical">
+        <Panel minSize={10}>
+          <InputImageList/>
+        </Panel>
+        <Resizer onReset={handleReset}/>
+        <Panel minSize={10}>
+          <OutputImageList/>
+        </Panel>
+      </PanelGroup>
+    </Wrapper>
+  )
 }
 
 const Wrapper = styled.div`

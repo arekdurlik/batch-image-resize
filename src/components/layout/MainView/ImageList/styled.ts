@@ -80,8 +80,10 @@ flex-direction: column;
 justify-content: flex-end;
 user-select: none;
 `
+
 export const Image = styled.img`
 max-height: 100px;
+width: 100px;
 border-radius: var(--borderRadius-default);
 z-index: 2;
 overflow-clip-margin: none;

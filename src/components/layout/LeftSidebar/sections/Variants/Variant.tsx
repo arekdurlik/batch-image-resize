@@ -4,10 +4,11 @@ import { Variant as VariantType } from '../../../../../store/types'
 import { IoMdTrash } from 'react-icons/io'
 import styled from 'styled-components'
 import { useToastsState } from '../../../../../store/toastsState'
-import { Button, SectionGroup, SideBarSection } from '../../../../styled/globals'
 import { HorizontalInputGroup, VerticalInputGroup } from '../../../../inputs/styled'
 import { TextInput } from '../../../../inputs/TextInput'
 import { Checkbox } from '../../../../inputs/Checkbox'
+import { SectionGroup, SideBarSection } from '../../../../styled'
+import { Button } from '../../../../inputs/Button'
 
 export function Variant(variant: VariantType & { index: number }) {
   const [width, setWidth] = useState(variant.width ?? '');
@@ -70,29 +71,31 @@ export function Variant(variant: VariantType & { index: number }) {
     timeoutId.current = setTimeout(updateStoreHeight, 350);
   }, [updateStoreHeight]);
 
-  return <SectionGroup>
-    <VariantName>
-      Variant {variant.index + 1}
-      <Button onClick={showToast}>
-        <IoMdTrash/>Delete
-      </Button>
-    </VariantName>
-    <SideBarSection>
-      <VerticalInputGroup>
-        <TextInput label='Prefix' value={variant.prefix} onChange={e => api.setVariantPrefix(variant.id, e.target.value)}/>
-        <TextInput label='Suffix' value={variant.suffix} onChange={e => api.setVariantSuffix(variant.id, e.target.value)} />
-      </VerticalInputGroup>
-      <HorizontalInputGroup>
-        <TextInput label='Width' value={width ?? ''} onChange={handleWidth} onBlur={updateStoreWidth}/>
-        <TextInput label='Height' value={height ?? ''} onChange={handleHeight} onBlur={updateStoreHeight} />
-      </HorizontalInputGroup>
-      <Checkbox label='Crop into square' checked={crop} onChange={(e) => {
-        const value = e.target.checked;
-        setCrop(value);
-        api.setVariantCrop(variant.id, value);
-      }}/>
-    </SideBarSection>
-  </SectionGroup>
+  return (
+    <SectionGroup>
+      <VariantName>
+        Variant {variant.index + 1}
+        <Button onClick={showToast}>
+          <IoMdTrash/>Delete
+        </Button>
+      </VariantName>
+      <SideBarSection>
+        <VerticalInputGroup>
+          <TextInput label='Prefix' value={variant.prefix} onChange={e => api.setVariantPrefix(variant.id, e.target.value)}/>
+          <TextInput label='Suffix' value={variant.suffix} onChange={e => api.setVariantSuffix(variant.id, e.target.value)} />
+        </VerticalInputGroup>
+        <HorizontalInputGroup>
+          <TextInput label='Width' value={width ?? ''} onChange={handleWidth} onBlur={updateStoreWidth}/>
+          <TextInput label='Height' value={height ?? ''} onChange={handleHeight} onBlur={updateStoreHeight} />
+        </HorizontalInputGroup>
+        <Checkbox label='Crop into square' checked={crop} onChange={(e) => {
+          const value = e.target.checked;
+          setCrop(value);
+          api.setVariantCrop(variant.id, value);
+        }}/>
+      </SideBarSection>
+    </SectionGroup>
+  )
 }
 
 const VariantName = styled.h4`

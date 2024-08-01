@@ -5,13 +5,15 @@ import { Export } from './Export'
 
 export function LeftSidebar() {
 
-  return <Container>
-    <Content>
-      <Settings/>
-      <Variants/>
-    </Content>
-    <Export/>
-  </Container>
+  return (
+    <Container>
+      <Content>
+        <Settings/>
+        <Variants/>
+      </Content>
+      <Export/>
+    </Container>
+  )
 }
 
 export const AnimatedBackground = styled.div`

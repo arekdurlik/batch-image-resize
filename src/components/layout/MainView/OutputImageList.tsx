@@ -1,32 +1,80 @@
-import { Button, ButtonGroup, SectionHeader, SectionTitle } from '../../styled/globals'
 import styled from 'styled-components'
 import { SelectInput } from '../../inputs/SelectInput'
-import { useState } from 'react'
-import { MdArrowDownward, MdArrowUpward, MdMoreHoriz } from 'react-icons/md'
+import { useCallback, useMemo, useState } from 'react'
+import { MdArrowDownward, MdArrowUpward, MdClose, MdMoreHoriz } from 'react-icons/md'
 import { useAppStore } from '../../../store/appStore'
 import { ImageList } from './ImageList'
 import { SortDirection, SortType } from './ImageList/types'
+import { Button } from '../../inputs/Button'
+import { SectionHeader, SectionTitle } from '../../styled'
+import { compare, removeFileExtension } from '../../../lib/helpers'
+import { OutputImageData } from '../../../store/types'
+import { ButtonGroup } from '../../inputs/styled'
+import { TextInput } from '../../inputs/TextInput'
+
+const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 export function OutputImageList() {
   const [sortOption, setSortOption] = useState<SortType>(SortType.FILENAME);
   const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.ASC);
+  const [filter, setFilter] = useState('');
   const images = useAppStore(state => state.outputImages);
+  const variants = useAppStore(state => state.variants);
 
+  const sortingMethod = useCallback((a: OutputImageData, b: OutputImageData) => {
+    switch(sortOption) {
+      case SortType.VARIANT: {
+        const variantA = variants.find(v => v.id === a.variantId);
+        const variantB = variants.find(v => v.id === b.variantId);
+
+        if (!variantA || !variantB) return 0;
+
+        return sortDirection === SortDirection.ASC
+        ? compare(variantA.index, variantB.index) || collator.compare(a.filename, b.filename)
+        : compare(variantB.index, variantA.index) || collator.compare(a.filename, b.filename);
+      }
+      case SortType.FILESIZE:
+        return sortDirection === SortDirection.ASC 
+        ? compare(a.image.full.size, b.image.full.size)
+        : compare(b.image.full.size, a.image.full.size);
+      default:
+        return sortDirection === SortDirection.ASC 
+        ? collator.compare(removeFileExtension(a.filename), removeFileExtension(b.filename))
+        : collator.compare(removeFileExtension(b.filename), removeFileExtension(a.filename));
+      }
+  }, [sortOption, sortDirection, variants]);
+      
   function handleChange(value: string | number) {
     setSortOption(value as SortType);
   }
-
+  
   function flipSortDirection() {
     setSortDirection(prev => prev === SortDirection.ASC  ? SortDirection.DESC  : SortDirection.ASC )
   }
+  
+  const sortedImages = useMemo(() => (
+    [...images].sort(sortingMethod)
+  ), [images, sortingMethod]);
 
+  const filteredImages = filter.length ? sortedImages.filter(img => img.filename.includes(filter)) : sortedImages;
+      
   return (
-    <>
+    <Wrapper>
       <FixedTitle>
         <SectionHeader>
           <SectionTitle>Output images</SectionTitle>
           <Sort>
-            <span>Sort by:</span>
+            <span >Filter by:</span>
+            <TextInput 
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              suffix={filter.length 
+                ? <ClearFilter onClick={() => setFilter('')}/> 
+                : undefined
+              }
+              style={{ width: 137 }}
+            />
+            <span style={{ marginLeft: 8 }}>Sort by:</span>
             <ButtonGroup>
               <SelectInput 
                 value={sortOption} 
@@ -34,6 +82,7 @@ export function OutputImageList() {
                 options={[
                   { label: 'File name', value: SortType.FILENAME },
                   { label: 'File size', value: SortType.FILESIZE },
+                  { label: 'Variant', value: SortType.VARIANT },
                 ]}
               />
               <Button onClick={flipSortDirection}>
@@ -43,60 +92,40 @@ export function OutputImageList() {
                 }
               </Button>
             </ButtonGroup>
-            <Button style={{ marginLeft: 16 }}>
+            <Button style={{ marginLeft: 8 }}>
               <MdMoreHoriz/>
             </Button>
           </Sort>
         </SectionHeader>
       </FixedTitle>
-      <Wrapper>
-        <ImageList images={images} sortBy={sortOption} sortDir={sortDirection}/>
-      </Wrapper>
-    </>
+      <ImageListWrapper>
+        <ImageList images={filteredImages} sortBy={sortOption} />
+      </ImageListWrapper>
+    </Wrapper>
   )
 }
 
-const FixedTitle = styled.div`
-position: absolute;
-z-index: 3;
-background: linear-gradient(to top, var(--bgColor-default-transparent), var(--bgColor-default) 85%);
-backdrop-filter: blur(15px);
-width: 100%;
+const Wrapper = styled.div`
+flex: 1;
+display: flex;
+flex-direction: column;
+height: 100%;
 `
 
-const Wrapper = styled.div`
+const ClearFilter = styled(MdClose)`
+cursor: pointer;
+`
+
+const FixedTitle = styled.div`
+width: 100%;
+z-index: 3;
+pointer-events: none;
+`
+
+const ImageListWrapper = styled.div`
+position: relative;
 overflow-y: scroll;
-height: calc(100%);
-padding-top: 50px;
-
-&::-webkit-scrollbar {
-    background-color: var(--bgColor-default);
-    
-}
-
-&::-webkit-scrollbar-track {
-    background-color: #efefef;
-    margin-top: 50px;
-  }
-
-&::-webkit-scrollbar-thumb {
-    background-color: #bbb;
-    border-radius: 20px;
-    border: 0.2vw solid #eee;
-    transition: background-color var(--transition-default);
-    
-    &:hover {
-      background-color: #aaa;
-    }
-
-    &:active {
-      background-color: #999;
-    }
-}
-
-&::-webkit-scrollbar-button {
-    display:none;
-}
+height: 100%;
 `
 
 const Sort = styled.div`
@@ -106,8 +135,5 @@ align-items: center;
 
 span {
   font-weight: 500;
-}
-
-${Button} {
 }
 `

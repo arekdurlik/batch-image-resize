@@ -14,6 +14,8 @@ export const GlobalStyles = createGlobalStyle`
 body {
   ${fontStack};
 
+  overflow: hidden;
+
   background-color: var(--bgColor-default);
   color: var(--fgColor-default);
   font-size: 14px;

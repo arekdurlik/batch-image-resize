@@ -2,9 +2,9 @@ import JSZip from 'jszip'
 import styled from 'styled-components'
 import { OutputImageData } from '../../../store/types'
 import { useAppStore } from '../../../store/appStore'
-import { Button } from '../../styled/globals'
 import { useMemo } from 'react'
-import { bytesToSizeFormatted } from '../../../helpers'
+import { bytesToSizeFormatted } from '../../../lib/helpers'
+import { Button } from '../../inputs/Button'
 
 export function Export() {
   const { outputImages, totalInputImagesSize } = useAppStore();
@@ -17,7 +17,7 @@ export function Export() {
     outputImages.forEach(({ image, filename }) => {
       promises.push(new Promise(resolve => {
         try {
-          resolve(zip.file(filename.value, image.full));
+          resolve(zip.file(filename, image.full));
         } catch {
           throw new Error(`Failed to add file ${name} to the archive.`);
         }
@@ -45,14 +45,16 @@ export function Export() {
     a.click();
   }
 
-  return <Wrapper>
-    {totalOutputBytes > 0 && 
-      `${bytesToSizeFormatted(totalInputBytes)} → ≈${bytesToSizeFormatted(totalOutputBytes)}`
-    }
-    <StyledButton onClick={handleClick}>
-      Export
-    </StyledButton>
-  </Wrapper>
+  return (
+    <Wrapper>
+      {totalOutputBytes > 0 && 
+        `${bytesToSizeFormatted(totalInputBytes)} → ≈${bytesToSizeFormatted(totalOutputBytes)}`
+      }
+      <Button onClick={handleClick}>
+        Export
+      </Button>
+    </Wrapper>
+  )
 }
 
 const Wrapper = styled.div`
@@ -62,17 +64,4 @@ place-items: center;
 gap: 5px;
 z-index: 2;
 padding: 5px;
-`
-
-const StyledButton = styled(Button)`
-background-color: #267e32;
-color: var(--bgColor-default);
- 
-svg {
-  fill: var(--bgColor-default);
-}
-
-&:hover {
-  background-color: #28a539;
-}
 `

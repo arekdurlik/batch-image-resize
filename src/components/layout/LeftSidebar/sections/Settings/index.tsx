@@ -1,7 +1,7 @@
-import { ChangeEvent, MouseEvent, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { Rename } from './Rename'
-import { SectionGroup, SectionHeader, SectionTitle } from '../../../../styled/globals'
 import { useAppStore } from '../../../../../store/appStore'
+import { SectionGroup, SectionHeader, SectionTitle } from '../../../../styled'
 
 export function Settings() {
   const [quality, setQuality] = useState(1);

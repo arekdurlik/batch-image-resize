@@ -6,14 +6,15 @@ type Props = {
   checked: boolean
   onChange?: ChangeEventHandler<HTMLInputElement>
   style?: CSSProperties
-}
+};
+
 export function Checkbox({ label, checked, onChange, style }: Props) {
 
   return <Container style={style}>
     <Label>
       <input
-        name={label}
         type='checkbox'
+        name={label}
         checked={checked}
         onChange={onChange}
       />

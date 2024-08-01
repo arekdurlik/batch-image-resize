@@ -1,6 +1,7 @@
 export enum SortType {
   FILENAME = 'FILENAME',
-  FILESIZE = 'FILESIZE'
+  FILESIZE = 'FILESIZE',
+  VARIANT = 'VARIANT'
 }
 
 export enum SortDirection {

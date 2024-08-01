@@ -1,8 +1,9 @@
 import { create } from 'zustand'
 import { v1 as uuid } from 'uuid'
-import { processImage } from '../utils'
-import { changeFilename, filenameToJpg, insertVariantDataToFilename, isJpg } from '../helpers'
+import { processImage } from '../lib/utils'
+import { changeFilename, filenameToJpg, insertVariantDataToFilename, isJpg } from '../lib/helpers'
 import { InputImageData, OutputImageData, Variant, VariantUpdate } from './types'
+import { THUMBNAIL_SIZE } from '../lib/constants'
 
 async function regenerateAllOutputImages() {
   const inputImages = useAppStore.getState().inputImages;
@@ -22,7 +23,7 @@ async function regenerateVariantOutputImages(variant: Variant) {
   regenerateVariantOutputImagesIndex += 1;
   const currentIndex = regenerateVariantOutputImagesIndex;
   
-  const inputImages = [...useAppStore.getState().inputImages];
+  const inputImages = useAppStore.getState().inputImages;
   const outputImages: OutputImageData[] = [...useAppStore.getState().outputImages];
 
   for (let i = 0; i < outputImages.length; i++) {
@@ -84,7 +85,7 @@ async function generateOutputImage(inputImage: InputImageData, variant: Variant)
 
   const processedFull = await processImage(inputImage.image.full, quality, variant.width, variant.height, variant.crop);
   const processedFile = new File([processedFull], inputImage.filename);
-  const processedThumbnail = await processImage(processedFile, isJpg(inputImage.filename) ? 0.9 : 1, 150, variant.height, variant.crop);
+  const processedThumbnail = await processImage(processedFile, isJpg(inputImage.filename) ? 0.9 : 1, THUMBNAIL_SIZE, variant.height, variant.crop);
 
   return {
     id: uuid(),
@@ -149,6 +150,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   addingOutputImages: false,
   variants: [{
     id: uuid(),
+    index: 0,
     width: 400,
     height: undefined,
     prefix: '',
@@ -173,7 +175,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         id, 
         image: {
           full: file,
-          thumbnail: await processImage(file, 1, 150, undefined),
+          thumbnail: await processImage(file, 1, THUMBNAIL_SIZE, undefined),
         }, 
         filename: indexAsName ? changeFilename(file.name, String(inputImages.length + 1)) : file.name, 
         dimensions: { 
@@ -207,7 +209,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
             id, 
             image: {
               full: file,
-              thumbnail: await processImage(file, 1, 150, undefined),
+              thumbnail: await processImage(file, 1, THUMBNAIL_SIZE, undefined),
             }, 
             filename: indexAsName ? changeFilename(file.name, String(inputImages.length + 1)) : file.name, 
             dimensions: { 
@@ -255,7 +257,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       set({ variants });
       
       for (let i = 0; i < inputImages.length; i++) {
-        const outputImages = get().outputImages;
+        const outputImages = [...get().outputImages];
         const image = await generateOutputImage(inputImages[i], variant);
         outputImages.push(image);
         set({ outputImages });
