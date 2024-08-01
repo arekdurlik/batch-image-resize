@@ -13,15 +13,19 @@ export function Resizer({ onReset }: { onReset?: () => void }) {
     setTimeout(() => setCancelHover(false));
   }
 
-  return <>
-    <PanelResizeHandle style={{ zIndex: 5, position: 'relative', top: 4 }} onDragging={setDragging} />
+  return <Wrapper>
+    <PanelResizeHandle style={{ zIndex: 5, position: 'relative' }} onDragging={setDragging} />
     <StyledHandle>
       <ResizerWrapper onDoubleClick={handleDoubleClick} className={cancelHover ? 'no-hover' : ''}>
         <ResizerHandle $dragging={dragging} />
       </ResizerWrapper>
     </StyledHandle>  
-  </>
+  </Wrapper>
 }
+
+const Wrapper = styled.div`
+position: relative;
+`
 
 const ResizerHandle = styled.div<{ $dragging: boolean }>`
 position: relative;
@@ -39,7 +43,7 @@ ${props => props.$dragging && `
 
 const ResizerWrapper = styled.div`
 position: absolute;
-top: 0px;
+top: -5px;
 left: 0;
 right: 0;
 bottom: 0px;
@@ -68,7 +72,7 @@ z-index: 4;
 `
 
 const StyledHandle = styled.div`
-position: relative;
-height: 5px;
+position: absolute;
+height: 0px;
 width: 100%;
 `

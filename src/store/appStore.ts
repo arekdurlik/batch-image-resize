@@ -22,7 +22,7 @@ async function regenerateVariantOutputImages(variant: Variant) {
   regenerateVariantOutputImagesIndex += 1;
   const currentIndex = regenerateVariantOutputImagesIndex;
   
-  const inputImages = useAppStore.getState().inputImages;
+  const inputImages = [...useAppStore.getState().inputImages];
   const outputImages: OutputImageData[] = [...useAppStore.getState().outputImages];
 
   for (let i = 0; i < outputImages.length; i++) {
@@ -102,15 +102,11 @@ async function generateOutputImage(inputImage: InputImageData, variant: Variant)
       height: newHeight
     },
 
-    filename: {
-      overwritten: false,
-      value: filename
-    },
+    overwriteFilename: false,
+    filename: filename,
 
-    quality: {
-      overwritten: false,
-      value: quality
-    }
+    overwriteQuality: false,
+    quality: quality
   }
 }
 
@@ -129,7 +125,6 @@ type AppStore = {
     addInputImage: (file: File, width: number, height: number) => void
     addInputImages: (images: { file: File, width: number, height: number }[]) => void
 
-    setImageFiles: (images: InputImageData[]) => void
     setQuality: (quality: number) => void
     setIndexAsName: (indexAsName: boolean) => void
     setPrefix: (prefix: string) => void
@@ -161,14 +156,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
     crop: false
   }],
 
-  quality: 100,
+  quality: 1,
   indexAsName: false,
   prefix: '',
   suffix: '',
 
   api: {
     addInputImage: async (file, width, height) => {
-      const inputImages = get().inputImages;
+      const inputImages = [...get().inputImages];
       const indexAsName = get().indexAsName;
       const id = uuid();
 
@@ -241,7 +236,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
         set({ addingInputImages: false });
       }
     },
-    setImageFiles: (inputImages) => set({ inputImages }),
     setQuality: async (quality) => {
       set({ quality })
 
@@ -326,7 +320,7 @@ const setVariantPrefixAndSuffix = function(id: string, prefix: string | undefine
 
   outputImages.forEach(image => {
     if (image.variantId === variants[variantIndex].id) {
-      image.filename.value = insertVariantDataToFilename(
+      image.filename = insertVariantDataToFilename(
         image.inputImageFilename,
         variants[variantIndex].prefix,
         variants[variantIndex].suffix

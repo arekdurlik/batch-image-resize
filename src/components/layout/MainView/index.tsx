@@ -1,9 +1,9 @@
 import styled from 'styled-components'
-import { Input } from './Input'
-import { Output } from './Output'
 import { ImperativePanelGroupHandle, Panel, PanelGroup } from 'react-resizable-panels'
 import { Resizer } from './Resizer'
 import { useRef } from 'react'
+import { InputImageList } from './InputImageList'
+import { OutputImageList } from './OutputImageList'
 
 export function MainView() {
   const panelGroup = useRef<ImperativePanelGroupHandle>(null!);
@@ -15,11 +15,11 @@ export function MainView() {
   return <Wrapper>
     <PanelGroup ref={panelGroup} direction="vertical">
       <Panel minSize={10}>
-        <Input/>
+        <InputImageList/>
       </Panel>
       <Resizer onReset={handleReset}/>
       <Panel minSize={10}>
-        <Output/>
+        <OutputImageList/>
       </Panel>
     </PanelGroup>
   </Wrapper>

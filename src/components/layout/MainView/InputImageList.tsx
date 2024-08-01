@@ -1,18 +1,22 @@
 import styled from 'styled-components'
 import { DropZone } from './DropZone'
 import { SectionHeader, SectionTitle } from '../../styled/globals'
-import { InputImageList } from './ImageList/InputImageList'
+import { useAppStore } from '../../../store/appStore'
+import { ImageList } from './ImageList'
 
-export function Input() {
+export function InputImageList() {
+  const images = useAppStore(state => state.inputImages);
+  useAppStore(state => state.totalInputImagesSize); // reload images
+
   return (
     <>
       <FixedTitle>
         <SectionHeader>
-          <SectionTitle>Input</SectionTitle>
+          <SectionTitle>Input images</SectionTitle>
         </SectionHeader>
       </FixedTitle>
       <Wrapper>
-        <InputImageList/>
+        <ImageList images={images}/>
         <DropZone/>
       </Wrapper>
     </>
@@ -29,6 +33,6 @@ width: 100%;
 const Wrapper = styled.div`
 overflow-y: scroll;
 position: relative;
-height: calc(100%);
-padding-top: 40px;
+height: calc(100% - 50px);
+margin-top: 50px;
 `

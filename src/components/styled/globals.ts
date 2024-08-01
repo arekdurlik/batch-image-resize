@@ -14,35 +14,56 @@ export const Button = styled.button`
   align-items: center;
   gap: 5px;
   width: fit-content;
-
-  transition: background-color ${transitions.button};
-
+  
   &:hover {
     background-color: ${props => props.theme.inputBackgroundHover};
     cursor: pointer;
   }
-
+  
+  
+    outline: 1px solid transparent;
+    outline-offset: -2px;
+    transition: ${transitions.button};
   &:focus {
-  border-color: ${props => props.theme.blue};
-  box-shadow: 
-    inset 1px 1px ${props => props.theme.blue}, 
-    inset 1px -1px ${props => props.theme.blue}, 
-    inset -1px -1px ${props => props.theme.blue}, 
-    inset -1px 1px ${props => props.theme.blue};
-    z-index: 1;
+    outline: 2px solid ${props => props.theme.blue};
+    outline-offset: -2px;
+  
   }
-
   svg {
     font-size: 16px;
   }
 `
 
+export const ButtonGroup = styled.div`
+display: flex;
+& > {
+
+  &:first-child {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0;
+  }
+
+  
+  &:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  &:not(:first-child) {
+    margin-left: -1px;
+  }
+
+}
+`
+
 export const SectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 10px;
 
-  padding: 10px;
+  padding: 0 10px;
+  height: 50px;
   border-bottom: 1px solid ${props => props.theme.border};
 `
 

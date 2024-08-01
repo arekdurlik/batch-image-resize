@@ -24,19 +24,19 @@ export type OutputImageData = {
     thumbnail: Blob
   },
 
-  filename: {
-    overwritten: boolean,
-    value: string
-  }
-  quality: {
-    overwritten: boolean,
-    value: number
-  }
+  overwriteFilename: boolean
+  filename: string
+
+  overwriteQuality: boolean
+  quality: number
+
   dimensions: {
     width: number,
     height: number
   }
 };
+
+export type ImageData = InputImageData | OutputImageData;
 
 export type Variant = {
   id: string
