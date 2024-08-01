@@ -10,8 +10,8 @@ const Container = styled.div`
 position: fixed;
 padding: 20px;
 width: 100%;
-border-bottom: 1px solid ${props => props.theme.border};
+border-bottom: 1px solid var(--borderColor-default);
 backdrop-filter: blur(70px);
-background-color: ${props => `${props.theme.background}` + '99'};
+background-color: var(--bgColor-default-transparent);
 z-index: 10;
 `

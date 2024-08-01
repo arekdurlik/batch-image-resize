@@ -31,13 +31,13 @@ const ResizerHandle = styled.div<{ $dragging: boolean }>`
 position: relative;
 width: 100%;
 height: 1px;
-background-color: ${props => props.theme.border};
+background-color: var(--borderColor-default);
 transition: 150ms;
 
 ${props => props.$dragging && `
   transition: none !important;
   height: 5px;
-  background-color: #41a9ee;
+  background-color: var(--color-blue-5);
 `}
 `
 
@@ -57,14 +57,14 @@ z-index: 4;
 &:hover {
   ${ResizerHandle} {
     height: 5px;
-    background-color: #41a9ee;
+    background-color: var(--color-blue-5);
     transition-delay: 300ms;
 }
 
 &.no-hover {
   ${ResizerHandle} {
     height: 1px;
-    background-color: ${props => props.theme.border};
+    background-color: var(--borderColor-default);
     transition-delay: 0ms;
   }
 }

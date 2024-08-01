@@ -1,5 +1,6 @@
 import { ChangeEventHandler } from 'react'
 import styled from 'styled-components'
+import { outline } from '../../styles/mixins/outline'
 
 type Props = {
   label?: string
@@ -35,21 +36,15 @@ font-weight: 500;
 `
 
 const Input = styled.input`
+${outline}
+
 font-weight: 400;
-background-color: ${props => props.theme.inputBackground};
-border: 1px solid ${props => props.theme.border};
-border-radius: ${props => props.theme.borderRadius};
+background-color: var(--button-default-bgColor-rest);
+border: 1px solid var(--borderColor-default);
+border-radius: var(--borderRadius-default);
 padding: 3px 6px;
 width: 100%;
 min-height: 30px;
-transition: border-color 150ms;
+transition: border-color var(--transition-default);
 
-&:focus {
-  border-color: ${props => props.theme.blue};
-  box-shadow: 
-    inset 1px 1px ${props => props.theme.blue}, 
-    inset 1px -1px ${props => props.theme.blue}, 
-    inset -1px -1px ${props => props.theme.blue}, 
-    inset -1px 1px ${props => props.theme.blue};
-}
 `

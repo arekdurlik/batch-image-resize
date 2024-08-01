@@ -115,10 +115,10 @@ ${({ $type }) => {
 
 const Content = styled.div`
 position: relative;
-background-color: ${props => props.theme.background};
-border: 1px solid ${props => props.theme.border};
+background-color: var(--bgColor-default);
+border: 1px solid var(--borderColor-default);
 padding: 10px;
-border-radius: ${props => props.theme.borderRadius};
+border-radius: var(--borderRadius-default);
 overflow: hidden;
 white-space: pre-wrap;
 
@@ -144,10 +144,10 @@ display: flex;
 align-items: center;
 font-size: 16px;
 padding-left: 20px;
-transition: 0.15s;
+transition: var(--transition-default);
 
 svg {
-  fill: ${props => props.theme.text};
+  fill: var(--fgColor-default);
 }
 
 &:hover {
@@ -161,6 +161,6 @@ position: absolute;
 bottom: 0;
 left: 0px;
 height: 6px;
-background-color: ${props => props.theme.border};
+background-color: var(--borderColor-default);
 opacity: 0.25;
 `

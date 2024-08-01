@@ -53,21 +53,22 @@ padding: 4px;
     position: absolute;
     inset: 0;
     pointer-events: none;
-    border-radius: ${props => props.theme.borderRadius};
-    background-color:#35aeff;
+    border-radius: var(--borderRadius-default);
     opacity: 0;
-    transition: 50ms;
+    transition: var(--transition-fast);
   }
 
   &:hover {
     &::before {
-      opacity: 0.2;
+      opacity: 1;
+      background-color: var(--color-blue-0);
     }
   }
-
+  
   &:active {
     &::before {
-      opacity: 0.4;
+      opacity: 1;
+      background-color: var(--color-blue-1);
     }
   }
 `
@@ -81,7 +82,7 @@ user-select: none;
 `
 export const Image = styled.img`
 max-height: 100px;
-border-radius: ${props => props.theme.borderRadius};
+border-radius: var(--borderRadius-default);
 z-index: 2;
 overflow-clip-margin: none;
 `

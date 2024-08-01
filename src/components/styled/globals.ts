@@ -1,34 +1,40 @@
 import styled from 'styled-components'
-import { transitions } from '../../styles/shared'
+import { outline } from '../../styles/mixins/outline'
 
 export const Button = styled.button`
-  border: 1px solid ${props => props.theme.border};
-  border-radius: ${props => props.theme.borderRadius};
-  background-color: ${props => props.theme.inputBackground};
-  color: ${props => props.theme.text};
-  padding: 3px 10px;
-  font-weight: 500;
-  min-height: 30px;
+  ${outline}
+
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 5px;
+
+  border: 1px solid var(--borderColor-default);
+  border-radius: var(--borderRadius-default);
+  background-color: var(--button-default-bgColor-rest);
+  color: var(--button-default-fgColor-rest);
+  padding: 3px 10px;
+  font-weight: 500;
+  min-height: 30px;
   width: fit-content;
-  
+  cursor: pointer;
+  transition: 
+    background-color var(--transition-default), 
+    outline var(--transition-fast);
+
   &:hover {
-    background-color: ${props => props.theme.inputBackgroundHover};
-    cursor: pointer;
+    background-color: var(--button-default-bgColor-hover);
+  }
+
+  &:active {
+    background-color: var(--button-default-bgColor-active);
+  }
+
+  &:focus-visible {
+    // button group collapsed border fix
+    z-index: 1;
   }
   
-  
-    outline: 1px solid transparent;
-    outline-offset: -2px;
-    transition: ${transitions.button};
-  &:focus {
-    outline: 2px solid ${props => props.theme.blue};
-    outline-offset: -2px;
-  
-  }
   svg {
     font-size: 16px;
   }
@@ -36,6 +42,7 @@ export const Button = styled.button`
 
 export const ButtonGroup = styled.div`
 display: flex;
+
 & > {
 
   &:first-child {
@@ -64,7 +71,7 @@ export const SectionHeader = styled.div`
 
   padding: 0 10px;
   height: 50px;
-  border-bottom: 1px solid ${props => props.theme.border};
+  border-bottom: 1px solid var(--borderColor-default);
 `
 
 export const SectionTitle = styled.h2`
@@ -81,5 +88,5 @@ export const SideBarSection = styled.div<{ $animate?: boolean }>`
 
 export const SectionGroup = styled.div`
   padding: 10px;
-  border-bottom: 1px solid ${props => props.theme.border};
+  border-bottom: 1px solid var(--borderColor-default);
 `

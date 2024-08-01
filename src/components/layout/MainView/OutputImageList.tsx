@@ -59,7 +59,7 @@ export function OutputImageList() {
 const FixedTitle = styled.div`
 position: absolute;
 z-index: 3;
-background: ${props => `linear-gradient(to top, ${props.theme.backgroundTransparent}, ${props.theme.background} 85%)`};
+background: linear-gradient(to top, var(--bgColor-default-transparent), var(--bgColor-default) 85%);
 backdrop-filter: blur(15px);
 width: 100%;
 `
@@ -70,7 +70,7 @@ height: calc(100%);
 padding-top: 50px;
 
 &::-webkit-scrollbar {
-    background-color: ${props => props.theme.background};
+    background-color: var(--bgColor-default);
     
 }
 
@@ -83,7 +83,7 @@ padding-top: 50px;
     background-color: #bbb;
     border-radius: 20px;
     border: 0.2vw solid #eee;
-    transition: background-color 150ms;
+    transition: background-color var(--transition-default);
     
     &:hover {
       background-color: #aaa;

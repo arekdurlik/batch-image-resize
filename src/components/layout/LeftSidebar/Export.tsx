@@ -56,7 +56,7 @@ export function Export() {
 }
 
 const Wrapper = styled.div`
-border-top: 1px solid ${props => props.theme.border};
+border-top: 1px solid var(--borderColor-default);
 display: grid;
 place-items: center;
 gap: 5px;
@@ -66,10 +66,10 @@ padding: 5px;
 
 const StyledButton = styled(Button)`
 background-color: #267e32;
-color: ${props => props.theme.background};
+color: var(--bgColor-default);
  
 svg {
-  fill: ${props => props.theme.background};
+  fill: var(--bgColor-default);
 }
 
 &:hover {

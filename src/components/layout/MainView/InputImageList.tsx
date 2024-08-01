@@ -26,8 +26,7 @@ export function InputImageList() {
 const FixedTitle = styled.div`
 position: absolute;
 z-index: 3;
-background: ${props => `linear-gradient(to top, ${props.theme.backgroundTransparent}, ${props.theme.background} 85%)`};
-backdrop-filter: blur(15px);
+background: linear-gradient(to top, var(--bgColor-default-transparent), var(--bgColor-default) 85%);
 width: 100%;
 `
 const Wrapper = styled.div`

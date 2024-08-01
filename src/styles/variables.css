@@ -1,0 +1,45 @@
+:root {
+  --color-blue-0: hsl(212, 100%, 90%); 
+  --color-blue-1: hsl(212, 100%, 82%); 
+  --color-blue-2: hsl(212, 100%, 74%); 
+  --color-blue-3: hsl(212, 100%, 66%); 
+  --color-blue-4: hsl(212, 100%, 58%);
+  --color-blue-5: hsl(212, 100%, 50%);
+  --color-blue-6: hsl(212, 100%, 42%);
+  --color-blue-7: hsl(212, 100%, 34%);
+  --color-blue-8: hsl(212, 100%, 26%);
+  --color-blue-9: hsl(212, 100%, 18%);
+
+  --transition-fast: 75ms;
+  --transition-default: 150ms;
+  --transition-slow: 300ms;
+
+  --borderWidth: 1px;
+  --borderRadius-small: 2.5px;
+  --borderRadius-default: 5px;
+  --borderRadius-large: 10px;
+  --borderRadius-full: 9999px;
+
+  --outlineColor: var(--color-blue-5);
+  --outlineOffset: -2px;
+
+  --fgColor-default:  hsl(200, 3%, 17%);
+  --fgColor-muted:    hsl(200, 3%, 25%);
+  --fgColor-inverse:  hsl(208, 33%, 91%);
+
+  --bgColor-default:              hsl(0, 0%, 98%);
+  --bgColor-default-transparent:  hsla(0, 0%, 98%, 0.867);
+  --bgColor-muted:                hsl(0, 0%, 90%);
+  --bgColor-inverse:              hsl(0, 0%, 2%);
+
+  --borderColor-default: hsl(220, 11%, 78%);
+
+  --button-default-fgColor-rest:      var(--fgColor-default);
+  --button-default-bgColor-rest:    hsl(218, 65%, 97%);
+  --button-default-bgColor-hover:   hsl(218, 65%, 94%);
+  --button-default-bgColor-active:  hsl(218, 65%, 90%);
+  --button-default-bgColor-selected:  var(--button-default-bgColor-active);
+  --button-default-borderColor:       var(--borderColor-default);
+
+  --input-bgColor: var(--button-default-bgColor-rest);
+}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { GoTriangleDown } from 'react-icons/go'
 import { MdCheck } from 'react-icons/md'
 import styled from 'styled-components'
+import { outline } from '../../styles/mixins/outline'
 
 type Props = {
   label?: string
@@ -87,11 +88,13 @@ export function SelectInput({ value, options, rightAligned = false, onChange }: 
 }
 
 const Select = styled.div`
+${outline}
+
 position: relative;
 font-weight: 400;
-background-color: ${props => props.theme.inputBackground};
-border: 1px solid ${props => props.theme.border};
-border-radius: ${props => props.theme.borderRadius};
+background-color: var(--button-default-bgColor-rest);
+border: 1px solid var(--borderColor-default);
+border-radius: var(--borderRadius-default);
 padding: 3px 6px;
 display: flex;
 min-height: 30px;
@@ -102,16 +105,8 @@ justify-content: flex-end;
 transition: border-color 150ms;
 
 &:hover {
-  background-color: ${props => props.theme.inputBackgroundHover};
+  background-color: var(--button-default-bgColor-hover);
   cursor: pointer;
-}
-&:focus {
-  border-color: ${props => props.theme.blue};
-  box-shadow: 
-    inset 1px 1px ${props => props.theme.blue}, 
-    inset 1px -1px ${props => props.theme.blue}, 
-    inset -1px -1px ${props => props.theme.blue}, 
-    inset -1px 1px ${props => props.theme.blue};
 }
 `
 
@@ -135,7 +130,7 @@ min-width: max-content;
 width: 100%;
 overflow: hidden;
 padding: 5px;
-border-radius: ${props => props.theme.borderRadius};
+border-radius: var(--borderRadius-default);
 box-shadow: 0px 3px 6px 0px #424a531f;
 
 @keyframes fade-in {
@@ -153,8 +148,8 @@ animation-name: fade-in;
 animation-duration: 150ms;
 
 ${props => props.$rightAligned ? 'right: 0' : 'left: 0'};
-background-color: ${props => props.theme.background};
-border: 1px solid ${props => props.theme.border};
+background-color: var(--bgColor-default);
+border: 1px solid var(--borderRadius-default);
 `
 
 const Check = styled(MdCheck)<{ $visible: boolean }>`
@@ -166,12 +161,12 @@ align-items: center;
 gap: 5px;
 padding: 5.5px 10px;
 cursor: pointer;
-transition: 150ms;
-border-radius: ${props => props.theme.borderRadius};
+transition: var(--transition-default);
+border-radius: var(--borderRadius-default);
 
 &:hover {
-  background-color: ${props => props.theme.inputBackground};
+  background-color: var(--button-default-bgColor-rest);
 }
 
-${props => props.$highlighted && `background-color: ${props.theme.inputBackground}`};
+${props => props.$highlighted && outline};
 `
