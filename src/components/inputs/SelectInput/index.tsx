@@ -1,14 +1,20 @@
 import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { Option as OptionType, Placement, Props } from './types'
 import { Check, Option, Options, Select, SelectedOption, Triangle } from './styled'
+import { createPortal } from 'react-dom'
 
 export function SelectInput({ value, options, rightAligned = false, onChange }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const [placement, setPlacement] = useState(Placement.BOTTOM);
+  const [renderParams, setRenderParams] = useState({
+    placement: Placement.BOTTOM,
+    x: 0,
+    y: 0
+  });
   
   const ref = useRef<HTMLDivElement>(null!);
   const optionsContainerRef = useRef<HTMLUListElement>(null);
+  const overlay = useRef<HTMLDivElement>(document.querySelector('#overlay')!);
 
   const optionsRefMap = useMemo(() => new Map(), []);
   const currentLabel = options.find(o => o.value === value)?.label;
@@ -37,12 +43,21 @@ export function SelectInput({ value, options, rightAligned = false, onChange }: 
     if (!options) return;
 
     if (isOpen) {
-      const { bottom } = options.getBoundingClientRect();
-      
-      if (bottom > window.innerHeight) {
-        setPlacement(Placement.TOP)
+      const button = ref.current.getBoundingClientRect();
+
+
+      if (button.bottom + options.offsetHeight > window.innerHeight) {
+        setRenderParams({
+          placement: Placement.TOP,
+          x: button.left,
+          y: button.top - options.offsetHeight
+        });
       } else {
-        setPlacement(Placement.BOTTOM);
+        setRenderParams({
+          placement: Placement.BOTTOM,
+          x: button.left,
+          y: button.top + button.height
+        });
       }
     }
   }, [isOpen]);
@@ -85,7 +100,6 @@ export function SelectInput({ value, options, rightAligned = false, onChange }: 
 
   function handleOpen() {
     setIsOpen(prev => !prev);
-    setPlacement(Placement.BOTTOM); // default placement
   }
 
   function handleSelect(option: OptionType) {
@@ -102,28 +116,29 @@ export function SelectInput({ value, options, rightAligned = false, onChange }: 
       ref={ref}
       tabIndex={0}
       onClick={handleOpen} 
-      onBlur={() => { setIsOpen(false); ref.current.blur() }}
     >
       <SelectedOption>{currentLabel}</SelectedOption>
       <Triangle/>
       {isOpen && (
-        <Options 
-          ref={optionsContainerRef} 
-          $rightAligned={rightAligned} 
-          $placement={placement}
-        >
-          {options.map((option, i) => (
-            <Option 
-              ref={node => node && optionsRefMap.set(i, node)}
-              key={option.label + option.value}
-              onClick={handleSelect(option)}
-              $highlighted={i === highlightedIndex}
-            > 
-              <Check $visible={option.value === value}/>
-              {option.label}
-            </Option>
-          ))}
-        </Options>
+        createPortal((
+          <Options 
+            ref={optionsContainerRef} 
+            $rightAligned={rightAligned} 
+            $renderParams={renderParams}
+          >
+            {options.map((option, i) => (
+              <Option 
+                ref={node => node && optionsRefMap.set(i, node)}
+                key={option.label + option.value}
+                onClick={handleSelect(option)}
+                $highlighted={i === highlightedIndex}
+              > 
+                <Check $visible={option.value === value}/>
+                {option.label}
+              </Option>
+            ))}
+          </Options>
+        ), overlay.current)
       )}
     </Select>
   )

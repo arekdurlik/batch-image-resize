@@ -1,6 +1,6 @@
 import { MdCheck } from 'react-icons/md'
 import styled from 'styled-components'
-import { outline } from '../../../styles/mixins/outline'
+import { outline, outlineActive } from '../../../styles/mixins/outline'
 import { Placement } from './types'
 import { GoTriangleDown } from 'react-icons/go'
 
@@ -41,11 +41,10 @@ top: 1px;
 pointer-events: none;
 `
 
-export const Options = styled.ul<{ $rightAligned: boolean, $placement: Placement }>`
+export const Options = styled.ul<{ $rightAligned: boolean, $renderParams: { placement: Placement, x: number, y: number } }>`
 list-style: none;
 position: absolute;
 min-width: max-content;
-width: 100%;
 overflow: hidden;
 padding: 5px;
 border: 1px solid var(--borderColor-default);
@@ -54,34 +53,24 @@ box-shadow: var(--shadow-default);
 background-color: var(--bgColor-default);
 cursor: default;
 
-@keyframes fade-down {
+left: ${props => props.$renderParams.x}px;
+top: ${props => props.$renderParams.y}px;
+opacity: 0;
+
+@keyframes slide-in {
   from  {
-    top: calc(100% - 4px);
+    top: ${props => props.$renderParams.y + (props.$renderParams.placement === Placement.BOTTOM ? -4 : 4)}px;
     opacity: 0;
   }
   to {
-      top: calc(100% + 4px);
+    top: ${props => props.$renderParams.y + (props.$renderParams.placement === Placement.BOTTOM ? 4 : -4)}px;
     opacity: 1;
   }
 }
 
-@keyframes fade-up {
-  from  {
-    bottom: calc(100% - 4px);
-    opacity: 0;
-  }
-  to {
-    bottom: calc(100% + 4px);
-    opacity: 1;
-  }
-}
-
-animation-name: ${props => props.$placement === Placement.BOTTOM ? 'fade-down' : 'fade-up'};
-animation-duration: 150ms;
+animation-name: slide-in; 
+animation-duration: 200ms;
 animation-fill-mode: forwards;
-
-${props => props.$rightAligned ? 'right: 0' : 'left: 0'};
-background-color: var(--bgColor-default);
 `
 
 export const Check = styled(MdCheck)<{ $visible: boolean }>`
@@ -93,12 +82,12 @@ align-items: center;
 gap: 5px;
 padding: 5.5px 10px;
 cursor: pointer;
-transition: var(--transition-default);
+transition: background-color var(--transition-default);
 border-radius: var(--borderRadius-default);
 
 &:hover {
   background-color: var(--button-default-bgColor-rest);
 }
 
-${props => props.$highlighted && outline};
+${props => props.$highlighted && outlineActive};
 `

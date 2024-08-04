@@ -4,6 +4,7 @@ import { useAppStore } from '../../../store/appStore'
 import { ImageList } from './ImageList'
 import { SectionHeader, SectionTitle } from '../../styled'
 import { useMemo } from 'react'
+import { removeFileExtension } from '../../../lib/helpers'
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
@@ -12,7 +13,7 @@ export function InputImageList() {
   useAppStore(state => state.totalInputImagesSize); // reload images
 
   const sortedImages = useMemo(() => (
-    images.sort((a, b) => collator.compare(a.filename, b.filename))
+    images.sort((a, b) => collator.compare(removeFileExtension(a.filename), removeFileExtension(b.filename)))
   ), [images]);
 
   return (
@@ -40,6 +41,7 @@ height: 100%;
 const FixedTitle = styled.div`
 width: 100%;
 `
+
 const ImageListWrapper = styled.div`
 position: relative;
 overflow-y: scroll;

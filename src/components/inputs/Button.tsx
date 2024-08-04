@@ -34,9 +34,9 @@ const StyledButton = styled.button`
   border-radius: var(--borderRadius-default);
   background-color: var(--button-default-bgColor-rest);
   color: var(--button-default-fgColor-rest);
-  padding: 3px 10px;
+  padding: 3px 7px;
   font-weight: 500;
-  min-height: 30px;
+  min-height: 29px;
   width: fit-content;
   cursor: pointer;
   transition: 

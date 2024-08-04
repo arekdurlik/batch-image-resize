@@ -52,4 +52,15 @@ ul {
   isolation: isolate;
   height: 100vh;
 }
+
+#portal {
+  position: absolute;
+  inset: 0;
+  z-index: 1222;
+  pointer-events: none;
+
+  > * {
+    pointer-events: all;
+  }
+}
 `
