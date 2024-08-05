@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
 import { FileRejection, useDropzone } from 'react-dropzone'
-import { useAppStore } from '../../../store/appStore'
 import styled from 'styled-components'
+import { useInputImages } from '../../../store/inputImages'
 
 export function DropZone() {
-  const api = useAppStore(state => state.api);
+  const api = useInputImages(state => state.api);
 
   const onDrop = useCallback((acceptedFiles : File[], fileRejections: FileRejection[]) => {
     if (fileRejections.length) {
@@ -21,7 +21,7 @@ export function DropZone() {
         images.push({ file, width: img.width, height: img.height })
         
         if (index === acceptedFiles.length - 1) {
-          api.addInputImages(images);
+          api.add(images);
         }
       }
       img.src = URL.createObjectURL(file);

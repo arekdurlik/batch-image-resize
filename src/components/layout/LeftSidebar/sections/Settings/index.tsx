@@ -1,11 +1,11 @@
 import { ChangeEvent, useState } from 'react'
 import { Rename } from './Rename'
-import { useAppStore } from '../../../../../store/appStore'
+import { useApp } from '../../../../../store/app'
 import { SectionGroup, SectionHeader, SectionTitle } from '../../../../styled'
 
 export function Settings() {
   const [quality, setQuality] = useState(1);
-  const api = useAppStore(state => state.api);
+  const api = useApp(state => state.api);
 
   function handleQuality(event: ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;

@@ -1,23 +1,25 @@
 import { IoMdAdd } from "react-icons/io";
-import { useAppStore } from '../../../../../store/appStore'
 import { Button } from '../../../../inputs/Button'
+import { useVariants } from '../../../../../store/variants'
 
 let index = 0;
 
 export function AddVariant() {
-  const api = useAppStore(state => state.api);
+  const api = useVariants(state => state.api);
 
   function handleAdd() {
     index++;
 
-    api.addVariant({
+    api.add({
       id: `v-${Date.now()}`,
       index,
       width: undefined,
       height: undefined,
       prefix: '',
       suffix: '',
-      crop: false
+      crop: false,
+      overWriteQuality: false,
+      quality: 1
     });
   }
 

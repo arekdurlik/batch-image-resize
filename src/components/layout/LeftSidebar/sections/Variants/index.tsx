@@ -1,10 +1,10 @@
-import { useAppStore } from '../../../../../store/appStore'
+import { useVariants } from '../../../../../store/variants'
 import { SectionHeader, SectionTitle } from '../../../../styled'
 import { AddVariant } from './AddVariant'
 import { Variant } from './Variant'
 
 export function Variants() {
-  const variants = useAppStore(state => state.variants);
+  const variants = useVariants(state => state.variants);
 
   return (
     <>

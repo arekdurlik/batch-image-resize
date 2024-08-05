@@ -1,16 +1,16 @@
 import styled from 'styled-components'
 import { DropZone } from './DropZone'
-import { useAppStore } from '../../../store/appStore'
 import { ImageList } from './ImageList'
 import { SectionHeader, SectionTitle } from '../../styled'
 import { useMemo } from 'react'
 import { removeFileExtension } from '../../../lib/helpers'
+import { useInputImages } from '../../../store/inputImages'
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 export function InputImageList() {
-  const images = useAppStore(state => state.inputImages);
-  useAppStore(state => state.totalInputImagesSize); // reload images
+  const images = useInputImages(state => state.images);
+  useInputImages(state => state.totalSize); // reload images
 
   const sortedImages = useMemo(() => (
     images.sort((a, b) => collator.compare(removeFileExtension(a.filename), removeFileExtension(b.filename)))

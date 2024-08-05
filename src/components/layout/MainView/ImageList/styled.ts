@@ -87,6 +87,7 @@ width: 100px;
 border-radius: var(--borderRadius-default);
 z-index: 2;
 overflow-clip-margin: none;
+object-fit: cover;
 `
 
 export const Title = styled.span`

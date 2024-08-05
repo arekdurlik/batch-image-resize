@@ -2,7 +2,6 @@ import styled from 'styled-components'
 import { SelectInput } from '../../inputs/SelectInput'
 import { useCallback, useMemo, useState } from 'react'
 import { MdArrowDownward, MdArrowUpward, MdClose, MdMoreHoriz } from 'react-icons/md'
-import { useAppStore } from '../../../store/appStore'
 import { ImageList } from './ImageList'
 import { SortDirection, SortType } from './ImageList/types'
 import { Button } from '../../inputs/Button'
@@ -11,6 +10,8 @@ import { compare, removeFileExtension } from '../../../lib/helpers'
 import { OutputImageData } from '../../../store/types'
 import { ButtonGroup } from '../../inputs/styled'
 import { TextInput } from '../../inputs/TextInput'
+import { useVariants } from '../../../store/variants'
+import { useOutputImages } from '../../../store/outputImages'
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
@@ -18,8 +19,8 @@ export function OutputImageList() {
   const [sortOption, setSortOption] = useState<SortType>(SortType.FILENAME);
   const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.ASC);
   const [filter, setFilter] = useState('');
-  const images = useAppStore(state => state.outputImages);
-  const variants = useAppStore(state => state.variants);
+  const images = useOutputImages(state => state.images);
+  const variants = useVariants(state => state.variants);
 
   const sortingMethod = useCallback((a: OutputImageData, b: OutputImageData) => {
     switch(sortOption) {

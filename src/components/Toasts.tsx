@@ -2,13 +2,13 @@ import { animated, useTransition } from '@react-spring/web'
 import { useCallback, useMemo } from 'react'
 import { MdCheckCircle, MdError, MdInfo, MdWarning } from 'react-icons/md'
 import styled from 'styled-components'
-import { ToastType, useToastsState } from '../store/toastsState'
+import { ToastType, useToasts } from '../store/toasts'
 import { IoMdClose } from 'react-icons/io'
 
 export function Toasts() {
   const refMap = useMemo(() => new WeakMap(), []);
   const cancelMap = useMemo(() => new WeakMap(), []);
-  const toastsState = useToastsState();
+  const toastsState = useToasts();
 
   const transitions = useTransition(toastsState.toasts, {
     from: { opacity: 0, height: 0, life: '100%' },

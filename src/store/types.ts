@@ -1,5 +1,6 @@
 export type InputImageData = { 
   id: string
+  index: number
   
   image: {
     full: File
@@ -46,6 +47,8 @@ export type Variant = {
   prefix: string
   suffix: string
   crop: boolean
+  overWriteQuality: boolean
+  quality: number
 };
 
 export type VariantUpdate = keyof Partial<Omit<Variant, 'id'>>;

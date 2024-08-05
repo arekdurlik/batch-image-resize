@@ -1,22 +1,22 @@
 import { ChangeEvent, useCallback, useRef, useState } from 'react'
-import { useAppStore } from '../../../../../store/appStore'
 import { Variant as VariantType } from '../../../../../store/types'
 import { IoMdTrash } from 'react-icons/io'
 import styled from 'styled-components'
-import { useToastsState } from '../../../../../store/toastsState'
+import { useToasts } from '../../../../../store/toasts'
 import { HorizontalInputGroup, VerticalInputGroup } from '../../../../inputs/styled'
 import { TextInput } from '../../../../inputs/TextInput'
 import { Checkbox } from '../../../../inputs/Checkbox'
 import { SectionGroup, SideBarSection } from '../../../../styled'
 import { Button } from '../../../../inputs/Button'
+import { useVariants } from '../../../../../store/variants'
 
 export function Variant(variant: VariantType & { index: number }) {
   const [width, setWidth] = useState(variant.width ?? '');
   const [height, setHeight] = useState(variant.height ?? '');
   const [crop, setCrop] = useState(variant.crop ?? false);
-  const api = useAppStore(state => state.api);
+  const api = useVariants(state => state.api);
   const timeoutId = useRef<NodeJS.Timeout>();
-  const openToast = useToastsState(state => state.openToast);
+  const openToast = useToasts(state => state.openToast);
 
   const widthRef = useRef<string | number>();
   const heightRef = useRef<string | number>();
@@ -26,12 +26,12 @@ export function Variant(variant: VariantType & { index: number }) {
 
   const updateStoreWidth = useCallback(() => {
     clearTimeout(timeoutId.current);
-    api.setVariantWidth(variant.id, widthRef.current ? Number(widthRef.current) : undefined);
+    api.setDimension('width', variant.id, widthRef.current ? Number(widthRef.current) : undefined);
   }, [api, variant.id]);
 
   const updateStoreHeight = useCallback(() => {
     clearTimeout(timeoutId.current);
-    api.setVariantHeight(variant.id, heightRef.current ? Number(heightRef.current) : undefined);
+    api.setDimension('height', variant.id, heightRef.current ? Number(heightRef.current) : undefined);
   }, [api, variant.id]);
 
   const showToast = useCallback(() => 
@@ -43,6 +43,9 @@ export function Variant(variant: VariantType & { index: number }) {
     clearTimeout(timeoutId.current);
 
     const value = event.target.value;
+
+    if (value === width) return;
+    
     const regex =/^[0-9]+$/;
 
     if (value.match(regex)) {
@@ -52,13 +55,16 @@ export function Variant(variant: VariantType & { index: number }) {
       setWidth('');
     } else return;
 
-    timeoutId.current = setTimeout(updateStoreWidth, 350);
-  }, [updateStoreWidth]);
+    timeoutId.current = setTimeout(updateStoreWidth, 50);
+  }, [width, updateStoreWidth]);
   
   const handleHeight = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     clearTimeout(timeoutId.current);
 
     const value = event.target.value;
+
+    if (value === height) return;
+
     const regex =/^[0-9]+$/;
     
     if (value.match(regex)) {
@@ -68,8 +74,8 @@ export function Variant(variant: VariantType & { index: number }) {
       setHeight('');
     } else return;
     
-    timeoutId.current = setTimeout(updateStoreHeight, 350);
-  }, [updateStoreHeight]);
+    timeoutId.current = setTimeout(updateStoreHeight, 50);
+  }, [height, updateStoreHeight]);
 
   return (
     <SectionGroup>
@@ -81,17 +87,17 @@ export function Variant(variant: VariantType & { index: number }) {
       </VariantName>
       <SideBarSection>
         <VerticalInputGroup>
-          <TextInput label='Prefix' value={variant.prefix} onChange={e => api.setVariantPrefix(variant.id, e.target.value)}/>
-          <TextInput label='Suffix' value={variant.suffix} onChange={e => api.setVariantSuffix(variant.id, e.target.value)} />
+          <TextInput label='Prefix' value={variant.prefix} onChange={e => api.setFilenamePart('prefix', variant.id, e.target.value)}/>
+          <TextInput label='Suffix' value={variant.suffix} onChange={e => api.setFilenamePart('suffix', variant.id, e.target.value)} />
         </VerticalInputGroup>
         <HorizontalInputGroup>
-          <TextInput label='Width' value={width ?? ''} onChange={handleWidth} onBlur={updateStoreWidth}/>
-          <TextInput label='Height' value={height ?? ''} onChange={handleHeight} onBlur={updateStoreHeight} />
+          <TextInput label='Width' value={width ?? ''} onChange={handleWidth}/>
+          <TextInput label='Height' value={height ?? ''} onChange={handleHeight}/>
         </HorizontalInputGroup>
         <Checkbox label='Crop into square' checked={crop} onChange={(e) => {
           const value = e.target.checked;
           setCrop(value);
-          api.setVariantCrop(variant.id, value);
+          api.setCrop(variant.id, value);
         }}/>
       </SideBarSection>
     </SectionGroup>

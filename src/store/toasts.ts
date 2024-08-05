@@ -13,7 +13,7 @@ type ToastsState = {
   closeToast: (id: number) => void
 };
 
-export const useToastsState = create<ToastsState>((set, get) => ({
+export const useToasts = create<ToastsState>((set, get) => ({
   id: 0,
   toasts: [],
   openToast: (type: ToastType, message: string) => {

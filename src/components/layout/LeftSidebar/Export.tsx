@@ -1,14 +1,16 @@
 import JSZip from 'jszip'
 import styled from 'styled-components'
 import { OutputImageData } from '../../../store/types'
-import { useAppStore } from '../../../store/appStore'
+import { useApp } from '../../../store/app'
 import { useMemo } from 'react'
 import { bytesToSizeFormatted } from '../../../lib/helpers'
 import { Button } from '../../inputs/Button'
+import { useOutputImages } from '../../../store/outputImages'
+import { useInputImages } from '../../../store/inputImages'
 
 export function Export() {
-  const { outputImages, totalInputImagesSize } = useAppStore();
-  const totalInputBytes = totalInputImagesSize;
+  const totalInputBytes = useInputImages(state => state.totalSize);
+  const outputImages = useOutputImages(state => state.images);
   const totalOutputBytes = useMemo(() => outputImages.reduce((a, b) => a + b.image.full.size, 0), [outputImages]);
   
   function zipItUp(zip: JSZip, outputImages: OutputImageData[]): Promise<JSZip[]> {

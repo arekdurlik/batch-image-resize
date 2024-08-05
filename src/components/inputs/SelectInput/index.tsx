@@ -39,18 +39,19 @@ export function SelectInput({ value, options, rightAligned = false, onChange }: 
 
   // set list placement based on screen bounds
   useEffect(() => {
-    const options = optionsContainerRef.current;
-    if (!options) return;
+    const optionsContainer = optionsContainerRef.current;
+    if (!optionsContainer) return;
 
     if (isOpen) {
+      setHighlightedIndex(options.findIndex(item => item.value === value));
+      
       const button = ref.current.getBoundingClientRect();
 
-
-      if (button.bottom + options.offsetHeight > window.innerHeight) {
+      if (button.bottom + optionsContainer.offsetHeight > window.innerHeight) {
         setRenderParams({
           placement: Placement.TOP,
           x: button.left,
-          y: button.top - options.offsetHeight
+          y: button.top - optionsContainer.offsetHeight
         });
       } else {
         setRenderParams({
@@ -60,7 +61,7 @@ export function SelectInput({ value, options, rightAligned = false, onChange }: 
         });
       }
     }
-  }, [isOpen]);
+  }, [isOpen, options, value]);
 
   // keyboard navigation
   useEffect(() => {
@@ -102,6 +103,12 @@ export function SelectInput({ value, options, rightAligned = false, onChange }: 
     setIsOpen(prev => !prev);
   }
 
+  function handleMouseOver(index: number) {
+    return function() {
+      setHighlightedIndex(index);
+    }
+  }
+
   function handleSelect(option: OptionType) {
     return function(event: ReactMouseEvent) {
       event.stopPropagation();
@@ -131,6 +138,7 @@ export function SelectInput({ value, options, rightAligned = false, onChange }: 
                 ref={node => node && optionsRefMap.set(i, node)}
                 key={option.label + option.value}
                 onClick={handleSelect(option)}
+                onMouseOver={handleMouseOver(i)}
                 $highlighted={i === highlightedIndex}
               > 
                 <Check $visible={option.value === value}/>

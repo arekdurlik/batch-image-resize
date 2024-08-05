@@ -85,9 +85,5 @@ cursor: pointer;
 transition: background-color var(--transition-default);
 border-radius: var(--borderRadius-default);
 
-&:hover {
-  background-color: var(--button-default-bgColor-rest);
-}
-
-${props => props.$highlighted && outlineActive};
+${props => props.$highlighted && 'background-color: var(--button-default-bgColor-hover)'};
 `

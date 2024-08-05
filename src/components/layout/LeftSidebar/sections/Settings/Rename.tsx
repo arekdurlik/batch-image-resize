@@ -3,11 +3,11 @@ import { Checkbox } from '../../../../inputs/Checkbox'
 import { Collapsible } from '../../../../Collapsible'
 import { VerticalInputGroup } from '../../../../inputs/styled'
 import { TextInput } from '../../../../inputs/TextInput'
-import { useAppStore } from '../../../../../store/appStore'
+import { useApp } from '../../../../../store/app'
 
 export function Rename() {
   const [on, setOn] = useState(false);
-  const { prefix, suffix, indexAsName, api } = useAppStore();
+  const { prefix, suffix, indexAsName, api } = useApp();
 
   function handlePrefix(e: ChangeEvent<HTMLInputElement>) {
     api.setPrefix(e.target.value);
