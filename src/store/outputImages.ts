@@ -91,7 +91,9 @@ async function regenerateVariantOutputImages(outputImages: OutputImageData[], va
         throw new Error(`Variant with id ${variant.id} not found.`);
       }
       
+      const oldId = outputImages[i].id;
       outputImages[i] = await generateOutputImage(inputImage, variant);
+      outputImages[i].id = oldId;
     }
 
     if (currentIndex !== regenerateVariantOutputImagesIndex) {
@@ -103,7 +105,7 @@ async function regenerateVariantOutputImages(outputImages: OutputImageData[], va
 
 type OutputImagesState = {
   images: OutputImageData[]
-  addingImages: boolean
+  generatingImages: boolean
   api: {
     generate: (images: InputImageData[]) => void
     generateVariant: (variant: Variant) => void
@@ -117,10 +119,10 @@ let regenerateIndex = 0;
 
 export const useOutputImages = create<OutputImagesState>((set, get) => ({
   images: [],
-  addingImages: false,
+  generatingImages: false,
   api: {
     async generate(images) {
-      set({ addingImages: true });
+      set({ generatingImages: true });
 
       try {
         for (let i = 0; i < images.length; i++) {
@@ -134,7 +136,7 @@ export const useOutputImages = create<OutputImagesState>((set, get) => ({
       } catch(error) {
         console.error(error);
       } finally {
-        set ({ addingImages: false });
+        set ({ generatingImages: false });
       }
 
     },
@@ -144,7 +146,8 @@ export const useOutputImages = create<OutputImagesState>((set, get) => ({
 
       const inputImages = useInputImages.getState().images;
       const outputImages: OutputImageData[] = [];
-      
+
+      set({ generatingImages: true });
       for (let i = 0; i < inputImages.length; i++) {
         const images = await generateOutputImageVariants(inputImages[i]);
         outputImages.push(...images);
@@ -152,7 +155,7 @@ export const useOutputImages = create<OutputImagesState>((set, get) => ({
         if (currentIndex !== regenerateIndex) return; 
       }
 
-      set({ images: outputImages });
+      set({ images: outputImages, generatingImages: false });
     },
     async generateVariant(variant) {
       const inputImages = useInputImages.getState().images;
@@ -165,9 +168,11 @@ export const useOutputImages = create<OutputImagesState>((set, get) => ({
       }
     },
     async regenerateVariant(variant) {
-      const images = await regenerateVariantOutputImages([...get().images], variant);
+      set({ generatingImages: true });
       
-      images && set({ images });
+      const images = await regenerateVariantOutputImages([...get().images], variant);
+
+      images && set({ images, generatingImages: false });
     },
     updateVariantData(variant) {
       const images = [...get().images];
@@ -183,6 +188,8 @@ export const useOutputImages = create<OutputImagesState>((set, get) => ({
           ));
         }
       });
+
+      set({ images });
     }
   }
 }));

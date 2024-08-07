@@ -5,6 +5,7 @@ import { SectionHeader, SectionTitle } from '../../styled'
 import { useMemo } from 'react'
 import { removeFileExtension } from '../../../lib/helpers'
 import { useInputImages } from '../../../store/inputImages'
+import { SECTION_HEADER_HEIGHT } from '../../../lib/constants'
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
@@ -24,26 +25,24 @@ export function InputImageList() {
         </SectionHeader>
       </FixedTitle>
       <ImageListWrapper>
-        <ImageList images={sortedImages}/>
-        <DropZone/>
+        <ImageList type='input' images={sortedImages} />
+        {sortedImages.length === 0 && <DropZone/>}
       </ImageListWrapper>
     </Wrapper>
   )
 }
 
 const Wrapper = styled.div`
-flex: 1;
+position: relative;
 display: flex;
 flex-direction: column;
 height: 100%;
 `
 
 const FixedTitle = styled.div`
-width: 100%;
 `
 
 const ImageListWrapper = styled.div`
 position: relative;
-overflow-y: scroll;
-height: 100%;
+height: calc(100% - ${SECTION_HEADER_HEIGHT}px);
 `

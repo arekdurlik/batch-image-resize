@@ -65,3 +65,7 @@ export function bytesToSizeFormatted(bytes: number) {
 export function difference(a: number, b: number) {
   return Math.abs(a - b);
 }
+
+export function clamp(a: number, min = 0, max = 1) {
+  return Math.min(max, Math.max(min, a));
+}

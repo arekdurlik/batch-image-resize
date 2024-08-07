@@ -12,6 +12,7 @@ import { ButtonGroup } from '../../inputs/styled'
 import { TextInput } from '../../inputs/TextInput'
 import { useVariants } from '../../../store/variants'
 import { useOutputImages } from '../../../store/outputImages'
+import { SECTION_HEADER_HEIGHT } from '../../../lib/constants'
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
@@ -44,21 +45,22 @@ export function OutputImageList() {
         : collator.compare(removeFileExtension(b.filename), removeFileExtension(a.filename));
       }
   }, [sortOption, sortDirection, variants]);
+
+  const sortedImages = useMemo(
+    () => [...images].sort(sortingMethod),
+    [images, sortingMethod]
+  );
+
+  const filteredImages = filter.length ? sortedImages.filter(img => img.filename.includes(filter)) : sortedImages;
       
   function handleChange(value: string | number) {
     setSortOption(value as SortType);
   }
   
   function flipSortDirection() {
-    setSortDirection(prev => prev === SortDirection.ASC  ? SortDirection.DESC  : SortDirection.ASC )
+    setSortDirection(prev => prev === SortDirection.ASC ? SortDirection.DESC : SortDirection.ASC )
   }
-  
-  const sortedImages = useMemo(() => (
-    [...images].sort(sortingMethod)
-  ), [images, sortingMethod]);
-
-  const filteredImages = filter.length ? sortedImages.filter(img => img.filename.includes(filter)) : sortedImages;
-      
+ 
   return (
     <Wrapper>
       <FixedTitle>
@@ -100,7 +102,11 @@ export function OutputImageList() {
         </SectionHeader>
       </FixedTitle>
       <ImageListWrapper>
-        <ImageList images={filteredImages} sortBy={sortOption} />
+        <ImageList 
+          type='output'
+          images={filteredImages} 
+          sortBy={sortOption}
+          />
       </ImageListWrapper>
     </Wrapper>
   )
@@ -111,6 +117,12 @@ flex: 1;
 display: flex;
 flex-direction: column;
 height: 100%;
+border-top: 1px solid var(--borderColor-default);
+`
+
+const ImageListWrapper = styled.div`
+position: relative;
+height: calc(100% - ${SECTION_HEADER_HEIGHT}px);
 `
 
 const ClearFilter = styled(MdClose)`
@@ -121,12 +133,6 @@ const FixedTitle = styled.div`
 width: 100%;
 z-index: 3;
 pointer-events: none;
-`
-
-const ImageListWrapper = styled.div`
-position: relative;
-overflow-y: scroll;
-height: 100%;
 `
 
 const Sort = styled.div`

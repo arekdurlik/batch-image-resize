@@ -1,13 +1,22 @@
 import { create } from 'zustand'
 import { useOutputImages } from './outputImages'
 
+export type ActiveItem = {
+  type: 'input',
+  id: string
+} | {
+  type: 'output',
+  id: string
+} | undefined
+
 type App = {
+  activeItem: ActiveItem,
   quality: number
   indexAsName: boolean
   prefix: string
   suffix: string
   api: {
-
+    setActiveItem: (item: ActiveItem) => void
     setQuality: (quality: number) => void
     setIndexAsName: (indexAsName: boolean) => void
     setPrefix: (prefix: string) => void
@@ -16,13 +25,15 @@ type App = {
 };
 
 export const useApp = create<App>((set, get) => ({
+  activeItem: undefined,
   quality: 1,
   indexAsName: false,
   prefix: '',
   suffix: '',
-
+  
   api: {
-    setQuality: async (quality) => {
+    setActiveItem: (item) => set({ activeItem: item }),
+    async setQuality(quality) {
       set({ quality })
 
       useOutputImages.getState().api.regenerate();

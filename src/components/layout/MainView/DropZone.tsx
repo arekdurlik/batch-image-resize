@@ -50,5 +50,5 @@ export function DropZone() {
 const Wrapper = styled.div<{ $isDragActive: boolean }>`
 position: absolute;
 inset: 0;
-z-index: ${props => props.$isDragActive ? 2 : 0};
+z-index: 3;
 `
