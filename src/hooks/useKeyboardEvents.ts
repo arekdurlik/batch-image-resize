@@ -1,10 +1,19 @@
 import { DependencyList, useEffect } from 'react'
 
-export function useKeyboardEvents(callback: (event: KeyboardEvent) => void, enabled = true, deps = <DependencyList>[]) {
+export function useKeyDownEvents(callback: (event: KeyboardEvent) => void, enabled = true, deps = <DependencyList>[]) {
   useEffect(() => {
     if (enabled) {
       document.addEventListener('keydown', callback);
       return () => document.removeEventListener('keydown', callback);
     }
-  }, [enabled, ...deps]);
+  }, [callback, enabled, ...deps]);
+}
+
+export function useKeyUpEvents(callback: (event: KeyboardEvent) => void, enabled = true, deps = <DependencyList>[]) {
+  useEffect(() => {
+    if (enabled) {
+      document.addEventListener('keyup', callback);
+      return () => document.removeEventListener('keyup', callback);
+    }
+  }, [callback, enabled, ...deps]);
 }

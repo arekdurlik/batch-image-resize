@@ -1,41 +1,47 @@
-import { Grid } from './styled'
+import { Grid, ImageListWrapper } from './styled'
 import { ImageData } from '../../../../store/types'
 import { SortType } from './types'
 import { ListItem } from './Item'
-import styled from 'styled-components'
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../../../../store/app'
-import { useKeyboardEvents } from '../../../../hooks/useKeyboardEvents'
+import { useKeyDownEvents, useKeyUpEvents } from '../../../../hooks/useKeyboardEvents'
 import { clamp } from '../../../../lib/helpers'
 import { usePrevious } from '../../../../hooks/usePrevious'
 import { useOutsideClick } from '../../../../hooks/useOutsideClick'
-
-type Props = { 
-  type: 'input' | 'output'
-  images: ImageData[], 
-  sortBy?: SortType, 
-};
+import { useMouseInputRef } from '../../../../hooks/useMouseInputRef'
 
 const INPUT_TIMEOUT = 500;
 
+type Props = { 
+  type: 'input' | 'output'
+  images: ImageData[]
+  sortBy?: SortType 
+};
+
 export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   const [isActive, setIsActive] = useState(false);
-  const activeItem = useApp(state => state.activeItem);
-  const previousActiveItem = usePrevious(activeItem);
-  const setActiveItem = useApp(state => state.api.setActiveItem);
-  const grid = useRef<HTMLDivElement>(null!);
   const itemRefMap = useMemo(() => new Map<string, HTMLDivElement>(), []);
+  const grid = useRef<HTMLDivElement>(null!);
   const list = useRef<HTMLDivElement>(null!);
-  useOutsideClick(list, () => setIsActive(false));
+  const ctrl = useRef(false);
+
+  const api = useApp(state => state.api);
+  const selectedItems = useApp(state => state.selectedItems);
+  const prevSelectedItems = usePrevious(selectedItems)!;
+  
   const inputtingFilename = useRef(false);
   const inputtingTimeout = useRef<NodeJS.Timeout>();
   const input = useRef('');
-
+  
+  const mouse = useMouseInputRef();
+  useOutsideClick(list, () => setIsActive(false));
+  
   // jump to new active item if out of view
   useEffect(() => {
-    if (!activeItem) return;
+    if (!selectedItems) return;
+    const lastItem = selectedItems[selectedItems.length - 1];
 
-    const activeItemRef = itemRefMap.get(activeItem?.id);
+    const activeItemRef = itemRefMap.get(lastItem?.id);
 
     if (activeItemRef) {
       const { top: itemTop, bottom: itemBottom } = activeItemRef.getBoundingClientRect();
@@ -51,12 +57,19 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
         list.current.scrollTo({ top: list.current.scrollTop + bottomDifference + scrollPadding });
       }
     }
-  }, [activeItem, itemRefMap]);
+  }, [selectedItems, itemRefMap]);
 
-  useKeyboardEvents((event) => {
-    const activeId = activeItem?.id ?? previousActiveItem?.id;
+  useKeyDownEvents((event) => {
+    switch (event.code) {
+      case 'ControlLeft': ctrl.current = true; return;
+    }
 
-    const index = images.findIndex(img => img.id === activeId) ?? 0;
+    const lastItem = selectedItems[selectedItems.length - 1];
+    const lastPreviousItem = prevSelectedItems[prevSelectedItems.length - 1];
+
+    const activeId = lastItem?.id ?? lastPreviousItem?.id;
+
+    const index = Math.max(0, images.findIndex(img => img.id === activeId));
     let newIndex = index;
 
     switch(event.code) {
@@ -79,7 +92,7 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
         
         newIndex = event.code === 'ArrowUp' ? newIndex - columnCount : newIndex + columnCount;
 
-        if ((newIndex < 0 || newIndex > images.length -1) && activeItem !== undefined) {
+        if ((newIndex < 0 || newIndex > images.length -1) && lastItem !== undefined) {
           newIndex = index;
         }
 
@@ -99,10 +112,16 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
       }
     }
     
-    if (newIndex === index && activeItem !== undefined) return;
+    if (newIndex === index && lastItem !== undefined) return;
 
-    setActiveItem({ type, id: images[newIndex].id });
-  }, isActive, [images, activeItem]);
+    api.setSelectedItems([{ type, id: images[newIndex].id }]);
+  }, isActive, [images, selectedItems]);
+
+  useKeyUpEvents((event) => {
+    switch (event.code) {
+      case 'ControlLeft': ctrl.current = false; break;
+    }
+  });
 
   function handleInput(key: string) {
     if (key.length !== 1) return;
@@ -117,26 +136,35 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
     }, INPUT_TIMEOUT);
 
     const found = images.find(img => img.filename.toLowerCase().startsWith(input.current));
-    found && setActiveItem({ type, id: found.id });
-  }
-
-  function handleFocus() {
-    setIsActive(true);
-    const index = Math.max(0, images.findIndex(img => img.id === previousActiveItem?.id)); 
-
-    setActiveItem({ type, id: images[index].id});
+    found && api.setSelectedItems([{ type, id: found.id }]);
   }
 
   function handleBackgroundClick() {
     setIsActive(true);
-    setActiveItem(undefined);
   }
 
+  function handleFocus() {
+    if (mouse.current.lmb) return;
+
+    setIsActive(true);
+    const latestActive = selectedItems[selectedItems.length - 1];
+    const latestPreviousActive = prevSelectedItems[prevSelectedItems.length - 1];
+
+    const index = images.findIndex(img => img.id === latestPreviousActive?.id);
+
+    index >= 0 && latestActive.type === type
+      ? api.setSelectedItems([{ type, id: images[index].id}])
+      : api.setSelectedItems([{ type, id: images[0].id}]);
+  }
+  
   function handleItemClick(itemId: string) {
     return (event: MouseEvent) => {
       event.stopPropagation();
       setIsActive(true);
-      setActiveItem(itemId ? { type, id: itemId } : undefined);
+
+      ctrl.current
+        ? api.selectItem({ type, id: itemId })
+        : api.setSelectedItems([{ type, id: itemId }]);
     }
   }
 
@@ -147,7 +175,6 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
       onFocus={handleFocus}
       onClick={handleBackgroundClick}
       onBlur={() => setIsActive(false)} 
-      /* style={{ backgroundColor: isActive ? 'red' : undefined }} */
     > 
       {images.length > 0 && (
         <Grid ref={grid} className='imagelist-container-query'>
@@ -159,9 +186,9 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
               }
               key={image.id}
               image={image} 
-              isActive={image.id === activeItem?.id}
-              isPreviousActive={image.id === previousActiveItem?.id}
-              previousActiveVisible={!activeItem}
+              isActive={selectedItems.find(i => i.id === image.id) !== undefined}
+              isPreviousActive={image.id === prevSelectedItems[prevSelectedItems.length - 1]?.id}
+              previousActiveVisible={selectedItems.length === 0}
               sortBy={sortBy} 
               onClick={handleItemClick(image.id)}
             />
@@ -171,12 +198,3 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
     </ImageListWrapper>
   )
 }
-
-const ImageListWrapper = styled.div`
-z-index: 3;
-overflow-y: scroll;
-height: 100%;
-position: relative;
-container-type: inline-size;
-`
-

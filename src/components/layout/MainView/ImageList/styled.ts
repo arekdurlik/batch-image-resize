@@ -1,10 +1,21 @@
 import styled from 'styled-components'
+import { outline } from '../../../../styles/mixins/outline'
+
+export const ImageListWrapper = styled.div`
+position: relative;
+z-index: 3;
+overflow-y: scroll;
+overflow-x: hidden;
+height: 100%;
+container-type: inline-size;
+`
 
 export const Grid = styled.div`
 display: grid;
 grid-template-columns: repeat(10, 1fr);
 gap: 5px 10px;
 padding: 20px;
+pointer-events: none;
 
 @container (max-width: 1260px) {
   grid-template-columns: repeat(9, 1fr);
@@ -55,6 +66,7 @@ align-items: center;
 height: fit-content;
 user-select: initial;
 padding: 4px;
+z-index: -1;
 
 
 &:before {
@@ -102,13 +114,14 @@ display: flex;
 flex-direction: column;
 justify-content: flex-end;
 user-select: none;
+pointer-events: all;
 `
 
 export const Image = styled.img`
 max-height: 100px;
 width: 100px;
 border-radius: var(--borderRadius-default);
-z-index: 2;
+z-index: 1;
 overflow-clip-margin: none;
 object-fit: cover;
 `

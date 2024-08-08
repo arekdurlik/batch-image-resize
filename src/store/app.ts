@@ -1,22 +1,26 @@
 import { create } from 'zustand'
 import { useOutputImages } from './outputImages'
 
-export type ActiveItem = {
+export type SelectedItem = {
   type: 'input',
   id: string
 } | {
   type: 'output',
   id: string
-} | undefined
+}
 
 type App = {
-  activeItem: ActiveItem,
+  selectedItems: SelectedItem[],
+  latestSelectedItem: SelectedItem | undefined,
   quality: number
   indexAsName: boolean
   prefix: string
   suffix: string
   api: {
-    setActiveItem: (item: ActiveItem) => void
+    selectItem: (item: SelectedItem) => void
+    deselectItem: (item: SelectedItem) => void
+    setSelectedItems: (items: SelectedItem[]) => void
+    clearSelectedItems: () => void
     setQuality: (quality: number) => void
     setIndexAsName: (indexAsName: boolean) => void
     setPrefix: (prefix: string) => void
@@ -25,14 +29,34 @@ type App = {
 };
 
 export const useApp = create<App>((set, get) => ({
-  activeItem: undefined,
+  selectedItems: [],
+  latestSelectedItem: undefined,
   quality: 1,
   indexAsName: false,
   prefix: '',
   suffix: '',
   
   api: {
-    setActiveItem: (item) => set({ activeItem: item }),
+    selectItem: (item) => {
+      const selectedItems = [...get().selectedItems].filter(i => i.type === item.type);
+      selectedItems.push(item);
+      set({ selectedItems, latestSelectedItem: item });
+    },
+    deselectItem: (item) => {
+      const selectedItems = [...get().selectedItems];
+      const index = selectedItems.findIndex(i => i.id === item.id);
+      
+      if (index < 0) {
+        return;
+      }
+      
+      selectedItems.splice(index);
+      set({ selectedItems, latestSelectedItem: selectedItems[selectedItems.length - 1] });
+    },
+    setSelectedItems: (items) => {
+      set({ selectedItems: items, latestSelectedItem: items[items.length - 1] });
+    },
+    clearSelectedItems: () => set({ selectedItems: [] }),
     async setQuality(quality) {
       set({ quality })
 
