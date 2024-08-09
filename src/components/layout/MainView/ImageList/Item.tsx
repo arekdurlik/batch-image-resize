@@ -1,28 +1,57 @@
-import { forwardRef, MouseEvent, MutableRefObject, useRef } from 'react'
+import { forwardRef, memo, MouseEvent, useEffect, useRef, useState } from 'react'
 import { bytesToSizeFormatted } from '../../../../lib/helpers'
 import { ImageData } from '../../../../store/types'
 import { Image, ImageWrapper, Item, Title } from './styled'
 import { SortType } from './types'
+import { useApp } from '../../../../store/app'
 
 type Props = { 
+  type: 'input' | 'output'
   image: ImageData, 
   sortBy?: SortType, 
-  isActive: boolean, 
-  isPreviousActive: boolean, 
-  previousActiveVisible?: boolean, 
   onClick?: (e: MouseEvent) => void 
 };
 
-export const ListItem = forwardRef<HTMLDivElement, Props>((props, ref) => {
-  const { image, sortBy, isActive, isPreviousActive, previousActiveVisible = true, onClick } = props;
-  
+export const ListItem = memo(forwardRef<HTMLDivElement, Props>((props, ref) => {
+  const { image, sortBy, onClick } = props;
+  const item = useRef<HTMLDivElement>(null!);
+
+  useEffect(() => {
+    useApp.subscribe(state => ({ 
+      selectedItems: state.selectedItems, 
+      latestSelected: state.latestSelectedItem 
+    }), ({ selectedItems, latestSelected }) => {
+
+      const isActive = selectedItems.find(i => i.id === image.id);
+      if (isActive) {
+        item.current.classList.add('list-item--active');
+      } else {
+        item.current.classList.remove('list-item--active');
+      }
+
+      const isPreviousActive = latestSelected?.id === image.id;
+      if (isPreviousActive) {
+        item.current.classList.add('list-item--previous-active');
+      } else {
+        item.current.classList.remove('list-item--previous-active');
+      }
+    });
+  }, [image.id]);
+
+
   return (
     <Item 
-      ref={ref} 
+      ref={node => {
+        node && (item.current = node);
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      }} 
       key={image.id} 
-      $active={isActive} 
-      $previousActive={previousActiveVisible && isPreviousActive} 
       onClick={event => onClick?.(event)}
+      data-id={image.id}
     >
       <ImageWrapper>
         <Image src={URL.createObjectURL(image.image.thumbnail)}/>
@@ -35,4 +64,4 @@ export const ListItem = forwardRef<HTMLDivElement, Props>((props, ref) => {
       </Title>
     </Item>
   )
-})
+}))

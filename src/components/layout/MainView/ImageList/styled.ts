@@ -1,19 +1,26 @@
-import styled from 'styled-components'
-import { outline } from '../../../../styles/mixins/outline'
+import styled, { css } from 'styled-components'
 
-export const ImageListWrapper = styled.div`
+export const ImageListWrapper = styled.div<{ $focused: boolean }>`
 position: relative;
 z-index: 3;
 overflow-y: scroll;
 overflow-x: hidden;
 height: 100%;
 container-type: inline-size;
+
+${props => !props.$focused && css`
+.list-item--active {
+  &::before {
+    opacity: 0.66 !important;
+  }
+}
+`}
 `
 
 export const Grid = styled.div`
 display: grid;
 grid-template-columns: repeat(10, 1fr);
-gap: 5px 10px;
+gap: 3px 10px;
 padding: 20px;
 pointer-events: none;
 
@@ -58,16 +65,16 @@ pointer-events: none;
 }
 `
 
-export const Item = styled.div<{ $active: boolean, $previousActive?: boolean }>`
+export const Item = styled.div<{ $previousActive?: boolean }>`
 position: relative;
 display: flex;
 flex-direction: column;
 align-items: center;
 height: fit-content;
 user-select: initial;
+pointer-events: all;
 padding: 4px;
 z-index: -1;
-
 
 &:before {
   content: '';
@@ -76,6 +83,8 @@ z-index: -1;
   pointer-events: none;
   border-radius: var(--borderRadius-default);
   opacity: 0;
+  outline-color: var(--borderColor-default);
+  outline-offset: -1px;
   transition: var(--transition-fast);
 }
 
@@ -93,19 +102,23 @@ z-index: -1;
   }
 }
 
-${props => props.$active && `
-&::before {
-  opacity: 1;
-  background-color: var(--color-blue-1) !important;
-}
-`} 
+&.list-item {
+  &--active {
+    &::before {
+      opacity: 1;
+      background-color: var(--color-blue-1) !important;
+    }
+  }
 
-${props => props.$previousActive && `
-&::before {
-  opacity: 1;
-  border: 1px solid var(--borderColor-default);
+  &--previous-active {
+    &:not(.list-item--active) {
+      &::before {
+        opacity: 1;
+        outline: 1px solid var(--borderColor-default);
+      }
+    }
+  }
 }
-`} 
 `
 
 export const ImageWrapper = styled.div`
