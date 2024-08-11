@@ -8,14 +8,22 @@ export function jumpToItem(container: HTMLElement, item: HTMLElement) {
   const topDifference = listTop - itemTop;
   const bottomDifference = itemBottom - listBottom;
 
+  const ScrollUpDestination = container.scrollTop - topDifference - scrollPadding;
+  const scrollDownDestination = container.scrollTop + bottomDifference + scrollPadding;
+
   if (topDifference > 0) {
+    // scroll up
+
+    const doesntFit = itemBottom < listBottom;
     container.scrollTo({ 
-      top: container.scrollTop - topDifference - scrollPadding, 
+      top: doesntFit ? scrollDownDestination : ScrollUpDestination, 
       behavior: 'smooth' 
     });
   } else if (bottomDifference > 0) {
+    // scroll down
+    
     container.scrollTo({ 
-      top: container.scrollTop + bottomDifference + scrollPadding, 
+      top: scrollDownDestination, 
       behavior: 'smooth' 
     });
   }

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { useOutputImages } from './outputImages'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { mergeUniqueSelectionItems } from '../utils'
+import { useInputImages } from './inputImages'
 
 export type SelectedItem = {
   type: 'input',
@@ -25,7 +26,11 @@ type App = {
   api: {
     selectItems: (
       items: SelectedItem[], 
-      modifiers?: { control?: boolean, shift?: boolean }
+      modifiers?: { control?: boolean }
+    ) => void
+    selectItemsWithShift: (
+      items: SelectedItem[],
+      allItems: SelectedItem[]
     ) => void
     selectItemsByDrag: (
       items: SelectedItem[],
@@ -55,20 +60,35 @@ export const useApp = create<App>()(subscribeWithSelector((set, get) => ({
   api: {
     selectItems: (items, modifiers = {}) => {
       const selectedItemsOfSameType = [...get().selectedItems].filter(i => i.type === items[0]?.type);
-      const { control, shift } = modifiers;
+      const { control } = modifiers;
       
       if (items.length === 1) {
         set({ latestSelectedItem: items[0] });
       }
       
-      if (!control && !shift) {
+      if (!control) {
         set({ selectedItems: items });
-      }
-      
-      if (control) {
+      } else {
         const inverted = mergeUniqueSelectionItems(items, selectedItemsOfSameType);
         set({ selectedItems: inverted });
-      }  
+      }
+    },
+    selectItemsWithShift: (items, allItems) => {
+      const item = items[0];
+
+      const clickIndex  = allItems.findIndex(i => i.id === item.id);
+      let otherEndIndex = allItems.findIndex(i => i.id === get().latestSelectedItem?.id);
+
+      if (otherEndIndex < 0) { // switched type
+        set({ latestSelectedItem: item });
+        otherEndIndex = 0;
+      }
+
+      const startIndex = clickIndex > otherEndIndex ? otherEndIndex : clickIndex;
+      const endIndex = clickIndex > otherEndIndex ? clickIndex : otherEndIndex;
+
+      const slice = allItems.slice(startIndex, endIndex + 1);
+      set({ selectedItems: slice });
     },
     selectItemsByDrag: (selected, added, removed, modifiers = {}) => {
       const { control, shift } = modifiers;

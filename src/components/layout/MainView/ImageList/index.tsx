@@ -58,7 +58,7 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
       selected.current = newState.selected;
       latestSelectedItem.current = newState.latestSelected;
 
-      if (!mouse.current.lmb && newState.latestSelected) {
+      if (!mouse.lmb && newState.latestSelected) {
         const item = itemRefMap.get(newState.latestSelected.id);
         item && jumpToItem(list.current, item);
       }
@@ -141,11 +141,9 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
 
     setIsActive(true);
 
-    if (selected.current.length === 0) {
-      api.setSelectedItems([], true);
-    } else {
-      api.setSelectedItems([]);
-    }
+    selected.current.length === 0
+      ? api.setSelectedItems([], true)
+      : api.setSelectedItems([]);
   }
   
   function handleKeyboardFocus() {
@@ -161,7 +159,7 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   }
 
   function handleKeyboardBlur() {
-    if (mouse.current.lmb) return;
+    if (mouse.lmb) return;
     handleBlur();
   }
 
@@ -174,9 +172,17 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   function handleItemClick(itemId: string) {
     return (event: MouseEvent) => {
       event.stopPropagation();
+
       setIsActive(true);
 
-      api.selectItems([{ type, id: itemId }], modifiers);
+      if (modifiers.shift) {
+        api.selectItemsWithShift(
+          [{ type, id: itemId }], 
+          images.map(({ id }) => ({ type, id }))
+        );
+      } else {
+        api.selectItems([{ type, id: itemId }], modifiers);
+      }
     }
   }
 

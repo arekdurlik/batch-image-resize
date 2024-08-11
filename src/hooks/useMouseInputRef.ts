@@ -29,5 +29,8 @@ export function useMouseInputRef() {
     };
   }, []);
 
-  return buttonsPressed;
+  return {
+    get lmb() { return buttonsPressed.current.lmb },
+    get rmb() { return buttonsPressed.current.rmb },
+  };
 }
