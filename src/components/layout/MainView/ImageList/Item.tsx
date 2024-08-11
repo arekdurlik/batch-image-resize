@@ -1,4 +1,4 @@
-import { forwardRef, memo, MouseEvent, useEffect, useRef, useState } from 'react'
+import { forwardRef, MouseEvent, useEffect, useRef } from 'react'
 import { bytesToSizeFormatted } from '../../../../lib/helpers'
 import { ImageData } from '../../../../store/types'
 import { Image, ImageWrapper, Item, Title } from './styled'
@@ -12,7 +12,7 @@ type Props = {
   onClick?: (e: MouseEvent) => void 
 };
 
-export const ListItem = memo(forwardRef<HTMLDivElement, Props>((props, ref) => {
+export const ListItem = forwardRef<HTMLDivElement, Props>((props, ref) => {
   const { image, sortBy, onClick } = props;
   const item = useRef<HTMLDivElement>(null!);
 
@@ -49,7 +49,6 @@ export const ListItem = memo(forwardRef<HTMLDivElement, Props>((props, ref) => {
           ref.current = node;
         }
       }} 
-      key={image.id} 
       onClick={event => onClick?.(event)}
       data-id={image.id}
     >
@@ -64,4 +63,4 @@ export const ListItem = memo(forwardRef<HTMLDivElement, Props>((props, ref) => {
       </Title>
     </Item>
   )
-}))
+});

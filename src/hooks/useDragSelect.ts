@@ -10,12 +10,18 @@ type DrawnArea = {
   end: undefined | Coordinates
 };
 
+export type OnChangeData = { 
+  selected: HTMLElement[], 
+  added: HTMLElement[], 
+  removed: HTMLElement[] 
+}
+
 export function useDragSelect(
   container: RefObject<HTMLElement>, 
   selectables: HTMLElement[], 
   callbacks: { 
     onStart?: () => void,
-    onSelect?: (selected: HTMLElement[]) => void, 
+    onChange?: (data: OnChangeData) => void, 
     onCancel?: () => void 
   }
 ) {
@@ -26,6 +32,7 @@ export function useDragSelect(
   const mouseDown = useRef(false);
   const containerStartScrollTop = useRef(0);
   const selectedLength = useRef(0);
+  const previousSelected = useRef<HTMLElement[]>([]);
   const drawArea = useRef<DrawnArea>({
     start: undefined,
     end: undefined
@@ -42,6 +49,9 @@ export function useDragSelect(
     }
 
     mouseDown.current = false;
+    selectedLength.current = -1;
+    previousSelected.current = [];
+
     document.removeEventListener('mouseup', handleMouseUp);
 
     const d = drawArea.current;
@@ -58,6 +68,8 @@ export function useDragSelect(
       if (event.target !== containerElement) return;
       
       mouseDown.current = true;
+      selectedLength.current = -1;
+      previousSelected.current = [];
 
       containerStartScrollTop.current = containerElement.scrollTop;
       const bounds = containerElement.getBoundingClientRect();
@@ -100,15 +112,23 @@ export function useDragSelect(
       drawSelectionBox(boxElement.current, drawArea.current.start!, drawArea.current.end!);
       const boxRect = boxElement.current.getBoundingClientRect();
 
-      const selectedItems = selectables.filter(i => {
+      const selected = selectables.filter(i => {
         return inSelectorArea(i.getBoundingClientRect(), boxRect);
       });
 
-      if (selectedItems.length === selectedLength.current) return;
+      const added = selected.filter(i => !previousSelected.current.includes(i));
+      const removed = previousSelected.current.filter(i => !selected.includes(i));
 
-      selectedLength.current = selectedItems.length;
-
-      callbacks.onSelect?.(selectedItems);
+      if (selected.length === selectedLength.current) return;
+      selectedLength.current = selected.length;
+      
+      callbacks.onChange?.({
+        selected,
+        added,
+        removed
+    });
+      
+      previousSelected.current = selected;
     },
   }
 } 

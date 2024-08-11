@@ -9,8 +9,9 @@ import { clamp } from '../../../../lib/helpers'
 import { useOutsideClick } from '../../../../hooks/useOutsideClick'
 import { useMouseInputRef } from '../../../../hooks/useMouseInputRef'
 import { useDragSelect } from '../../../../hooks/useDragSelect'
-import { jumpToItem } from './utils'
-import { useKeyboardInputRef } from '../../../../hooks/useKeyboardInput'
+import { jumpToItem, toSelectedItems } from './utils'
+import { useForceUpdate } from '../../../../hooks/useForceUpdate'
+import { useModifiersRef } from '../../../../hooks/useModifiers'
 
 const INPUT_TIMEOUT = 500;
 
@@ -23,6 +24,7 @@ type Props = {
 export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   const [isActive, setIsActive] = useState(false);
   const itemRefMap = useMemo(() => new Map<string, HTMLDivElement>(), []);
+
   const grid = useRef<HTMLDivElement>(null!);
   const list = useRef<HTMLDivElement>(null!);
   const selected = useRef<SelectedItem[]>([]);
@@ -30,17 +32,22 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   const inputtingTimeout = useRef<NodeJS.Timeout>();
   const input = useRef('');
   
-  useOutsideClick(list, handleBlur, { cancelOnDrag: true });
   const api = useApp(state => state.api);
   const mouse = useMouseInputRef();
-  const keyboard = useKeyboardInputRef(['tab', 'control', 'shift']);
-  const dragSelectBind = useDragSelect(list, Array.from(itemRefMap).map(i => i[1]), {
+  const modifiers = useModifiersRef();
+  
+  const selectables = Array.from(itemRefMap).map(i => i[1]);
+  const dragSelectBind = useDragSelect(list, selectables, {
     onStart: () => setIsActive(true),
-    onSelect: (selected) => {
-      api.setSelectedItems(selected.map(i => ({ type, id: i.dataset.id! })));
+    onChange: data => {
+      const { selected, added, removed } = toSelectedItems(data, type);
+      api.selectItemsByDrag(selected, added, removed, modifiers);
     },
     onCancel: () => handleBackgroundClick()
   });
+  
+  useForceUpdate([images.length]); // fixes drag selecting before images are loaded in
+  useOutsideClick(list, handleBlur, { cancelOnDrag: true });
 
   // jump to new active item if out of view
   useEffect(() => {
@@ -59,8 +66,9 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   }, [itemRefMap, mouse]);
 
   useKeyDownEvents((event) => {
+    
     const lastItem = selected.current[selected.current.length - 1];
-    const activeId = lastItem?.id ?? 0;
+    const activeId = lastItem?.id ?? latestSelectedItem.current?.id ?? 0;
 
     const index = Math.max(0, images.findIndex(img => img.id === activeId));
     let newIndex = index;
@@ -68,7 +76,9 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
     switch(event.key) {
       case 'ArrowLeft': 
       case 'ArrowRight': {
-        newIndex = event.code === 'ArrowLeft' ? newIndex - 1 : newIndex + 1;
+        newIndex = event.code === 'ArrowLeft' 
+          ? newIndex - 1 
+          : newIndex + 1;
         newIndex = clamp(newIndex, 0, images.length - 1);
         
         break;
@@ -83,9 +93,11 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
           .split(' ')
           .length; 
         
-        newIndex = event.key === 'ArrowUp' ? newIndex - columnCount : newIndex + columnCount;
+        newIndex = event.key === 'ArrowUp' 
+          ? newIndex - columnCount 
+          : newIndex + columnCount;
 
-        if ((newIndex < 0 || newIndex > images.length -1) && lastItem !== undefined) {
+        if (newIndex < 0 || newIndex > images.length -1) {
           newIndex = index;
         }
 
@@ -108,7 +120,7 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
     if (newIndex === index && lastItem !== undefined) return;
 
     api.setSelectedItems([{ type, id: images[newIndex].id }], true);
-  }, isActive, [images, selected]);
+  }, isActive && images.length > 0, [images, selected]);
 
   function handleInput(key: string) {
     if (key.length !== 1) return;
@@ -121,11 +133,14 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
     }, INPUT_TIMEOUT);
 
     const found = images.find(img => img.filename.toLowerCase().startsWith(input.current));
-    found && api.setSelectedItems([{ type, id: found.id }]);
+    found && api.setSelectedItems([{ type, id: found.id }], true);
   }
 
   function handleBackgroundClick() {
+    if (!images.length) return;
+
     setIsActive(true);
+
     if (selected.current.length === 0) {
       api.setSelectedItems([], true);
     } else {
@@ -134,7 +149,8 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   }
   
   function handleKeyboardFocus() {
-    if (!keyboard.current.tab) return;
+    if (!modifiers.tab || !images.length) return;
+
     setIsActive(true);
     
     const index = images.findIndex(img => img.id === latestSelectedItem.current?.id);
@@ -160,9 +176,7 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
       event.stopPropagation();
       setIsActive(true);
 
-      keyboard.current.control
-        ? api.selectItem({ type, id: itemId })
-        : api.setSelectedItems([{ type, id: itemId }], true);
+      api.selectItems([{ type, id: itemId }], modifiers);
     }
   }
 

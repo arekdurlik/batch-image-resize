@@ -27,6 +27,14 @@ h1, h2, h3, h4 {
   font-weight: 500;
 }
 
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.25em;
+}
+
 img, picture, video, canvas, svg {
   display: block;
   max-width: 100%;
@@ -61,6 +69,22 @@ ul {
 
   > * {
     pointer-events: all;
+  }
+}
+
+.drag-select-box {
+  position: absolute;
+  border: 1px solid var(--color-blue-3);
+  z-index: 999;
+  opacity: 0.5;
+  pointer-events: none;
+
+  &:before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-blue-3);
+    opacity: 0.5;
   }
 }
 `
