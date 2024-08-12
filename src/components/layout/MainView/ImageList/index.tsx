@@ -2,14 +2,14 @@ import { Grid, ImageListWrapper } from './styled'
 import { ImageData } from '../../../../store/types'
 import { SortType } from './types'
 import { ListItem } from './Item'
-import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { SelectedItem, useApp } from '../../../../store/app'
 import { useKeyDownEvents } from '../../../../hooks/useKeyboardEvents'
 import { clamp } from '../../../../lib/helpers'
 import { useOutsideClick } from '../../../../hooks/useOutsideClick'
 import { useMouseInputRef } from '../../../../hooks/useMouseInputRef'
 import { useDragSelect } from '../../../../hooks/useDragSelect'
-import { jumpToItem, toSelectedItems } from './utils'
+import { allToSelectedItems, jumpToElement, toSelectedItems } from './utils'
 import { useForceUpdate } from '../../../../hooks/useForceUpdate'
 import { useModifiersRef } from '../../../../hooks/useModifiers'
 
@@ -39,11 +39,31 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   const selectables = Array.from(itemRefMap).map(i => i[1]);
   const dragSelectBind = useDragSelect(list, selectables, {
     onStart: () => setIsActive(true),
-    onChange: data => {
-      const { selected, added, removed } = toSelectedItems(data, type);
-      api.selectItemsByDrag(selected, added, removed, modifiers);
+    onChange: (data) => { // drag select
+      const i = allToSelectedItems(data, type);
+      api.selectItemsByDrag(i.selected, i.added, i.removed, modifiers);
     },
-    onCancel: () => handleBackgroundClick()
+    onEnd: (data, dragged) => { // click select
+      if (dragged) return;
+
+      if (data.length === 0) {
+        if (modifiers.none) {
+          api.setSelectedItems([], !selected.current.length);
+        }
+        return;
+      }
+
+      const items = toSelectedItems(data, type);
+
+      if (modifiers.shift) {
+        api.selectItemsWithShift(
+          items[0], 
+          images.map(({ id }) => ({ type, id }))
+        );
+      } else {
+        api.selectItems(items, modifiers);
+      }
+    }
   });
   
   useForceUpdate([images.length]); // fixes drag selecting before images are loaded in
@@ -51,22 +71,21 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
 
   // jump to new active item if out of view
   useEffect(() => {
-    useApp.subscribe(state => ({ 
-      selected: state.selectedItems, 
-      latestSelected: state.latestSelectedItem
-    }), (newState) => {
-      selected.current = newState.selected;
-      latestSelectedItem.current = newState.latestSelected;
+    useApp.subscribe(state => state.selectedItems, (items) => {
+      selected.current = items;
+    });
 
-      if (!mouse.lmb && newState.latestSelected) {
-        const item = itemRefMap.get(newState.latestSelected.id);
-        item && jumpToItem(list.current, item);
+    useApp.subscribe(state => state.latestSelectedItem, (item) => {
+      latestSelectedItem.current = item;
+
+      if (!mouse.lmb && item) {
+        const el = itemRefMap.get(item.id);
+        el && jumpToElement(list.current, el);
       }
-    })
+    });
   }, [itemRefMap, mouse]);
 
   useKeyDownEvents((event) => {
-    
     const lastItem = selected.current[selected.current.length - 1];
     const activeId = lastItem?.id ?? latestSelectedItem.current?.id ?? 0;
 
@@ -135,16 +154,6 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
     const found = images.find(img => img.filename.toLowerCase().startsWith(input.current));
     found && api.setSelectedItems([{ type, id: found.id }], true);
   }
-
-  function handleBackgroundClick() {
-    if (!images.length) return;
-
-    setIsActive(true);
-
-    selected.current.length === 0
-      ? api.setSelectedItems([], true)
-      : api.setSelectedItems([]);
-  }
   
   function handleKeyboardFocus() {
     if (!modifiers.tab || !images.length) return;
@@ -168,23 +177,6 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
     setIsActive(false);
     latestSelectedItem.current = selected.current[selected.current.length - 1];
   }
-  
-  function handleItemClick(itemId: string) {
-    return (event: MouseEvent) => {
-      event.stopPropagation();
-
-      setIsActive(true);
-
-      if (modifiers.shift) {
-        api.selectItemsWithShift(
-          [{ type, id: itemId }], 
-          images.map(({ id }) => ({ type, id }))
-        );
-      } else {
-        api.selectItems([{ type, id: itemId }], modifiers);
-      }
-    }
-  }
 
   return (
     <ImageListWrapper
@@ -199,15 +191,14 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
         <Grid ref={grid} className='imagelist-container-query'>
           {images.map(image => (
             <ListItem
-            ref={node => node 
-              ? itemRefMap.set(image.id, node) 
-              : itemRefMap.delete(image.id)
-            }
-            key={image.id}
-            type={type}
-            image={image} 
-            sortBy={sortBy} 
-            onClick={handleItemClick(image.id)}
+              ref={node => node 
+                ? itemRefMap.set(image.id, node) 
+                : itemRefMap.delete(image.id)
+              }
+              key={image.id}
+              type={type}
+              image={image} 
+              sortBy={sortBy} 
             />
           ))}
         </Grid>

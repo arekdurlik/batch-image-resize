@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { useOutputImages } from './outputImages'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { mergeUniqueSelectionItems } from '../utils'
-import { useInputImages } from './inputImages'
 
 export type SelectedItem = {
   type: 'input',
@@ -29,7 +28,7 @@ type App = {
       modifiers?: { control?: boolean }
     ) => void
     selectItemsWithShift: (
-      items: SelectedItem[],
+      item: SelectedItem,
       allItems: SelectedItem[]
     ) => void
     selectItemsByDrag: (
@@ -73,8 +72,7 @@ export const useApp = create<App>()(subscribeWithSelector((set, get) => ({
         set({ selectedItems: inverted });
       }
     },
-    selectItemsWithShift: (items, allItems) => {
-      const item = items[0];
+    selectItemsWithShift: (item, allItems) => {
 
       const clickIndex  = allItems.findIndex(i => i.id === item.id);
       let otherEndIndex = allItems.findIndex(i => i.id === get().latestSelectedItem?.id);
@@ -104,21 +102,16 @@ export const useApp = create<App>()(subscribeWithSelector((set, get) => ({
       }
       
       if (control) {
-        added.forEach(item => {
-          const index = selectedItems.findIndex(i => i.id === item.id);
+        [added, removed].forEach(arr => {
+          arr.forEach(item => {
+            const index = selectedItems.findIndex(i => i.id === item.id);
     
           index > -1
             ? selectedItems.splice(index, 1)
             : selectedItems.push(item);
+          });
         });
-        
-        removed.forEach(item => {
-          const index = selectedItems.findIndex(i => i.id === item.id);
-          
-          index > -1
-            ? selectedItems.splice(index, 1)
-            : selectedItems.push(item);
-        });
+
         set({ selectedItems });
       }
       

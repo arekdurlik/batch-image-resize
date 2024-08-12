@@ -1,27 +1,25 @@
 import { OnChangeData } from '../../../../hooks/useDragSelect'
 
-export function jumpToItem(container: HTMLElement, item: HTMLElement) {
-  const { top: itemTop, bottom: itemBottom } = item.getBoundingClientRect();
-  const { top: listTop, bottom: listBottom } = container.getBoundingClientRect();
+export function jumpToElement(container: HTMLElement, element: HTMLElement) {
+  const { top: elTop, bottom: elBottom } = element.getBoundingClientRect();
+  const { top: boxTop, bottom: boxBottom } = container.getBoundingClientRect();
 
   const scrollPadding = 20;
-  const topDifference = listTop - itemTop;
-  const bottomDifference = itemBottom - listBottom;
-
-  const ScrollUpDestination = container.scrollTop - topDifference - scrollPadding;
-  const scrollDownDestination = container.scrollTop + bottomDifference + scrollPadding;
+  const topDifference = boxTop - elTop;
+  const bottomDifference = elBottom - boxBottom;
 
   if (topDifference > 0) {
     // scroll up
 
-    const doesntFit = itemBottom < listBottom;
+    const ScrollUpDestination = container.scrollTop - topDifference - scrollPadding;
     container.scrollTo({ 
-      top: doesntFit ? scrollDownDestination : ScrollUpDestination, 
+      top: ScrollUpDestination, 
       behavior: 'smooth' 
     });
   } else if (bottomDifference > 0) {
     // scroll down
     
+    const scrollDownDestination = container.scrollTop + bottomDifference + scrollPadding;
     container.scrollTo({ 
       top: scrollDownDestination, 
       behavior: 'smooth' 
@@ -29,10 +27,14 @@ export function jumpToItem(container: HTMLElement, item: HTMLElement) {
   }
 }
 
-export function toSelectedItems(data: OnChangeData, type: 'input' | 'output') {
+export function toSelectedItems(data: HTMLElement[], type: 'input' | 'output') {
+  return data.map(i => ({ type, id: i.dataset.id! }));
+}
+
+export function allToSelectedItems(data: OnChangeData, type: 'input' | 'output') {
   return {
-    selected: data.selected.map(i => ({ type, id: i.dataset.id! })),
-    added: data.added.map(i => ({ type, id: i.dataset.id! })),
-    removed: data.removed.map(i => ({ type, id: i.dataset.id! })),
+    selected: toSelectedItems(data.selected, type),
+    added: toSelectedItems(data.added, type),
+    removed: toSelectedItems(data.removed, type),
   }
 }

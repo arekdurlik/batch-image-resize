@@ -79,6 +79,10 @@ ul {
   opacity: 0.5;
   pointer-events: none;
 
+  &--hidden {
+    opacity: 0;
+  }
+
   &:before {
     content: '';
     position: absolute;
