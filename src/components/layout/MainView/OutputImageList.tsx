@@ -3,7 +3,7 @@ import { SelectInput } from '../../inputs/SelectInput'
 import { useCallback, useMemo, useState } from 'react'
 import { MdArrowDownward, MdArrowUpward, MdClose, MdMoreHoriz } from 'react-icons/md'
 import { ImageList } from './ImageList'
-import { SortDirection, SortType } from './ImageList/types'
+import { SortDirection, SortType } from './ImageList/utils'
 import { Button } from '../../inputs/Button'
 import { SectionHeader, SectionTitle } from '../../styled'
 import { compare, removeFileExtension } from '../../../lib/helpers'
@@ -13,6 +13,8 @@ import { TextInput } from '../../inputs/TextInput'
 import { useVariants } from '../../../store/variants'
 import { useOutputImages } from '../../../store/outputImages'
 import { SECTION_HEADER_HEIGHT } from '../../../lib/constants'
+import { ProgressBarWrapper } from './InputImageList'
+import { ProgressBar } from '../../ProgressBar'
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
@@ -22,6 +24,7 @@ export function OutputImageList() {
   const [filter, setFilter] = useState('');
   const images = useOutputImages(state => state.images);
   const variants = useVariants(state => state.variants);
+  const progress = useOutputImages(state => state.progress);
 
   const sortingMethod = useCallback((a: OutputImageData, b: OutputImageData) => {
     switch(sortOption) {
@@ -63,52 +66,55 @@ export function OutputImageList() {
  
   return (
     <Wrapper>
-      <FixedTitle>
-        <SectionHeader>
-          <SectionTitle>Output images</SectionTitle>
-          <Sort>
-            <span >Filter by:</span>
-            <TextInput 
-              value={filter}
-              onChange={e => setFilter(e.target.value)}
-              suffix={filter.length 
-                ? <ClearFilter onClick={() => setFilter('')}/> 
-                : undefined
-              }
-              style={{ width: 137 }}
-            />
-            <span style={{ marginLeft: 8 }}>Sort by:</span>
-            <ButtonGroup>
-              <SelectInput 
-                value={sortOption} 
-                onChange={handleChange}
-                options={[
-                  { label: 'File name', value: SortType.FILENAME },
-                  { label: 'File size', value: SortType.FILESIZE },
-                  { label: 'Variant', value: SortType.VARIANT },
-                ]}
-              />
-              <Button onClick={flipSortDirection}>
-                {sortDirection === SortDirection.ASC 
-                  ? <MdArrowUpward/>
-                  : <MdArrowDownward/>
+        <FixedTitle>
+          <SectionHeader>
+            <SectionTitle>Output images</SectionTitle>
+            <Sort>
+              <span >Filter by:</span>
+              <TextInput 
+                value={filter}
+                onChange={e => setFilter(e.target.value)}
+                suffix={filter.length 
+                  ? <ClearFilter onClick={() => setFilter('')}/> 
+                  : undefined
                 }
+                style={{ width: 137 }}
+              />
+              <span style={{ marginLeft: 8 }}>Sort by:</span>
+              <ButtonGroup>
+                <SelectInput 
+                  value={sortOption} 
+                  onChange={handleChange}
+                  options={[
+                    { label: 'File name', value: SortType.FILENAME },
+                    { label: 'File size', value: SortType.FILESIZE },
+                    { label: 'Variant', value: SortType.VARIANT },
+                  ]}
+                />
+                <Button onClick={flipSortDirection}>
+                  {sortDirection === SortDirection.ASC 
+                    ? <MdArrowUpward/>
+                    : <MdArrowDownward/>
+                  }
+                </Button>
+              </ButtonGroup>
+              <Button style={{ marginLeft: 8 }}>
+                <MdMoreHoriz/>
               </Button>
-            </ButtonGroup>
-            <Button style={{ marginLeft: 8 }}>
-              <MdMoreHoriz/>
-            </Button>
-          </Sort>
-        </SectionHeader>
-      </FixedTitle>
-      <ImageListWrapper>
-        <ImageList 
-          type='output'
-          images={filteredImages} 
-          sortBy={sortOption}
-          />
-      </ImageListWrapper>
-    </Wrapper>
+            </Sort>
+          </SectionHeader>
+        </FixedTitle>
+        <ImageListWrapper>
+          <ProgressBarWrapper>
+            <ProgressBar value={progress.processedItems} max={progress.totalItems}/>
+          </ProgressBarWrapper>
+          <ImageList
+            type='output'
+            images={filteredImages} 
+            sortBy={sortOption}
+            />
+        </ImageListWrapper>
+      </Wrapper>
   )
 }
 

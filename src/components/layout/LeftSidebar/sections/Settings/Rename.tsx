@@ -7,7 +7,10 @@ import { useApp } from '../../../../../store/app'
 
 export function Rename() {
   const [on, setOn] = useState(false);
-  const { prefix, suffix, indexAsName, api } = useApp();
+  const prefix = useApp(state => state.prefix);
+  const suffix = useApp(state => state.suffix);
+  const indexAsName = useApp(state => state.indexAsName);
+  const api = useApp(state => state.api);
 
   function handlePrefix(e: ChangeEvent<HTMLInputElement>) {
     api.setPrefix(e.target.value);

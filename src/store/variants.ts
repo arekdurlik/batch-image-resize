@@ -82,7 +82,13 @@ export const useVariants = create<Variants>((set, get) => ({
       }
   
       variants[index][dimension] = value;
-  
+      
+      if (dimension === 'height') {
+        variants[index].width = undefined;
+      } else {
+        variants[index].height = undefined;
+      }
+      
       set({ variants });
   
       useOutputImages.getState().api.regenerateVariant(variants[index]);

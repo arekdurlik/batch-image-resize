@@ -81,6 +81,7 @@ function canvasToBlob(image: HTMLCanvasElement, quality: number, extension: stri
   });
 }
 
+// TODO: maybe store the image on file upload so it doesn't have to be loaded again
 export async function processImage(file: File, quality: number, width: number | undefined, height: number | undefined, crop?: boolean) {
   const image = await loadImage(file);
 
@@ -91,5 +92,13 @@ export async function processImage(file: File, quality: number, width: number | 
 
   const extension = quality < 1 ? 'jpeg' : getFileExtension(file.name);
 
-  return canvasToBlob(resized, quality, extension);
+  const blob = await canvasToBlob(resized, quality, extension);
+
+  return {
+    blob, 
+    dimensions: {
+      width: resized.width,
+      height: resized.height
+    }
+  }
 }

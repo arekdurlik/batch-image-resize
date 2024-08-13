@@ -1,14 +1,14 @@
-import { ChangeEvent, useCallback, useRef, useState } from 'react'
+import { ChangeEvent, ChangeEventHandler, useCallback, useRef, useState } from 'react'
 import { Variant as VariantType } from '../../../../../store/types'
 import { IoMdTrash } from 'react-icons/io'
 import styled from 'styled-components'
-import { useToasts } from '../../../../../store/toasts'
 import { HorizontalInputGroup, VerticalInputGroup } from '../../../../inputs/styled'
 import { TextInput } from '../../../../inputs/TextInput'
 import { Checkbox } from '../../../../inputs/Checkbox'
 import { SectionGroup, SideBarSection } from '../../../../styled'
 import { Button } from '../../../../inputs/Button'
 import { useVariants } from '../../../../../store/variants'
+import { openToast } from '../../../../../store/toasts'
 
 export function Variant(variant: VariantType & { index: number }) {
   const [width, setWidth] = useState(variant.width ?? '');
@@ -16,7 +16,6 @@ export function Variant(variant: VariantType & { index: number }) {
   const [crop, setCrop] = useState(variant.crop ?? false);
   const api = useVariants(state => state.api);
   const timeoutId = useRef<NodeJS.Timeout>();
-  const openToast = useToasts(state => state.openToast);
 
   const widthRef = useRef<string | number>();
   const heightRef = useRef<string | number>();
@@ -34,10 +33,9 @@ export function Variant(variant: VariantType & { index: number }) {
     api.setDimension('height', variant.id, heightRef.current ? Number(heightRef.current) : undefined);
   }, [api, variant.id]);
 
-  const showToast = useCallback(() => 
-    openToast('error', 'Photos are being regenerated. Try again in a moment.'), 
-    [openToast]
-  );
+  function showToast() {
+    openToast('error', 'Photos are being regenerated. Try again in a moment.');
+  }
 
   const handleWidth = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     clearTimeout(timeoutId.current);
@@ -77,6 +75,12 @@ export function Variant(variant: VariantType & { index: number }) {
     timeoutId.current = setTimeout(updateStoreHeight, 50);
   }, [height, updateStoreHeight]);
 
+  function handleFilenamePart(part: 'prefix' | 'suffix', variantId: string) {
+    return (e: ChangeEvent<HTMLInputElement>) => {
+      api.setFilenamePart(part, variantId, e.target.value);
+    }
+  }
+
   return (
     <SectionGroup>
       <VariantName>
@@ -87,8 +91,8 @@ export function Variant(variant: VariantType & { index: number }) {
       </VariantName>
       <SideBarSection>
         <VerticalInputGroup>
-          <TextInput label='Prefix' value={variant.prefix} onChange={e => api.setFilenamePart('prefix', variant.id, e.target.value)}/>
-          <TextInput label='Suffix' value={variant.suffix} onChange={e => api.setFilenamePart('suffix', variant.id, e.target.value)} />
+          <TextInput label='Prefix' value={variant.prefix} onChange={handleFilenamePart('prefix', variant.id)}/>
+          <TextInput label='Suffix' value={variant.suffix} onChange={handleFilenamePart('suffix', variant.id)} />
         </VerticalInputGroup>
         <HorizontalInputGroup>
           <TextInput label='Width' value={width ?? ''} onChange={handleWidth}/>

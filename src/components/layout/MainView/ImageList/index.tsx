@@ -1,6 +1,5 @@
 import { Grid, ImageListWrapper } from './styled'
 import { ImageData } from '../../../../store/types'
-import { SortType } from './types'
 import { ListItem } from './Item'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { SelectedItem, useApp } from '../../../../store/app'
@@ -9,7 +8,7 @@ import { clamp } from '../../../../lib/helpers'
 import { useOutsideClick } from '../../../../hooks/useOutsideClick'
 import { useMouseInputRef } from '../../../../hooks/useMouseInputRef'
 import { useDragSelect } from '../../../../hooks/useDragSelect'
-import { allToSelectedItems, jumpToElement, toSelectedItems } from './utils'
+import { SortType, allToSelectedItems, jumpToElement, toSelectedItems } from './utils'
 import { useForceUpdate } from '../../../../hooks/useForceUpdate'
 import { useModifiersRef } from '../../../../hooks/useModifiers'
 
@@ -39,7 +38,7 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   const selectables = Array.from(itemRefMap).map(i => i[1]);
   const dragSelectBind = useDragSelect(list, selectables, {
     onStart: () => setIsActive(true),
-    onChange: (data) => { // drag select
+    onChange: data => { // drag select
       const i = allToSelectedItems(data, type);
       api.selectItemsByDrag(i.selected, i.added, i.removed, modifiers);
     },
@@ -71,11 +70,11 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
 
   // jump to new active item if out of view
   useEffect(() => {
-    useApp.subscribe(state => state.selectedItems, (items) => {
+    useApp.subscribe(state => state.selectedItems, items => {
       selected.current = items;
     });
 
-    useApp.subscribe(state => state.latestSelectedItem, (item) => {
+    useApp.subscribe(state => state.latestSelectedItem, item => {
       latestSelectedItem.current = item;
 
       if (!mouse.lmb && item) {
@@ -93,6 +92,15 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
     let newIndex = index;
 
     switch(event.key) {
+      case 'a':
+      case 'A': {
+        if (modifiers.control) {
+          event.preventDefault();
+          const items = toSelectedItems(selectables, type);
+          api.setSelectedItems(items);
+        }
+        return;
+      }
       case 'ArrowLeft': 
       case 'ArrowRight': {
         newIndex = event.code === 'ArrowLeft' 

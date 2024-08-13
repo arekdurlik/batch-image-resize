@@ -2,7 +2,7 @@ import { forwardRef, MouseEvent, useEffect, useRef } from 'react'
 import { bytesToSizeFormatted } from '../../../../lib/helpers'
 import { ImageData } from '../../../../store/types'
 import { Image, ImageWrapper, Item, Title } from './styled'
-import { SortType } from './types'
+import { SortType } from './utils'
 import { useApp } from '../../../../store/app'
 
 type Props = { 

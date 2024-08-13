@@ -20,7 +20,7 @@ export function Toasts() {
     leave: [{ opacity: 0 }, { height: 0 }],
     keys: item => item.id,
     onRest: (_result, _ctrl, item) => {
-      toastsState.closeToast(item.id);
+      toastsState.api.closeToast(item.id);
     },
     config: (item, _index, phase) => key => 
       phase === 'enter' && key === 'life' 
@@ -55,7 +55,7 @@ export function Toasts() {
                 e.stopPropagation()
                 if (cancelMap.has(item) && life.get() !== '0%') {
                   cancelMap.get(item)();
-                  toastsState.closeToast(item.id);
+                  toastsState.api.closeToast(item.id);
                 }
               }}>
                 <IoMdClose />

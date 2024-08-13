@@ -132,8 +132,7 @@ pointer-events: all;
 
 export const Image = styled.img`
 max-height: 100px;
-width: 100px;
-border-radius: var(--borderRadius-default);
+border-radius: var(--borderRadius-small);
 z-index: 1;
 overflow-clip-margin: none;
 object-fit: cover;

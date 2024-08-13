@@ -1,5 +1,16 @@
 import { OnChangeData } from '../../../../hooks/useDragSelect'
 
+export enum SortType {
+  FILENAME = 'FILENAME',
+  FILESIZE = 'FILESIZE',
+  VARIANT = 'VARIANT'
+}
+
+export enum SortDirection {
+  ASC = 'ASC',
+  DESC = 'DESC'
+}
+
 export function jumpToElement(container: HTMLElement, element: HTMLElement) {
   const { top: elTop, bottom: elBottom } = element.getBoundingClientRect();
   const { top: boxTop, bottom: boxBottom } = container.getBoundingClientRect();
