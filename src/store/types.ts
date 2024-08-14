@@ -54,3 +54,11 @@ export type Variant = {
 };
 
 export type VariantUpdate = keyof Partial<Omit<Variant, 'id'>>;
+
+export type SelectedItem = {
+  type: 'input',
+  id: string
+} | {
+  type: 'output',
+  id: string
+};

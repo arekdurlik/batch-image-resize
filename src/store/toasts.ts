@@ -1,7 +1,5 @@
 import { create } from 'zustand'
 
-export type ToastType = 'info' | 'success' | 'warning' | 'error';
-
 type ToastsState = {
   id: number,
   toasts: {
@@ -14,6 +12,13 @@ type ToastsState = {
     closeToast: (id: number) => void
   }
 };
+
+export enum ToastType {
+  INFO = 'INFO',
+  SUCCESS = 'SUCCESS',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
+}
 
 
 export const useToasts = create<ToastsState>((set, get) => ({

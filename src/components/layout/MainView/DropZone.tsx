@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { UploadedImage, useInputImages } from '../../../store/inputImages'
 import { Log } from '../../../lib/log'
 import { getFileExtension } from '../../../lib/helpers'
-import { openToast } from '../../../store/toasts'
+import { openToast, ToastType } from '../../../store/toasts'
 
 export function DropZone() {
   const api = useInputImages(state => state.api);
@@ -19,7 +19,7 @@ export function DropZone() {
         .join(', ');
 
       openToast(
-        'error', 
+        ToastType.ERROR, 
         `Uploads with file type ${rejectedFormats} are not supported. Please try again.`
       );
       return;

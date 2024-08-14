@@ -14,11 +14,11 @@ export function MainView() {
 
   return (
     <Wrapper>
-      <PanelGroup ref={panelGroup} direction="vertical">
+      <PanelGroup ref={panelGroup} direction='vertical'>
         <Panel minSize={10}>
           <InputImageList/>
         </Panel>
-        <Resizer onReset={handleReset}/>
+        <Resizer direction='vertical' onReset={handleReset}/>
         <Panel minSize={10}>
           <OutputImageList/>
         </Panel>
@@ -30,7 +30,6 @@ export function MainView() {
 const Wrapper = styled.div`
 position: relative;
 width: 100%;
-padding-top: 40px;
 display: flex;
 flex-direction: column;
 user-select: none;

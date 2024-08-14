@@ -1,7 +1,7 @@
 import { THUMBNAIL_SIZE } from '../../lib/constants'
 import { Log } from '../../lib/log'
 import { processImage } from '../../lib/utils'
-import { openToast } from '../toasts'
+import { openToast, ToastType } from '../toasts'
 import { InputImageData, UploadedImage } from '../types'
 import { v1 as uuid } from 'uuid'
 
@@ -31,12 +31,12 @@ export async function generateInputImage(image: UploadedImage): Promise<InputIma
   } catch (error) {
     if (String(error).includes('fingerprint')) {
       openToast(
-        'error', 
+        ToastType.ERROR, 
         "Error generating input image. Make sure fingerprinting protection isn't enabled in the browser settings."
       );
+    } else {
+      throw error;
     }
-
-    return null;
   }
   
   return inputImage;

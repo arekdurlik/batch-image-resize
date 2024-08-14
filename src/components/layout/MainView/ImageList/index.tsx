@@ -1,8 +1,8 @@
 import { Grid, ImageListWrapper } from './styled'
-import { ImageData } from '../../../../store/types'
+import { ImageData, SelectedItem } from '../../../../store/types'
 import { ListItem } from './Item'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { SelectedItem, useApp } from '../../../../store/app'
+import { useApp } from '../../../../store/app'
 import { useKeyDownEvents } from '../../../../hooks/useKeyboardEvents'
 import { clamp } from '../../../../lib/helpers'
 import { useOutsideClick } from '../../../../hooks/useOutsideClick'
@@ -85,8 +85,8 @@ export function ImageList({ type, images, sortBy = SortType.FILENAME }: Props) {
   }, [itemRefMap, mouse]);
 
   useKeyDownEvents((event) => {
-    const lastItem = selected.current[selected.current.length - 1];
-    const activeId = lastItem?.id ?? latestSelectedItem.current?.id ?? 0;
+    const lastItem = latestSelectedItem.current?.id;
+    const activeId = latestSelectedItem.current?.id ?? 0;
 
     const index = Math.max(0, images.findIndex(img => img.id === activeId));
     let newIndex = index;

@@ -1,6 +1,6 @@
-import { ChangeEventHandler, CSSProperties, ReactNode } from 'react'
+import { ChangeEvent, ChangeEventHandler, CSSProperties, ReactNode, useState } from 'react'
 import styled from 'styled-components'
-import { outline } from '../../styles/mixins/outline'
+import { outline, outlineActive, outlineRest } from '../../styles/mixins/outline'
 
 type Props = {
   label?: string
@@ -15,11 +15,17 @@ type Props = {
 };
 
 export function TextInput({ label, value, placeholder, prefix, suffix, spellCheck = false, onChange, onBlur, style }: Props) {
+  const [isFocused, setIsFocused] = useState(false);
+
+  function handleBlur(event: ChangeEvent<HTMLInputElement>) {
+    setIsFocused(false);
+    onBlur?.(event);
+  }
 
   return (
     <Wrapper style={style}>
       {label && <Label htmlFor={label}>{label}</Label>}
-      <InputContainer>
+      <InputContainer $focused={isFocused}>
         {prefix && <Icon>{prefix}</Icon>}
         <Input
           name={label}
@@ -27,7 +33,8 @@ export function TextInput({ label, value, placeholder, prefix, suffix, spellChec
           value={value}
           placeholder={placeholder}
           onChange={onChange}
-          onBlur={onBlur}
+          onFocus={() => setIsFocused(true)}
+          onBlur={handleBlur}
           spellCheck={spellCheck}
           >
         </Input>
@@ -53,8 +60,9 @@ const Label = styled.label`
 font-weight: 500;
 `
 
-const InputContainer = styled.div`
-${outline}
+const InputContainer = styled.div<{ $focused: boolean }>`
+${outlineRest}
+${props => props.$focused && outlineActive}
 background-color: var(--button-default-bgColor-rest);
 border: 1px solid var(--borderColor-default);
 border-radius: var(--borderRadius-default);

@@ -104,13 +104,13 @@ export function SelectInput({ value, options, rightAligned = false, onChange }: 
   }
 
   function handleMouseOver(index: number) {
-    return function() {
+    return () => {
       setHighlightedIndex(index);
     }
   }
 
   function handleSelect(option: OptionType) {
-    return function(event: ReactMouseEvent) {
+    return (event: ReactMouseEvent) => {
       event.stopPropagation();
       onChange(option.value);
       setIsOpen(false);

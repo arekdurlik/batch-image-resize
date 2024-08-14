@@ -6,7 +6,6 @@ export function Navbar() {
 }
 
 const Container = styled.div`
-position: fixed;
 padding: 20px;
 width: 100%;
 border-bottom: 1px solid var(--borderColor-default);

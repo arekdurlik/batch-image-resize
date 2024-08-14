@@ -3,8 +3,10 @@ import styled from 'styled-components'
 
 export function ProgressBar({ value, max }: { value: number, max: number }) {
   const bar = useRef<HTMLDivElement>(null!);
-  const width = (value / max) * 100 + '%';
-  const showBar = !isNaN(value/max) && (value / max) !== 1;
+  const fraction = value / max;
+  const width = fraction * 100 + '%';
+  const showBar = !isNaN(fraction) && fraction !== 1;
+  const dynamicOpacity = 1.25 - (fraction * 1.25);
 
   useEffect(() => {
     const barEl = bar.current;
@@ -24,7 +26,15 @@ export function ProgressBar({ value, max }: { value: number, max: number }) {
   }, [showBar]);
 
   return <Wrapper>
-    <Bar ref={bar} style={{ width }}/>
+    <Bar 
+      ref={bar} 
+      style={{ 
+        width, 
+        opacity: isNaN(dynamicOpacity) 
+          ? 1 
+          : dynamicOpacity 
+      }}
+    />
   </Wrapper>
 }
 
@@ -42,6 +52,6 @@ transition: var(--transition-slow);
 background-color: var(--color-blue-5);
 
 &.progress-bar--fade-out {
-  opacity: 0;
+  opacity: 0 !important;
 }
 `

@@ -8,7 +8,7 @@ import { Checkbox } from '../../../../inputs/Checkbox'
 import { SectionGroup, SideBarSection } from '../../../../styled'
 import { Button } from '../../../../inputs/Button'
 import { useVariants } from '../../../../../store/variants'
-import { openToast } from '../../../../../store/toasts'
+import { openToast, ToastType } from '../../../../../store/toasts'
 
 export function Variant(variant: VariantType & { index: number }) {
   const [width, setWidth] = useState(variant.width ?? '');
@@ -34,7 +34,7 @@ export function Variant(variant: VariantType & { index: number }) {
   }, [api, variant.id]);
 
   function showToast() {
-    openToast('error', 'Photos are being regenerated. Try again in a moment.');
+    openToast(ToastType.ERROR, 'Photos are being regenerated. Try again in a moment.');
   }
 
   const handleWidth = useCallback((event: ChangeEvent<HTMLInputElement>) => {

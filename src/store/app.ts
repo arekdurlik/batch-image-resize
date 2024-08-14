@@ -2,18 +2,8 @@ import { create } from 'zustand'
 import { useOutputImages } from './outputImages'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { mergeUniqueSelectionItems } from '../utils'
-
-export type SelectedItem = {
-  type: 'input',
-  id: string
-} | {
-  type: 'output',
-  id: string
-}
-
-function switchedType(items1: SelectedItem[], items2: SelectedItem[]) {
-  return items1[0]?.type && items2[0]?.type && items1[0].type !== items2[0].type;
-}
+import { SelectedItem } from './types'
+import { switchedType } from './utils'
 
 type App = {
   selectedItems: SelectedItem[],

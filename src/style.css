@@ -1,9 +1,0 @@
-.imagelist-container-query {
-  container-type: inline-size;
-}
-
-@container (min-width: 500px) {
-  .imagelist-container-query {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}

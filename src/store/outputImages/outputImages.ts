@@ -6,10 +6,10 @@ import { Log } from '../../lib/log'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { initialProgress, Progress, startProgress } from '../utils'
 import { generateOutputImage, generateOutputImageVariants } from './utils'
+import { openToast, ToastType } from '../toasts'
 
 type OutputImagesState = {
   images: OutputImageData[]
-  generatingImages: boolean
   progress: Progress
   api: {
     generate: (images: InputImageData[]) => void
@@ -26,13 +26,11 @@ let regenerateIndex = 0;
 
 export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector((set, get) => ({
   images: [],
-  generatingImages: false,
   progress: initialProgress,
   api: {
     async generate(images) {
-      Log.debug('Generating output images');
+      Log.debug('Generating output images.');
 
-      set({ generatingImages: true });
       const progress = startProgress(useOutputImages, images.length);
       
       try {
@@ -46,26 +44,22 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
           progress.advance();
         }
       } catch(error) {
-        Log.error('Error generating output images', error);
-      } finally {
-        set ({ generatingImages: false });
+        progress.cancel();
+        Log.error('Error generating output images.', error);
+        openToast(ToastType.ERROR, 'Error generating output images. Please try again.');
       }
-
     },
     async regenerate() {
-      Log.debug('Regenerating output images');
+      Log.debug('Regenerating output images.');
 
       regenerateIndex++;
       const currentIndex = regenerateIndex;
-
       const inputImages = useInputImages.getState().images;
       const outputImages: OutputImageData[] = [];
 
-      set({ generatingImages: true });
       const progress = startProgress(useOutputImages, inputImages.length);
 
       try {
-
         for (let i = 0; i < inputImages.length; i++) {
           const images = await generateOutputImageVariants(inputImages[i], false);
           outputImages.push(...images);
@@ -73,51 +67,55 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
           progress.advance();
 
           if (currentIndex !== regenerateIndex) {
-            set({ generatingImages: false });
             progress.cancel();
             return;
           } 
         }
         
-        set({ images: outputImages, generatingImages: false });
+        set({ images: outputImages });
       } catch (error) {
-        Log.error('Error generating output images', error);
+        progress.cancel();
+        Log.error('Error generating output images.', error);
+        openToast(ToastType.ERROR, 'Error generating output images. Please try again.');
       }
     },
     async generateVariant(variant) {
-      Log.debug('Generating output images for variant', { variant });
+      Log.debug('Generating output images for variant.', { variant });
 
       const inputImages = useInputImages.getState().images;
       const progress = startProgress(useOutputImages, inputImages.length);
       
-      for (let i = 0; i < inputImages.length; i++) {
-        const image = await generateOutputImage(inputImages[i], variant);
-        
-        if (image) {
-          const outputImages = [...get().images];
-          outputImages.push(image);
-          set({ images: outputImages });
-        }
+      try {
 
-        progress.advance();
+        for (let i = 0; i < inputImages.length; i++) {
+          const image = await generateOutputImage(inputImages[i], variant);
+          
+          if (image) {
+            const outputImages = [...get().images];
+            outputImages.push(image);
+            set({ images: outputImages });
+          }
+
+          progress.advance();
+        }
+      } catch (error) {
+        progress.cancel();
+        Log.error('Error generating output images for variant.', error);
+        openToast(ToastType.ERROR, 'Error generating output images. Please try again.');
       }
     },
     async regenerateVariant(variant) {
-      Log.debug('Regenerating output images for variant', { variant });
-
+      Log.debug('Regenerating output images for variant.', { variant });
       
       const outputImages = [...get().images];
       regenerateVariantOutputImagesIndex += 1;
       const currentIndex = regenerateVariantOutputImagesIndex;
-      
       const inputImages = useInputImages.getState().images;
-      
-      set({ generatingImages: true });
+
       const progress = startProgress(useOutputImages, outputImages.length);
 
       try {
         for (let i = 0; i < outputImages.length; i++) {
-
           if (outputImages[i].variantId === variant.id) {
             const inputImage = inputImages.find(img => img.id === outputImages[i].inputImageId);
   
@@ -132,23 +130,24 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
             }
           }
 
-          progress.advance();
-  
           if (currentIndex !== regenerateVariantOutputImagesIndex) {
-            set({ generatingImages: false });
+            Log.debug('Variant regeneration cancelled.');
             progress.cancel();
             return;
           } 
+          
+          progress.advance();
         }
 
+        set({ images: outputImages });
       } catch (error) {
-        Log.error('Error regenerating output images', error);
+        progress.cancel();
+        Log.error('Error regenerating output images.', error);
+        openToast(ToastType.ERROR, 'Error regenerating output images. Please try again.');
       }
-      
-      set({ images: outputImages, generatingImages: false });
     },
     updateVariantData(variant) {
-      Log.debug('Updating variant data', { variant });
+      Log.debug('Updating variant data.', { variant });
       const images = [...get().images];
 
       images.forEach(image => {

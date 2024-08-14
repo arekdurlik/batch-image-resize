@@ -40,7 +40,5 @@ overflow-y: hidden;
 
 const Content = styled.div`
 overflow-y: auto;
-position: relative;
-top: 1px;
 `
 
