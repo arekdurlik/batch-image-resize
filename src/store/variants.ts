@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { Variant } from './types'
-import { useOutputImages } from './outputImages'
+import { useOutputImages } from './output-images'
 import { v1 as uuid } from 'uuid'
 
 type Variants = {

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { useOutputImages } from './outputImages'
+import { useOutputImages } from './output-images'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { mergeUniqueSelectionItems } from '../utils'
 import { SelectedItem } from './types'

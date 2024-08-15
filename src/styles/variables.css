@@ -9,12 +9,18 @@
   --borderRadius-large:   10px;
   --borderRadius-full:    9999px;
 
-  --outlineColor: var(--color-blue-5);
-  --outlineOffset:  -2px;
-
   --shadow-xsmall: 0px 1px 0px 0px #1f23281a;
   --shadow-small: 0px 1px 0px 0px #1f23280a;
   --shadow-default: 0px 3px 6px 0px #424a531f;
+
+  --padding-small: 2.5px;
+  --padding-default: 5px;
+  --padding-large: 10px;
+
+  --outlineColor: var(--color-blue-5);
+  --outlineOffset:  -2px;
+
+  --lightboxBgColor: #212124ee;
 
   --color-blue-0: hsl(212, 100%, 92%); 
   --color-blue-1: hsl(212, 100%, 85%); 
@@ -27,6 +33,9 @@
   --color-blue-8: hsl(212, 100%, 26%);
   --color-blue-9: hsl(212, 100%, 18%);
 
+  --color-red-4: hsl(357, 80%, 40%);
+  --color-green-4: hsl(128, 60%, 40%);
+
   --fgColor-default:  hsl(200, 3%, 17%);
   --fgColor-muted:    hsl(200, 3%, 25%);
   --fgColor-icon:    hsl(200, 3%, 50%);
@@ -35,7 +44,7 @@
   --bgColor-default:              hsl(0, 0%, 98%);
   --bgColor-default-transparent:  hsla(0, 0%, 98%, 0.867);
   --bgColor-muted:                hsl(0, 0%, 90%);
-  --bgColor-inverse:              hsl(0, 0%, 2%);
+  --bgColor-inverse:              hsl(0, 0%, 10%);
 
   --borderColor-default: hsl(220, 11%, 78%);
 

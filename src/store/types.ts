@@ -5,8 +5,14 @@ export type InputImageData = {
   index: number
   
   image: {
-    full: File
-    thumbnail: Blob
+    full: {
+      file: File,
+      src: string
+    }
+    thumbnail: {
+      file: Blob,
+      src: string
+    }
   },
   
   filename: string
@@ -18,13 +24,22 @@ export type InputImageData = {
 
 export type OutputImageData = {
   id: string,
-  inputImageFilename: string
-  inputImageId: string
+  inputImage: {
+    id: string
+    filename: string
+    size: number
+  },
   variantId: string
 
   image: {
-    full: Blob
-    thumbnail: Blob
+    full: {
+      file: Blob,
+      src: string,
+    }
+    thumbnail: {
+      file: Blob,
+      src: string
+    }
   },
 
   overwriteFilename: boolean
