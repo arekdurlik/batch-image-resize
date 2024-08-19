@@ -6,7 +6,7 @@ import { SelectInput } from '../../ui/inputs/select-input'
 import { ButtonGroup } from '../../ui/inputs/styled'
 import { TextInput } from '../../ui/inputs/text-input'
 import { SortOption, SortDirection } from '../types'
-import { Tooltip, TooltipContent } from '../../ui/Tooltip'
+import { Tooltip, TooltipContent } from '../../ui/tooltips'
 
 type Props = {
   filter: string,

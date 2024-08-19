@@ -53,7 +53,11 @@ export const ListItem = forwardRef<HTMLDivElement, Props>((props, ref) => {
       data-id={image.id}
     >
       <ImageWrapper>
-        <Image src={image.image.thumbnail.src} draggable={false}/>
+        <Image 
+          src={image.image.thumbnail.src} 
+          draggable={false} 
+          onDoubleClick={() => window.open(image.image.full.src, '_blank')?.focus()}
+        />
       </ImageWrapper>
       <Title>
         {sortBy === SortOption.FILESIZE 

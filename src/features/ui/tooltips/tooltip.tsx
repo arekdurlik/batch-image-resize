@@ -57,6 +57,23 @@ export function Tooltip({ content, children, placement = Placement.BOTTOM, enabl
     setRenderParams({ x: left, y: top });
   }, [isOpen, placement, targetElement]);
   
+  function handleBlur() {
+    if (contentRef.current) {
+      contentRef.current.style.opacity = '0';
+    }
+    
+    fadeOutTimeout.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 150);
+  }
+  function handleFocus(event: FocusEvent) {
+    if (event.currentTarget instanceof HTMLElement) {
+      setIsOpen(true);
+      setTargetElement(event.currentTarget);
+      clearTimeout(fadeOutTimeout.current);
+    }
+  }
+
   function handleMouseEnter(event: MouseEvent) {
     if (event.target instanceof HTMLElement) {
       setTargetElement(event.target);
@@ -74,6 +91,8 @@ export function Tooltip({ content, children, placement = Placement.BOTTOM, enabl
 
   const clonedEle = React.cloneElement(child, {
       ...child.props,
+      onFocus: handleFocus,
+      onBlur: handleBlur,
       onMouseEnter: handleMouseEnter,
       onMouseLeave: handleMouseLeave,
   });

@@ -13,9 +13,9 @@
   --shadow-small: 0px 1px 0px 0px #1f23280a;
   --shadow-default: 0px 3px 6px 0px #424a531f;
 
-  --padding-small: 2.5px;
-  --padding-default: 5px;
-  --padding-large: 10px;
+  --spacing-small: 2.5px;
+  --spacing-default: 5px;
+  --spacing-large: 10px;
 
   --outlineColor: var(--color-blue-5);
   --outlineOffset:  -2px;
