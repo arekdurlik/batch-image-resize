@@ -1,6 +1,6 @@
 import { MdMoreHoriz } from 'react-icons/md'
 import { Button } from '../../ui/inputs/button'
-import { Tooltip, TooltipContent } from '../../ui/tooltips'
+import { Tooltip, TooltipContent } from '../../ui/tooltip'
 import { useState } from 'react'
 
 export function MoreOptions() {
