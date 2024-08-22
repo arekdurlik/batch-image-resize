@@ -9,7 +9,7 @@ import { SectionHeader, SectionTitle } from '../../layout/styled'
 import { Button } from '../../ui/inputs/button'
 import { ProgressBar } from '../../ui/progress-bar'
 import { ImageList } from '../image-list'
-import { Wrapper, ImageListWrapper, ProgressBarWrapper } from '../styled'
+import { Wrapper, ImageListWrapper, ProgressBarWrapper, HeaderOptions } from '../styled'
 import { SortOption, SortDirection } from '../types'
 import { FilterAndSort } from './filter-and-sort'
 import { MoreOptions } from './more-options'
@@ -61,7 +61,7 @@ export function OutputImages() {
     <Wrapper>
       <SectionHeader $borderTop>
         <SectionTitle>Output images</SectionTitle>
-        <Options>
+        <HeaderOptions>
           <FilterAndSort
             filter={filter}
             sortOption={sortOption}
@@ -71,7 +71,7 @@ export function OutputImages() {
             onSortDirChange={setSortDirection}
           />
           <MoreOptions/>
-        </Options>
+        </HeaderOptions>
       </SectionHeader>
       <ImageListWrapper>
         <ProgressBarWrapper>
@@ -89,13 +89,3 @@ export function OutputImages() {
     </Wrapper>
   )
 }
-
-const Options = styled.div`
-display: flex;
-gap: 5px;
-align-items: center;
-
-span {
-  font-weight: 500;
-}
-`

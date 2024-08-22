@@ -62,7 +62,7 @@ function resizeImage(image: HTMLCanvasElement | HTMLImageElement, width?: number
 
       offScreenCanvas.width = newWidth;
       offScreenCanvas.height = newHeight;
-      const resized = resizer.resize(image, offScreenCanvas);
+      const resized = resizer.resize(image, offScreenCanvas, { filter: 'lanczos3' });
       resolve(resized);
     } catch {
       throw new Error('Failed to resize image.');

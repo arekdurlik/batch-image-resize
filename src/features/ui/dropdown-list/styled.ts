@@ -11,10 +11,11 @@ cursor: pointer;
 transition: background-color var(--transition-default);
 border-radius: var(--borderRadius-default);
 
-${props => props.$highlighted && 'background-color: var(--button-default-bgColor-hover)'};
+${props => props.$highlighted && 'background-color: var(--control-default-bgColor-hover)'};
 `
 
 export const Container = styled.ul<{ 
+  $floating: boolean
   $slideIn: boolean
   $renderParams: { placement: Placement, x: number, y: number },
 }>`
@@ -26,6 +27,7 @@ overflow: hidden;
 border: 1px solid var(--borderColor-default);
 border-radius: var(--borderRadius-default);
 box-shadow: var(--shadow-default);
+${props => props.$floating && `box-shadow: var(--shadow-large);`}
 background-color: var(--bgColor-default);
 cursor: default;
 

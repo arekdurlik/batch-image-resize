@@ -100,6 +100,8 @@ export function useDragSelect(
   }
 
   function handleMouseDown(event: ReactMouseEvent) {
+    if (event.button === 2) return;
+
     if (!container.current) return;
 
     if (opts.ignoreChildren) {
@@ -168,7 +170,9 @@ export function useDragSelect(
     previousSelected.current = selected;
   }
 
-  function handleMouseUp() {
+  function handleMouseUp(event: MouseEvent) {
+    if (event.button === 2) return;
+
     if (callbacks.onEnd) {
       const boxRect = boxElement.current.getBoundingClientRect();
       const selected = selectables.filter(i => {

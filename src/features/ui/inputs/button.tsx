@@ -1,5 +1,5 @@
-import { ButtonHTMLAttributes, MouseEventHandler, ReactNode, CSSProperties } from 'react'
-import styled from 'styled-components'
+import { ButtonHTMLAttributes, MouseEventHandler, ReactNode, CSSProperties, forwardRef, MouseEvent, useEffect, useRef } from 'react'
+import styled, { css } from 'styled-components'
 import { outline } from '../../../styles/mixins'
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & { 
@@ -9,20 +9,28 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   style?: CSSProperties
 };
 
-export function Button({ disabled, onClick, children, style, ...props }: Props) {
+export const Button = forwardRef<HTMLButtonElement, Props>((props, ref) => {
+  const { disabled, onClick, children, style, ...rest } = props;
+
+  function handleClick(event: MouseEvent<HTMLButtonElement>) {
+    !disabled && onClick?.(event);
+  }
+
   return (
-    <StyledButton 
-      onClick={onClick} 
+    <StyledButton
+      tabIndex={disabled ? -1 : 0}
+      ref={ref}
+      onClick={handleClick} 
       style={style} 
-      disabled={disabled}
-      {...props}
+      $disabled={disabled}
+      {...rest}
     >
       {children}
     </StyledButton>
   )
-}
+});
 
-const StyledButton = styled.button`
+const StyledButton = styled.button<{ $disabled?: boolean }>`
   ${outline}
 
   display: flex;
@@ -32,8 +40,8 @@ const StyledButton = styled.button`
 
   border: 1px solid var(--borderColor-default);
   border-radius: var(--borderRadius-default);
-  background-color: var(--button-default-bgColor-rest);
-  color: var(--button-default-fgColor-rest);
+  background-color: var(--control-default-bgColor-rest);
+  color: var(--control-default-fgColor-rest);
   padding: 3px 7px;
   font-weight: 500;
   min-height: 29px;
@@ -44,11 +52,11 @@ const StyledButton = styled.button`
     outline var(--transition-fast);
 
   &:hover {
-    background-color: var(--button-default-bgColor-hover);
+    background-color: var(--control-default-bgColor-hover);
   }
 
   &:active {
-    background-color: var(--button-default-bgColor-active);
+    background-color: var(--control-default-bgColor-active);
   }
 
   &:focus-visible {
@@ -56,6 +64,15 @@ const StyledButton = styled.button`
     z-index: 1;
   }
   
+  ${props => props.$disabled && css`
+    cursor: not-allowed;
+    background-color: transparent;
+    color: var(--control-default-fgColor-disabled);
+    * {
+      color: var(--control-default-fgColor-disabled);
+    }
+  `}
+
   svg {
     font-size: 16px;
   }

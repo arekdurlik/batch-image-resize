@@ -91,4 +91,10 @@ ul {
     opacity: 0.5;
   }
 }
+
+.context-menu-actuator {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
 `

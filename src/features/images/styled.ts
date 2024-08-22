@@ -19,3 +19,13 @@ export const ImageListWrapper = styled.div`
 position: relative;
 height: calc(100% - ${SECTION_HEADER_HEIGHT}px);
 `
+
+export const HeaderOptions = styled.div`
+display: flex;
+gap: 5px;
+align-items: center;
+
+span {
+  font-weight: 500;
+}
+`

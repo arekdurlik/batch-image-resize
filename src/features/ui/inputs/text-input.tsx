@@ -63,7 +63,7 @@ font-weight: 500;
 const InputContainer = styled.div<{ $focused: boolean }>`
 ${outlineRest}
 ${props => props.$focused && outlineActive}
-background-color: var(--button-default-bgColor-rest);
+background-color: var(--control-default-bgColor-rest);
 border: 1px solid var(--borderColor-default);
 border-radius: var(--borderRadius-default);
 transition: border-color var(--transition-default);

@@ -25,14 +25,15 @@ export function SelectInput({ value, options, align, onChange }: Props) {
       <ActionMenu 
         actuator={ref} 
         initialHighlightIndex={options.findIndex(opt => opt.value === value) ?? 0}
-        align={align} 
+        align={align}
+        slideIn
       >
         {options.map(option => (
           <ActionMenu.Item
-          key={option.label + option.value}
-          label={option.label}
-          active={option.value === value}
-          onClick={handleSelect(option.value)}
+            key={option.label + option.value}
+            label={option.label}
+            onClick={handleSelect(option.value)}
+            check={option.value === value}
           />
         ))}
       </ActionMenu>

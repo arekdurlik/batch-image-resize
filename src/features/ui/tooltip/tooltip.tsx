@@ -3,30 +3,33 @@ import { createPortal } from 'react-dom'
 import { OVERLAY_ID, OVERLAY_Z_INDEX } from '../../../lib/constants'
 import styled, { css } from 'styled-components'
 import { Placement } from '../types'
-import { fadeIn } from '../../../styles/mixins'
 import { getRenderParams } from './utils'
-import { useHoverIntent } from '../../../hooks'
+import { useHoverIntent, useModifiersRef, useMouseInputRef } from '../../../hooks'
+import { TooltipContent } from './tooltip-content'
 
 type Props = {
   content: ReactNode
   children: ReactNode
   placement?: Placement
-  enabled?: boolean
+  disabled?: boolean
   openDelay?: number
 };
 
-export function Tooltip({ content, children, placement = Placement.BOTTOM, enabled = true }: Props) {
+const FADEOUT_TIME = 150;
+export function Tooltip({ content, children, placement = Placement.BOTTOM, disabled, openDelay = 200 }: Props) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const hoverIntended = useHoverIntent(isHovered && enabled);
+  const hoverIntended = useHoverIntent(isHovered && !disabled, openDelay);
 
-  const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [renderParams, setRenderParams] = useState({ x: 0, y: 0 });
   
   const contentRef = useRef<HTMLDivElement>(null);
   const overlay = useRef(document.querySelector(`#${OVERLAY_ID}`)!);
   const fadeOutTimeout = useRef<NodeJS.Timeout>();
+  const modifiers = useModifiersRef();
+  const mouse = useMouseInputRef();
 
+  const targetElement = useRef<HTMLElement | null>(null);
   useEffect(() => {
     let timeout = fadeOutTimeout.current;
 
@@ -39,44 +42,55 @@ export function Tooltip({ content, children, placement = Placement.BOTTOM, enabl
       
       timeout = setTimeout(() => {
         setIsOpen(false);
-      }, 150);
+      }, FADEOUT_TIME);
     }
 
     return () => clearTimeout(timeout);
-  }, [enabled, hoverIntended, placement, targetElement]);
+  }, [hoverIntended]);
 
   useEffect(() => {
-    if (!isOpen || !targetElement || !contentRef.current) return;
+    if (!targetElement || !contentRef.current || !targetElement.current) return;
     
-    const [left, top] = getRenderParams(
-      targetElement.getBoundingClientRect(), 
-      contentRef.current.getBoundingClientRect(), 
-      placement
-    );
-    
-    setRenderParams({ x: left, y: top });
+    if (isOpen) {
+      const [left, top] = getRenderParams(
+        targetElement.current.getBoundingClientRect(), 
+        contentRef.current.getBoundingClientRect(), 
+        placement
+      );
+      
+      setRenderParams({ x: left, y: top });
+      contentRef.current.style.opacity = '1';
+    } else {
+      contentRef.current.style.opacity = '0';
+    }
   }, [isOpen, placement, targetElement]);
   
   function handleBlur() {
+    if (mouse.lmb) return;
+
     if (contentRef.current) {
       contentRef.current.style.opacity = '0';
     }
     
     fadeOutTimeout.current = setTimeout(() => {
       setIsOpen(false);
-    }, 150);
+    }, FADEOUT_TIME);
   }
   function handleFocus(event: FocusEvent) {
+    if (mouse.lmb || !modifiers.tab) return;
+
     if (event.currentTarget instanceof HTMLElement) {
       setIsOpen(true);
-      setTargetElement(event.currentTarget);
+      targetElement.current = event.currentTarget;
       clearTimeout(fadeOutTimeout.current);
     }
   }
-
+  
   function handleMouseEnter(event: MouseEvent) {
+    if (isOpen) return;
+    
     if (event.target instanceof HTMLElement) {
-      setTargetElement(event.target);
+      targetElement.current = event.target;
       setIsHovered(true);
     }
   }
@@ -115,14 +129,16 @@ export function Tooltip({ content, children, placement = Placement.BOTTOM, enabl
   );
 }
 
+Tooltip.Content = TooltipContent;
+
 const ContentWrapper = styled.div<{ $renderParams?: { x: number, y: number }}>`
 position: absolute;
 transition: opacity var(--transition-default);
 z-index: ${OVERLAY_Z_INDEX.TOOLTIP};
+opacity: 0;
 
 ${props => props.$renderParams && css`
 left: ${props.$renderParams.x}px;
 top: ${props.$renderParams.y}px;
-${fadeIn}
 `}
 `

@@ -12,6 +12,7 @@
   --shadow-xsmall: 0px 1px 0px 0px #1f23281a;
   --shadow-small: 0px 1px 0px 0px #1f23280a;
   --shadow-default: 0px 3px 6px 0px #424a531f;
+  --shadow-large: 0px 0px 0px 1px #d1d9e080, 0px 6px 12px -3px #25292e0a, 0px 6px 18px 0px #25292e1f;
 
   --spacing-small: 2.5px;
   --spacing-default: 5px;
@@ -33,8 +34,8 @@
   --color-blue-8: hsl(212, 100%, 26%);
   --color-blue-9: hsl(212, 100%, 18%);
 
-  --color-red-4: hsl(357, 80%, 40%);
-  --color-green-4: hsl(128, 60%, 40%);
+  --color-red-5: hsl(356, 71%, 50%);
+  --color-green-5: hsl(128, 40%, 50%);
 
   --fgColor-default:  hsl(200, 3%, 17%);
   --fgColor-muted:    hsl(200, 3%, 25%);
@@ -48,12 +49,16 @@
 
   --borderColor-default: hsl(220, 11%, 78%);
 
-  --button-default-fgColor-rest:      var(--fgColor-default);
-  --button-default-bgColor-rest:      hsl(218, 65%, 97%);
-  --button-default-bgColor-hover:     hsl(218, 65%, 94%);
-  --button-default-bgColor-active:    hsl(218, 65%, 90%);
-  --button-default-bgColor-selected:  var(--button-default-bgColor-active);
-  --button-default-borderColor:       var(--borderColor-default);
+  --control-default-fgColor-rest:      var(--fgColor-default);
+  --control-default-fgColor-disabled:  color-mix(in hsl, var(--fgColor-default), transparent 60%);
+  --control-default-bgColor-rest:      hsl(218, 65%, 97%);
+  --control-default-bgColor-hover:     hsl(218, 65%, 94%);
+  --control-default-bgColor-active:    hsl(218, 65%, 90%);
+  --control-default-bgColor-selected:  var(--control-default-bgColor-active);
+  --control-default-borderColor:       var(--borderColor-default);
 
-  --input-bgColor: var(--button-default-bgColor-rest);
+  --control-danger-fgColor-rest: var(--color-red-5);
+  --control-danger-bgColor-hover: color-mix(in hsl, var(--color-red-5), transparent 85%);
+
+  --input-bgColor: var(--control-default-bgColor-rest);
 }

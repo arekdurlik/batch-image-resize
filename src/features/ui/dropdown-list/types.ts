@@ -4,6 +4,7 @@ export type Props = {
   children: ReactNode, 
   actuator?: RefObject<HTMLElement>
   initialHighlightIndex?: number,
+  floating?: boolean
   align?: Alignment
   slideIn?: boolean
   margin?: number

@@ -7,7 +7,7 @@ ${outline}
 
 position: relative;
 font-weight: 400;
-background-color: var(--button-default-bgColor-rest);
+background-color: var(--control-default-bgColor-rest);
 border: 1px solid var(--borderColor-default);
 border-radius: var(--borderRadius-default);
 padding: 3px 6px;
@@ -21,7 +21,7 @@ transition: border-color 150ms;
 
 
 &:hover {
-  background-color: var(--button-default-bgColor-hover);
+  background-color: var(--control-default-bgColor-hover);
   cursor: pointer;
 }
 `

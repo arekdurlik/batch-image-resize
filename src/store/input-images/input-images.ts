@@ -1,11 +1,12 @@
 import { create } from 'zustand'
-import { InputImageData, UploadedImage } from '../types'
+import { InputImageData, SelectedItem, UploadedImage } from '../types'
 import { useOutputImages } from '../output-images'
 import { useVariants } from '../variants'
 import { Log } from '../../lib/log'
 import { initialProgress, Progress, startProgress } from '../utils'
 import { generateInputImage } from './utils'
 import { openToast, ToastType } from '../toasts'
+import { useApp } from '../app'
 
 type InputImagesState = {
   images: InputImageData[]
@@ -13,6 +14,9 @@ type InputImagesState = {
   progress: Progress
   api: {
     add: (images: UploadedImage[]) => void
+    deleteByIds: (ids: string[]) => void
+    deleteAll: () => void
+    selectAll: () => void
   }
 };
 
@@ -40,7 +44,7 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
           inputImages.push(inputImage);
           newImages.push(inputImage);
 
-          set({ images: inputImages });
+          set({ images: inputImages, totalSize: get().totalSize + inputImage.image.full.file.size });
 
           progress.advance();
         } catch(error) {
@@ -64,6 +68,34 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
       variants.forEach(v => {
         useOutputImages.getState().api.generateVariant(v);
       });
+    },
+    deleteByIds: (ids) => {
+      const inputImages = [...get().images];
+      let totalSize = get().totalSize;
+
+      ids.forEach(id => {
+        const index = inputImages.findIndex(img => img.id === id);
+
+        if (index > -1) {
+          totalSize = totalSize - inputImages[index].image.full.file.size;
+          inputImages.splice(index, 1);
+        } else {
+          throw new Error();
+        }
+
+      });
+
+      useOutputImages.getState().api.deleteByInputImageIds(ids);
+
+      set({ images: inputImages, totalSize });
+    },
+    deleteAll: () => {
+      set({ images: [] });
+    },
+    selectAll: () => {
+      const images = get().images;
+      const toSelect = images.map(i => ({ type: 'input', id: i.id })) as SelectedItem[];
+      useApp.setState({ selectedItems: toSelect });
     }
   }
 }));

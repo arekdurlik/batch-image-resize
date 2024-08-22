@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { InputImageData, OutputImageData, Variant } from '../types'
+import { InputImageData, OutputImageData, SelectedItem, Variant } from '../types'
 import { insertVariantDataToFilename} from '../../lib/helpers'
 import { useInputImages } from '../input-images'
 import { Log } from '../../lib/log'
@@ -7,6 +7,7 @@ import { subscribeWithSelector } from 'zustand/middleware'
 import { initialProgress, Progress, startProgress } from '../utils'
 import { generateOutputImage, generateOutputImageVariants } from './utils'
 import { openToast, ToastType } from '../toasts'
+import { useApp } from '../app'
 
 type OutputImagesState = {
   images: OutputImageData[]
@@ -17,6 +18,9 @@ type OutputImagesState = {
     regenerate: () => void
     regenerateVariant: (variant: Variant) => void
     updateVariantData: (variant: Variant) => void
+    deleteByInputImageIds: (ids: string[]) => void
+    deleteAll: () => void
+    selectAll: () => void
   }
 };
 
@@ -87,7 +91,20 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
       
       try {
         for (let i = 0; i < inputImages.length; i++) {
+
+          let currentInputImages = useInputImages.getState().images;
+          if (!currentInputImages.some(img => img.id === inputImages[i].id)) {
+            progress.advance();
+            continue;
+          }
+          
           const image = await generateOutputImage(inputImages[i], variant);
+
+          currentInputImages = useInputImages.getState().images;
+          if (!currentInputImages.some(img => img.id === inputImages[i].id)) {
+            progress.advance();
+            continue;
+          }
           
           if (image) {
             const outputImages = [...get().images];
@@ -164,6 +181,23 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
       });
 
       set({ images });
+    },
+    deleteByInputImageIds: (ids) => {
+      let outputImages = [...get().images];
+
+      ids.forEach(id => {
+        outputImages = outputImages.filter(img => img.inputImage.id !== id);
+      });
+
+      set({ images: outputImages });
+    },
+    deleteAll: () => {
+      set({ images: [] });
+    },
+    selectAll: () => {
+      const images = get().images;
+      const toSelect = images.map(i => ({ type: 'output', id: i.id })) as SelectedItem[];
+      useApp.setState({ selectedItems: toSelect });
     }
   }
 })));

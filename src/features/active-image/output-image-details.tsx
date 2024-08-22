@@ -41,12 +41,14 @@ export function OutputImageDetails({ image }: { image: OutputImageData }) {
   )
 }
 
-const PercentageChange = styled.span<{ $value: number }>`
-${props => props.$value < 0 
-  ? 'color: var(--color-green-4)' 
-  : props.$value > 0 
-  ? 'color: var(--color-red-4)' 
-  : ''};
+export const PercentageChange = styled.span<{ $value?: number }>`
+${props => props.$value && (
+  props.$value < 0 
+    ? 'color: var(--color-green-5)' 
+    : props.$value > 0 
+      ? 'color: var(--color-red-5)' 
+      : ''
+)};
 `
 const Icons = styled.div`
 display: flex;

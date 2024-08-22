@@ -1,4 +1,4 @@
-import { Children, isValidElement, ReactElement, useEffect, useRef, useState } from 'react'
+import { Children, isValidElement, ReactElement, useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { OVERLAY_ID } from '../../../lib/constants'
 import { Placement } from '../types'
@@ -12,6 +12,7 @@ export function DropdownList({
 children, 
 actuator, 
 initialHighlightIndex = 0, 
+floating = false,
 align = 'left', 
 slideIn = false, 
 margin = 4, 
@@ -29,13 +30,19 @@ onClose,
   
   const tabbableLength = tabbableArray.length;
 
+  const runItemCallback = useCallback(async (index: number, event?: Event) => {
+    const item = reactElemRefArray[index];
+    if (item) {
+      (item as ReactElement).props?.onClick?.(event);
+      onClose?.();
+    }
+  }, [onClose, reactElemRefArray]);
+
   // fill dom and react elem refs arrays
   useEffect(() => {
     const reactArray = Children.map(children, child => {
       if (isValidElement(child)) {
         return child;
-      } else {
-        throw new Error(`Dropdown list child not a valid React element: ${child}`);
       }
     });
 
@@ -63,26 +70,32 @@ onClose,
   useEffect(() => {
     function handler(event: MouseEvent) {
       const clickedOnOption = list.current.contains(event.target as HTMLElement);
-
+      
       if (clickedOnOption) {
         const index = tabbableArray.findIndex(el => el === event.target);
-        const reactElem = reactElemRefArray[index];
-        (reactElem as ReactElement).props.onClick?.(event);
-        onClose?.();
+        runItemCallback(index, event);
       }
+    }
+    
+    function handleMouseDown(event: MouseEvent) {
+      event.stopPropagation();
     }
 
     const ref = list.current;
 
-    ref.addEventListener('click', handler, true);
-    return () => ref.removeEventListener('click', handler, true);
-  }, [onClose, reactElemRefArray, tabbableArray]);
+    ref.addEventListener('mousedown', handleMouseDown);
+    ref.addEventListener('click', handler);
+    return () => {
+      ref.removeEventListener('mousedown', handleMouseDown);
+      ref.removeEventListener('click', handler);
+    }
+  }, [onClose, tabbableArray, runItemCallback]);
 
   // click away listener
   // pointer down with useCapture, otherwise clicking on panel resizer doesn't close dropdown
   useEffect(() => {
     function handler(event: MouseEvent) {
-      const clickedOnActuator = event.target === actuator?.current;
+      const clickedOnActuator = actuator?.current?.contains(event.target as HTMLElement);
       const clickedOnList = event.target === list.current;
       const clickedOnOption = list.current.contains(event.target as HTMLElement);
 
@@ -91,10 +104,8 @@ onClose,
       }
     }
 
-    const ref = list.current;
-
-    ref.addEventListener('pointerdown', handler, true);
-    return () => ref.removeEventListener('pointerdown', handler, true);
+    document.addEventListener('pointerdown', handler, true);
+    return () => document.removeEventListener('pointerdown', handler, true);
   }, [actuator, onClose]);
 
   // set list placement based on screen bounds
@@ -132,6 +143,7 @@ onClose,
   // keyboard navigation
   useEffect(() => {
     function handler(event: KeyboardEvent) {
+      event.stopPropagation();
       switch (event.key) {
         case 'Tab':
         case 'Escape':
@@ -139,11 +151,7 @@ onClose,
           break;
         case 'Enter':
         case ' ': {
-          const item = reactElemRefArray[highlightedIndex];
-          if (item) {
-            (item as ReactElement).props.onClick?.(event);
-            onClose?.();
-          }
+          runItemCallback(highlightedIndex, event);
           break;
         }
         case 'ArrowUp':
@@ -161,11 +169,12 @@ onClose,
     
     ref.addEventListener('keydown', handler);
     return () => ref.removeEventListener('keydown', handler);
-  }, [highlightedIndex, tabbableLength, reactElemRefArray, onClose]);
-  
+  }, [highlightedIndex, tabbableLength, onClose, runItemCallback]);
+
   return createPortal((
     <Container
       ref={list}
+      $floating={floating}
       $slideIn={slideIn}
       $renderParams={renderParams}
     >

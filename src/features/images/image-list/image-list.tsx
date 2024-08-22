@@ -99,7 +99,7 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
       }
       case 'ArrowLeft': 
       case 'ArrowRight': {
-        newIndex = event.code === 'ArrowLeft' 
+        newIndex = event.key === 'ArrowLeft' 
           ? newIndex - 1 
           : newIndex + 1;
         newIndex = clamp(newIndex, 0, images.length - 1);
@@ -127,9 +127,10 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
         break;
       }
       default: {
-        if (event.key === 'Space') {
+        if (event.key === ' ') {
           if (input.current.length) {
             event.preventDefault();
+            event.stopPropagation();
           } else {
             return;
           }
@@ -172,12 +173,12 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
   }
 
   function handleKeyboardBlur() {
-    if (mouse.lmb) return;
+    if (!modifiers.tab) return;
     handleBlur();
   }
 
   function handleBlur() {
-    if (!isActive) return;
+    if (!isActive || mouse.rmb) return;
     setIsActive(false);
     latestSelectedItem.current = selected.current[selected.current.length - 1];
   }
@@ -189,6 +190,7 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
       tabIndex={0} 
       onFocus={handleKeyboardFocus}
       onBlur={handleKeyboardBlur}
+      onContextMenu={() => setIsActive(true)}
       {...dragSelectBind}
     > 
       {images.length > 0 && (
@@ -202,7 +204,8 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
               key={image.id}
               type={type}
               image={image} 
-              sortBy={sortBy} 
+              sortBy={sortBy}
+              listFocused={isActive}
             />
           ))}
         </Grid>

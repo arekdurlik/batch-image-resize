@@ -4,6 +4,9 @@ import { subscribeWithSelector } from 'zustand/middleware'
 import { mergeUniqueSelectionItems } from '../utils'
 import { SelectedItem } from './types'
 import { switchedType } from './utils'
+import { useInputImages } from './input-images'
+import { openToast, ToastType } from './toasts'
+import { Log } from '../lib/log'
 
 type App = {
   selectedItems: SelectedItem[],
@@ -28,9 +31,11 @@ type App = {
       modifiers?: { control?: boolean, shift?: boolean }
     ) => void
     deselectItems: (items: SelectedItem[]) => void
+    deselectAll: () => void
     setSelectedItems: (items: SelectedItem[], setLatestSelected?: boolean) => void
     setLastSelectedItem: (item: SelectedItem | undefined) => void
-    clearSelectedItems: () => void
+    deleteSelectedItems: () => void
+    clearAllSelectedItems: () => void
     setQuality: (quality: number) => void
     setIndexAsName: (indexAsName: boolean) => void
     setPrefix: (prefix: string) => void
@@ -129,6 +134,9 @@ export const useApp = create<App>()(subscribeWithSelector((set, get) => ({
       
       set({ selectedItems });
     },
+    deselectAll: () => {
+      set({ selectedItems: [], latestSelectedItem: undefined });
+    },
     setSelectedItems: (items, setLatestSelected = false) => {
       const latestSelectedItem = setLatestSelected ? items[items.length - 1] : undefined;
 
@@ -141,7 +149,54 @@ export const useApp = create<App>()(subscribeWithSelector((set, get) => ({
     setLastSelectedItem: (item) => {
       set({ latestSelectedItem: item });
     },
-    clearSelectedItems: () => {
+    deleteSelectedItems: () => {
+      try {
+        const selectedItems = [...get().selectedItems];
+        if (!selectedItems.length) return;
+
+        const latest = get().latestSelectedItem;
+        const inputImages = [...useInputImages.getState().images];
+        let outputImages = [...useOutputImages.getState().images];
+        let totalInputSize = useInputImages.getState().totalSize;
+
+        const type = selectedItems[0].type;
+        const typeImages = type === 'input' 
+          ? inputImages 
+          : outputImages;
+        
+        const selectedIds = selectedItems.map(i => i.id);
+
+        selectedIds.forEach(id => {
+          const index = typeImages.findIndex(img => img.id === id);
+  
+          if (index > -1) {
+            if (type === 'input') {
+              totalInputSize -= inputImages[index].image.full.file.size;
+              outputImages = outputImages.filter(img => img.inputImage.id !== id);
+            }
+
+            typeImages.splice(index, 1);
+          } else {
+            throw new Error();
+          }
+        });
+
+        if (type === 'input') {
+          useInputImages.setState({ images: inputImages, totalSize: totalInputSize });
+        }
+        
+        useOutputImages.setState({ images: outputImages });
+        set({ selectedItems: [] });
+
+        if (latest && selectedItems.map(i => i.id).includes(latest.id)) {
+          set({ latestSelectedItem: undefined });
+        }
+      } catch (error) {
+        Log.error('Error deleting selected images.', error);
+        openToast(ToastType.ERROR, 'Error deleting selected images.');
+      }
+    },
+    clearAllSelectedItems: () => {
       set({ selectedItems: [] })
     },
     async setQuality(quality) {

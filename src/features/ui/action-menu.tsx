@@ -5,64 +5,101 @@ import { Alignment } from './dropdown-list/types'
 type Props = {
   actuator: RefObject<HTMLElement>
   children: ReactNode
+  open?: boolean
   initialHighlightIndex?: number
+  floating?: boolean
   align?: Alignment
+  margin?: number
+  slideIn?: boolean
+  disabled?: boolean
+  onOpen?: () => void
+  onClose?: () => void
 };
 
-export function ActionMenu({ actuator, initialHighlightIndex, align, children }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+export function ActionMenu({ 
+  actuator, 
+  open, 
+  initialHighlightIndex, 
+  floating, 
+  align, 
+  margin,
+  slideIn, 
+  disabled,
+  onOpen,
+  onClose, 
+  children 
+}: Props) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = open !== undefined ? open : internalIsOpen;
 
   function handleClose() {
-    setIsOpen(false);
+    setInternalIsOpen(false);
     actuator.current?.focus();
+    onClose?.();
   }
 
   useEffect(() => {
+    if (isOpen) {
+      onOpen?.();
+    } else {
+      onClose?.();
+    }
+  }, [isOpen, onClose, onOpen]);
+
+  useEffect(() => {
+    if (disabled) return;
+    
     function handleKey(event: KeyboardEvent) {
       switch(event.key) {
         case 'Enter':
         case ' ':
-          toggleOpened();
+          if (!isOpen) setInternalIsOpen(true);
           break;
         case 'ArrowUp':
         case 'ArrowDown':
         case 'ArrowLeft':
         case 'ArrowRight':
-          !isOpen && setIsOpen(true);
+          !isOpen && setInternalIsOpen(true);
       }
     }
 
     function handleBlur(event: FocusEvent) {
       if (!isOpen && event.relatedTarget) {
-        setIsOpen(false);
+        setInternalIsOpen(false);
       }
     }
-
+    
     function toggleOpened() {
-      setIsOpen(prev => !prev);
+      setInternalIsOpen(prev => !prev);
+    }
+
+    function handleMouseDown() {
+      document.addEventListener('mouseup', toggleOpened);
     }
 
     if (actuator.current) {
       const act = actuator.current;
       act.addEventListener('keydown', handleKey);
       act.addEventListener('blur', handleBlur);
-      act.addEventListener('click', toggleOpened)
+      act.addEventListener('mousedown', handleMouseDown)
       return () => {
         act.removeEventListener('keydown', handleKey);
         act.removeEventListener('blur', handleBlur);
-        act.removeEventListener('click', toggleOpened)
+        act.removeEventListener('mousedown', handleMouseDown)
+        document.removeEventListener('mouseup', toggleOpened);
       }
     }
-  }, [actuator, isOpen]);
+  }, [actuator, disabled, isOpen]);
 
   return isOpen && (
     <DropdownList
       actuator={actuator}
-      open={isOpen}
       initialHighlightIndex={initialHighlightIndex}
       onClose={handleClose}
+      floating={floating}
       align={align}
-      slideIn
+      margin={margin}
+      slideIn={slideIn}
     >
       {children}
     </DropdownList>
