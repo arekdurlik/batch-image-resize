@@ -15,7 +15,7 @@ export function OutputImageDetails({ image }: { image: OutputImageData }) {
     <>
       <Details>
         <Field>
-          <Label>Filename<Icons><Edit/></Icons></Label>
+          <Label>Filename<Icons></Icons></Label>
           <Filename>{image.filename}</Filename>
         </Field>
 
@@ -33,7 +33,7 @@ export function OutputImageDetails({ image }: { image: OutputImageData }) {
         </Field>
 
         <Field>
-          <Label>Quality<Edit/></Label>
+          <Label>Quality</Label>
           <Filename>{Math.round(image.quality * 100 * 10) / 10}%</Filename>
         </Field>
       </Details>

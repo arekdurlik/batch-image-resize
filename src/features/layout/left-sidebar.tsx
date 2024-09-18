@@ -28,7 +28,8 @@ background-position: 0% 50%;
 const Container = styled.div`
 position: relative;
 height: 100%;
-width: 20rem;
+width: 275px;
+min-width: 275px;
 display: flex;
 flex-direction: column;
 justify-content: space-between;
@@ -38,5 +39,6 @@ overflow-y: hidden;
 
 const Content = styled.div`
 overflow-y: auto;
+height: 100%;
 `
 

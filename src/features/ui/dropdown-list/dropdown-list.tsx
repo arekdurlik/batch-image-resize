@@ -4,7 +4,7 @@ import { OVERLAY_ID } from '../../../lib/constants'
 import { Placement } from '../types'
 import { Container } from './styled'
 import { Item } from './children/item'
-import { Props } from './types'
+import { Props, RenderParams } from './types'
 import { getAlignment } from './utils'
 import { Divider } from './children/divider'
 
@@ -21,8 +21,8 @@ onClose,
   const [highlightedIndex, setHighlightedIndex] = useState(initialHighlightIndex);
   const [reactElemRefArray, setReactElemRefArray] = useState<ReactElement[]>([]);
   const [tabbableArray, setTabbableArray] = useState<(HTMLElement | null)[]>([]);
-  const [renderParams, setRenderParams] = useState({
-    x: 0, y: 0, placement: Placement.BOTTOM
+  const [renderParams, setRenderParams] = useState<RenderParams>({
+    x: 0, y: 0, placement: Placement.BOTTOM, width: 'auto'
   });
 
   const overlay = useRef<HTMLDivElement>(document.querySelector(`#${OVERLAY_ID}`)!);
@@ -113,25 +113,30 @@ onClose,
     function calculatePosition() {
       if (!list.current || !actuator?.current) return;
 
-      if (actuator.current) {
-        const listRect = list.current.getBoundingClientRect();
-        const actuatorRect = actuator.current.getBoundingClientRect();
-        const alignment = getAlignment(listRect, actuatorRect, align);
-        const actuatorBottom = actuatorRect.y + actuatorRect.height;
-        
-        if (actuatorBottom + listRect.height > window.innerHeight) {
-          setRenderParams({
-            x: actuatorRect.x + alignment, 
-            y: actuatorRect.y - listRect.height - margin,
-            placement: Placement.TOP
-          });
-        } else {
-          setRenderParams({
-            x: actuatorRect.x + alignment,
-            y: actuatorRect.y + actuatorRect.height + margin,
-            placement: Placement.BOTTOM
-          });
-        }
+      const listRect = list.current.getBoundingClientRect();
+      const actuatorRect = actuator.current.getBoundingClientRect();
+      const alignment = getAlignment(listRect, actuatorRect, align);
+      const actuatorBottom = actuatorRect.y + actuatorRect.height;
+      
+      let width: string | number = 'auto';
+
+      if (actuatorRect.width > listRect.width) {
+        width = actuatorRect.width;
+      }
+      if (actuatorBottom + listRect.height > window.innerHeight) {
+        setRenderParams({
+          x: actuatorRect.x + alignment, 
+          y: actuatorRect.y - listRect.height - margin,
+          placement: Placement.TOP,
+          width
+        });
+      } else {
+        setRenderParams({
+          x: actuatorRect.x + alignment,
+          y: actuatorRect.y + actuatorRect.height + margin,
+          placement: Placement.BOTTOM,
+          width
+        });
       }
     }
     

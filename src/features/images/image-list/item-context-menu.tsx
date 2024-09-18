@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useState } from 'react'
+import { RefObject, useEffect, useState } from 'react'
 import { useApp } from '../../../store/app'
 import { ImageData } from '../../../store/types'
 import { ContextMenu } from '../../ui/context-menu'
@@ -63,7 +63,7 @@ export function ItemContextMenu({ actuator, type, image, lastSelected, listFocus
       onOpen={handleContextMenuOpen} 
       onClose={() => setIsOpen(false)} 
     >
-      {selectedItems.length > 1 && (
+      {type !== 'input' && selectedItems.length > 1 && (
         <ContextMenu.Item
           label='Save images as...'
           icon={MdSaveAs}
@@ -76,7 +76,7 @@ export function ItemContextMenu({ actuator, type, image, lastSelected, listFocus
           onClick={() => window.open(image.image.full.src)}
         />
       )}
-      {selectedItems.length  === 1 && (
+      {type !== 'input' && selectedItems.length  === 1 && (
         <ContextMenu.Item
           label='Save image as...'
           icon={MdSaveAs}
@@ -89,7 +89,7 @@ export function ItemContextMenu({ actuator, type, image, lastSelected, listFocus
           onClick={copyImage}
         />
       )}
-      <ContextMenu.Divider/>
+      {!(type === 'input' && selectedItems.length > 1) && <ContextMenu.Divider/>}
       <ContextMenu.Item
         label='Delete'
         icon={IoMdTrash}

@@ -1,6 +1,6 @@
 import { THUMBNAIL_SIZE } from '../../lib/constants'
 import { Log } from '../../lib/log'
-import { processImage } from '../../lib/utils'
+import { calculateOuputDimensions, loadImage, processImage } from '../../lib/utils'
 import { openToast, ToastType } from '../toasts'
 import { InputImageData, UploadedImage } from '../types'
 import { v1 as uuid } from 'uuid'
@@ -18,12 +18,22 @@ export async function generateInputImage(image: UploadedImage): Promise<InputIma
       let thumbnailFile: Blob | File = file;
 
       if (needsThumbnail) {
-        thumbnailFile = (await processImage(file, 1, THUMBNAIL_SIZE, undefined)).blob;
+        const image = await loadImage(file);
+        const finalDimensions = calculateOuputDimensions(
+          image, 
+          { 
+            widthMode: 'upto', 
+            width: THUMBNAIL_SIZE, 
+            heightMode: 'upto',
+            height: THUMBNAIL_SIZE
+          }
+        );
+
+        thumbnailFile = (await processImage(image, file.name, 1, finalDimensions.width, finalDimensions.height)).blob;
       }
 
       const fullSrc = URL.createObjectURL(file);
 
-      if (needsThumbnail)
       inputImage = { 
         id, 
         index: 0,

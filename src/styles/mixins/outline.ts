@@ -11,9 +11,10 @@ outline: 2px solid var(--outlineColor);
 `
 
 export const outline = css`
-${outlineRest}
+outline: 1px solid transparent;
+outline-offset: var(--outlineOffset);
 
 &:focus-visible {
-  ${outlineActive}
+  outline: 2px solid var(--outlineColor);
 }
 `

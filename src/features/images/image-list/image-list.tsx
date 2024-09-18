@@ -194,7 +194,7 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
       {...dragSelectBind}
     > 
       {images.length > 0 && (
-        <Grid ref={grid} className='imagelist-container-query'>
+        <Grid ref={grid}>
           {images.map(image => (
             <ListItem
               ref={node => node 

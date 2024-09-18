@@ -1,5 +1,14 @@
 import styled, { css } from 'styled-components'
 
+export const ImageWrapper = styled.div`
+height: 100px;
+display: flex;
+flex-direction: column;
+justify-content: flex-end;
+user-select: none;
+pointer-events: all;
+`
+
 export const ImageListWrapper = styled.div<{ $focused: boolean }>`
 position: relative;
 z-index: 3;
@@ -24,45 +33,38 @@ gap: 3px 10px;
 padding: 20px;
 pointer-events: none;
 
-@container (max-width: 1260px) {
+@container (max-width: 1200px) {
   grid-template-columns: repeat(9, 1fr);
 }
 
-@container (max-width: 1120px) {
+@container (max-width: 1100px) {
   grid-template-columns: repeat(8, 1fr);
 }
 
-@media (max-width: 1800px) {
-  grid-template-columns: repeat(9, 1fr);
-}
-
-@media (max-width: 1600px) {
-  grid-template-columns: repeat(8, 1fr);
-}
-
-@media (max-width: 1450px) {
+@container (max-width: 1000px) {
   grid-template-columns: repeat(7, 1fr);
 }
 
-@media (max-width: 1350px) {
+@container (max-width: 900px) {
   grid-template-columns: repeat(6, 1fr);
 }
 
-@media (max-width: 1250px) {
+@container (max-width: 800px) {
   grid-template-columns: repeat(5, 1fr);
 }
 
-@media (max-width: 1000px) {
+@container (max-width: 700px) {
   grid-template-columns: repeat(4, 1fr);
 }
 
-@media (max-width: 850px) {
+@container (max-width: 600px) {
   grid-template-columns: repeat(3, 1fr);
 }
 
-@media (max-width: 700px) {
+@container (max-width: 500px) {
   grid-template-columns: repeat(2, 1fr);
 }
+
 `
 
 export const Item = styled.div<{ $previousActive?: boolean }>`
@@ -121,17 +123,8 @@ z-index: -1;
 }
 `
 
-export const ImageWrapper = styled.div`
-height: 100px;
-display: flex;
-flex-direction: column;
-justify-content: flex-end;
-user-select: none;
-pointer-events: all;
-`
-
 export const Image = styled.img`
-max-height: 100px;
+max-height: 100%;
 border-radius: var(--borderRadius-small);
 z-index: 1;
 overflow-clip-margin: none;

@@ -1,3 +1,4 @@
+import { CSSProperties } from 'react'
 import { Alignment } from '../../dropdown-list/types'
 
 export type Props = {
@@ -5,6 +6,7 @@ export type Props = {
   value: string | number
   options: Option[]
   align?: Alignment
+  style?: CSSProperties
   onChange: (value: string | number) => void
 };
 

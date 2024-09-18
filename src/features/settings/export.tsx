@@ -1,7 +1,6 @@
 import JSZip from 'jszip'
-import { useMemo } from 'react'
 import styled from 'styled-components'
-import { bytesToSizeFormatted } from '../../lib/helpers'
+import { bytesToSizeFormatted, getFileExtension, getFileNameWithoutExtension } from '../../lib/helpers'
 import { useInputImages } from '../../store/input-images'
 import { useOutputImages } from '../../store/output-images'
 import { OutputImageData } from '../../store/types'
@@ -10,15 +9,36 @@ import { Button } from '../ui/inputs/button'
 export function Export() {
   const totalInputBytes = useInputImages(state => state.totalSize);
   const outputImages = useOutputImages(state => state.images);
-  const totalOutputBytes = useMemo(() => outputImages.reduce((a, b) => a + b.image.full.file.size, 0), [outputImages]);
+  const totalOutputBytes = outputImages.reduce((a, b) => a + b.image.full.file.size, 0);
   
   function zipItUp(zip: JSZip, outputImages: OutputImageData[]): Promise<JSZip[]> {
     const promises: Promise<JSZip>[] = [];
+    const duplicateIndexes: { [key:string]: number } = {}
     
-    outputImages.forEach(({ image, filename }) => {
+    outputImages.forEach(outputImage => {
       promises.push(new Promise(resolve => {
         try {
-          resolve(zip.file(filename, image.full.file));
+          let finalFilename = outputImage.filename;
+
+          const isDuplicate = (i: OutputImageData) => (
+            i.id !== outputImage.id && i.filename === outputImage.filename
+          );
+
+          const duplicates = outputImages.filter(isDuplicate);
+
+          if (duplicates.length > 0) {
+            if (Object.prototype.hasOwnProperty.call(duplicateIndexes, outputImage.filename)) {
+              const name = getFileNameWithoutExtension(finalFilename);
+              const extension = getFileExtension(finalFilename);
+              finalFilename = `${name} (${duplicateIndexes[outputImage.filename]}).${extension}`;
+
+              duplicateIndexes[outputImage.filename]++;
+            } else {
+              duplicateIndexes[outputImage.filename] = 2;
+            }
+          }
+
+          resolve(zip.file(finalFilename, outputImage.image.full.file));
         } catch {
           throw new Error(`Failed to add file ${name} to the archive.`);
         }

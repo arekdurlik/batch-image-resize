@@ -12,7 +12,7 @@ export function Variants() {
         <SectionTitle>Variants</SectionTitle>
         <AddVariant/>
       </SectionHeader>
-      {variants.map((variant, i) => <Variant key={variant.id} {...variant} index={i} />)}
+      {variants.map(variant => <Variant key={variant.id} {...variant} />)}
     </>
   )
 }

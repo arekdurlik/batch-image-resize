@@ -62,6 +62,7 @@ export function FilterAndSort({
             { label: 'File size', value: SortOption.FILESIZE },
             { label: 'Variant', value: SortOption.VARIANT },
           ]}
+          style={{ width: 110 }}
         />
         <Tooltip
           content={

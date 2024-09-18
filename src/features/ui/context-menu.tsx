@@ -111,6 +111,7 @@ export function ContextMenu({
       align={align}
       margin={0}
       open={isOpen}
+      slideIn={false}
       onClose={handleClose}
     >
       {children}

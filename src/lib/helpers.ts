@@ -18,7 +18,7 @@ export function getFileExtension(filename: string) {
   return filename.substring(lastPeriod + 1);
 }
 
-export function removeFileExtension(filename: string) {
+export function getFileNameWithoutExtension(filename: string) {
   const lastPeriod = filename.lastIndexOf('.');
   return filename.substring(0, lastPeriod);
 }

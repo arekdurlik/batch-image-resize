@@ -1,67 +1,85 @@
-import { useCallback } from 'react'
-import { FileRejection, useDropzone } from 'react-dropzone'
-import styled from 'styled-components'
-import { useInputImages } from '../../../store/input-images'
-import { Log } from '../../../lib/log'
-import { getFileExtension } from '../../../lib/helpers'
-import { openToast, ToastType } from '../../../store/toasts'
-import { UploadedImage } from '../../../store/types'
+import { useDropzone } from 'react-dropzone'
+import styled, { css } from 'styled-components'
+import { MdCloudUpload } from 'react-icons/md'
+import { handleUpload } from './utils'
 
 export function DropZone() {
-  const api = useInputImages(state => state.api);
-
-  const onDrop = useCallback((acceptedFiles : File[], fileRejections: FileRejection[]) => {
-    if (fileRejections.length) {
-      Log.error('Error uploading files.', fileRejections);
-      const rejectedFormats = fileRejections
-        .map(rejection => getFileExtension(rejection.file.name))
-        .filter(v => v.length)
-        .map(v => `"${v}"`)
-        .join(', ');
-
-      openToast(
-        ToastType.ERROR, 
-        `Uploads with file type ${rejectedFormats} are not supported. Please try again.`
-      );
-      return;
-    }
-
-    const promises: Promise<UploadedImage>[] = [];
-
-    acceptedFiles.forEach((file) => {
-      const img = new Image();
-
-      promises.push(new Promise(resolve => {
-        img.onload = () => {
-          resolve({ file, width: img.width, height: img.height });
-        }
-      }));
-
-      img.src = URL.createObjectURL(file);
-    });
-
-    Promise.all(promises).then(images => api.add(images));
-  }, [api]);
-
-  const { getRootProps, getInputProps, isDragActive} = useDropzone({ onDrop, accept: {
-    'image/jpeg': [],
-    'image/png': []
-  } });
+  const { getRootProps, getInputProps, isDragActive,  } = useDropzone({ 
+    onDrop: handleUpload, 
+    accept: {
+      'image/jpeg': [],
+      'image/png': []
+    } 
+  });
 
   return (
     <Wrapper {...getRootProps()} $isDragActive={isDragActive}>
       <input {...getInputProps()} />
-      {
-        isDragActive ?
-          <p>Drop the files here ...</p> :
-          <p>Drag and drop files here, or click to select files</p>
-      }
+      <DropArea>
+        <Icon/>
+        <Cue>Drag and drop files to upload</Cue>
+        <Browse>or click to select files</Browse>
+      </DropArea>
     </Wrapper>
   )
 }
 
+const Icon = styled(MdCloudUpload)`
+font-size: 82px;
+min-height: 82px;
+fill: color-mix(in hsl, black, transparent 80%);
+margin-bottom: 5px;
+`
+
+const Cue = styled.span`
+font-size: 1.5em;
+font-weight: 500;
+`
+
+const Browse = styled.span`
+font-weight: 500;
+`
+
+const DropArea = styled.div`
+flex: 1;
+max-width: 500px;
+max-height: 250px;
+width: 100%;
+height: 100%;
+background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='5' ry='5' stroke='hsl(220, 11%, 78%)' stroke-width='2' stroke-dasharray='4 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+border-radius: 5px;
+transition: background-color var(--transition-default);
+
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+overflow: hidden;
+`
+
 const Wrapper = styled.div<{ $isDragActive: boolean }>`
 position: absolute;
+padding: var(--spacing-large);
 inset: 0;
 z-index: 3;
+display: flex;
+justify-content: center;
+align-items: center;
+overflow-y: scroll;
+cursor: pointer;
+
+transition: background-color var(--transition-default);
+&:hover {
+  ${DropArea} {
+    background-color: var(--control-default-bgColor-rest);
+  }
+}
+
+${props => props.$isDragActive && css`
+  ${DropArea} {
+    background-color: color-mix(in hsl, var(--color-green-5), transparent 80%);
+  }
+`}
+
+
 `

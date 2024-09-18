@@ -5,7 +5,7 @@ import { useInputImages } from '../input-images'
 import { Log } from '../../lib/log'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { initialProgress, Progress, startProgress } from '../utils'
-import { generateOutputImage, generateOutputImageVariants } from './utils'
+import { generateOutputImage, generateOutputImageVariants, getUpToDateVariant } from './utils'
 import { openToast, ToastType } from '../toasts'
 import { useApp } from '../app'
 
@@ -14,9 +14,9 @@ type OutputImagesState = {
   progress: Progress
   api: {
     generate: (images: InputImageData[]) => void
-    generateVariant: (variant: Variant) => void
+    generateVariant: (variantId: string) => void
     regenerate: () => void
-    regenerateVariant: (variant: Variant) => void
+    regenerateVariant: (variantId: string) => void
     updateVariantData: (variant: Variant) => void
     deleteByInputImageIds: (ids: string[]) => void
     deleteAll: () => void
@@ -83,8 +83,8 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
         openToast(ToastType.ERROR, 'Error generating output images. Please try again.');
       }
     },
-    async generateVariant(variant) {
-      Log.debug('Generating output images for variant.', { variant });
+    async generateVariant(variantId) {
+      Log.debug('Generating output images for variant.', { variantId });
 
       const inputImages = useInputImages.getState().images;
       const progress = startProgress(useOutputImages, inputImages.length);
@@ -98,7 +98,7 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
             continue;
           }
           
-          const image = await generateOutputImage(inputImages[i], variant);
+          const image = await generateOutputImage(inputImages[i], variantId);
 
           currentInputImages = useInputImages.getState().images;
           if (!currentInputImages.some(img => img.id === inputImages[i].id)) {
@@ -116,12 +116,16 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
         }
       } catch (error) {
         progress.cancel();
+
+        // probably deleted variant during generation
+        if (String(error).includes('not found')) return;
+
         Log.error('Error generating output images for variant.', error);
         openToast(ToastType.ERROR, 'Error generating output images. Please try again.');
       }
     },
-    async regenerateVariant(variant) {
-      Log.debug('Regenerating output images for variant.', { variant });
+    async regenerateVariant(variantId) {
+      Log.debug('Regenerating output images for variant.', { variantId });
       
       const outputImages = [...get().images];
       regenerateVariantOutputImagesIndex += 1;
@@ -132,14 +136,14 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
 
       try {
         for (let i = 0; i < outputImages.length; i++) {
-          if (outputImages[i].variantId === variant.id) {
+          if (outputImages[i].variantId === variantId) {
             const inputImage = inputImages.find(img => img.id === outputImages[i].inputImage.id);
   
             if (!inputImage) {
-              throw new Error(`Variant with id ${variant.id} not found.`);
+              throw new Error(`Variant with id ${variantId} not found.`);
             }
             
-            const image = await generateOutputImage(inputImage, variant, false);
+            const image = await generateOutputImage(inputImage, variantId, false);
             
             if (image) {
               URL.revokeObjectURL(outputImages[i].image.full.src);
@@ -157,6 +161,20 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
           progress.advance();
         }
 
+        const variant = getUpToDateVariant(variantId);
+
+        for (let i = 0; i < outputImages.length; i++) {
+          const image = outputImages[i];
+
+          if (!image.overwriteFilename) {
+            outputImages[i].filename = insertVariantDataToFilename(
+              image.inputImage.filename, 
+              variant.prefix, 
+              variant.suffix
+            );
+          }
+        }
+
         set({ images: outputImages });
       } catch (error) {
         progress.cancel();
@@ -170,13 +188,17 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
 
       images.forEach(image => {
         if (image.variantId === variant.id) {
-          !image.overwriteQuality && (image.quality = variant.quality);
+          if (!image.overwriteQuality) {
+            image.quality = variant.quality;
+          }
           
-          !image.overwriteFilename && (image.filename = insertVariantDataToFilename(
-            image.inputImage.filename,
-            variant.prefix,
-            variant.suffix
-          ));
+          if (!image.overwriteFilename) {
+            image.filename = insertVariantDataToFilename(
+              image.inputImage.filename,
+              variant.prefix,
+              variant.suffix
+            );
+          }
         }
       });
 

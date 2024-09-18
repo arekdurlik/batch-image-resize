@@ -23,7 +23,7 @@ export function ActionMenu({
   floating, 
   align, 
   margin,
-  slideIn, 
+  slideIn = true, 
   disabled,
   onOpen,
   onClose, 

@@ -16,7 +16,7 @@ type Props = {
 };
 
 const FADEOUT_TIME = 150;
-export function Tooltip({ content, children, placement = Placement.BOTTOM, disabled, openDelay = 200 }: Props) {
+export function Tooltip({ content, children, placement = Placement.BOTTOM, disabled, openDelay = 500 }: Props) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const hoverIntended = useHoverIntent(isHovered && !disabled, openDelay);
@@ -26,10 +26,11 @@ export function Tooltip({ content, children, placement = Placement.BOTTOM, disab
   const contentRef = useRef<HTMLDivElement>(null);
   const overlay = useRef(document.querySelector(`#${OVERLAY_ID}`)!);
   const fadeOutTimeout = useRef<NodeJS.Timeout>();
+  const focusTimeout = useRef<NodeJS.Timeout>();
   const modifiers = useModifiersRef();
   const mouse = useMouseInputRef();
-
   const targetElement = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     let timeout = fadeOutTimeout.current;
 
@@ -66,7 +67,8 @@ export function Tooltip({ content, children, placement = Placement.BOTTOM, disab
   }, [isOpen, placement, targetElement]);
   
   function handleBlur() {
-    if (mouse.lmb) return;
+    clearTimeout(focusTimeout.current);
+    if (mouse.lmb || !isOpen) return;
 
     if (contentRef.current) {
       contentRef.current.style.opacity = '0';
@@ -80,7 +82,9 @@ export function Tooltip({ content, children, placement = Placement.BOTTOM, disab
     if (mouse.lmb || !modifiers.tab) return;
 
     if (event.currentTarget instanceof HTMLElement) {
-      setIsOpen(true);
+      focusTimeout.current = setTimeout(() => {
+        setIsOpen(true);
+      }, openDelay)
       targetElement.current = event.currentTarget;
       clearTimeout(fadeOutTimeout.current);
     }

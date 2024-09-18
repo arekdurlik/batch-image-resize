@@ -2,7 +2,7 @@ import { MutableRefObject, useEffect, useRef } from 'react'
 import { difference } from '../lib/helpers'
 
 const DEFAULT_OPTIONS = { cancelOnDrag: false, dragCancelThreshold: 32 };
-export function useOutsideClick(ref: MutableRefObject<HTMLElement>, callback: () => void, options?: { cancelOnDrag?: boolean, dragCancelThreshold?: number }) {
+export function useOutsideClick(ref: MutableRefObject<HTMLElement>, callback: (event: MouseEvent) => void, options?: { cancelOnDrag?: boolean, dragCancelThreshold?: number }) {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const mouseDown = useRef({ x: 0, y: 0 });
 
@@ -20,7 +20,7 @@ export function useOutsideClick(ref: MutableRefObject<HTMLElement>, callback: ()
             }
           }
 
-          callback();
+          callback(event);
         }
       }
     }

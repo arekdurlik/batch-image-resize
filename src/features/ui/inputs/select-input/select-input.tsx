@@ -1,9 +1,10 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Props } from './types'
 import { Select, SelectedOption, Triangle } from './styled'
 import { ActionMenu } from '../../action-menu'
 
-export function SelectInput({ value, options, align, onChange }: Props) {
+export function SelectInput({ value, options, align, style, onChange }: Props) {
+  const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null!);
   const currentLabel = options.find(o => o.value === value)?.label;
 
@@ -18,6 +19,8 @@ export function SelectInput({ value, options, align, onChange }: Props) {
       <Select
         ref={ref}
         tabIndex={0}
+        style={style}
+        $open={open}
       >
         <SelectedOption>{currentLabel}</SelectedOption>
         <Triangle/>
@@ -26,6 +29,8 @@ export function SelectInput({ value, options, align, onChange }: Props) {
         actuator={ref} 
         initialHighlightIndex={options.findIndex(opt => opt.value === value) ?? 0}
         align={align}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
         slideIn
       >
         {options.map(option => (

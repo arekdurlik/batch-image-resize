@@ -1,24 +1,23 @@
-import { MdDeselect, MdMoreHoriz, MdRefresh, MdSelectAll } from 'react-icons/md'
+import { MdDeselect, MdMoreHoriz, MdSelectAll } from 'react-icons/md'
 import { Button } from '../../ui/inputs/button'
 import { Tooltip } from '../../ui/tooltip'
 import { useRef, useState } from 'react'
 import { ActionMenu } from '../../ui/action-menu'
 import { IoMdTrash } from 'react-icons/io'
 import { useApp } from '../../../store/app'
-import { useOutputImages } from '../../../store/output-images'
 import { useInputImages } from '../../../store/input-images'
 
 export function MoreOptions() {
   const [actionMenuOpened, setActionMenuOpened] = useState(false);
   const button = useRef<HTMLButtonElement>(null!);
   const selectedItems = useApp(state => state.selectedItems);
+  const latestSelectedItem = useApp(state => state.latestSelectedItem);
+  const latestSelectedItemIsInput = latestSelectedItem?.type === 'input'
   const inputImages = useInputImages(state => state.images);
   const inputImagesExist = inputImages.length > 0;
-  const outputImages = useOutputImages(state => state.images);
-  const outputImagesExist = outputImages.length > 0;
-  const api = useOutputImages(state => state.api);
+  const api = useInputImages(state => state.api);
   const appApi = useApp(state => state.api);
-  const selectedIsOutput = selectedItems[0]?.type === 'output';
+  const selectedIsInput = selectedItems[0]?.type === 'input';
 
   return (
     <>
@@ -32,8 +31,8 @@ export function MoreOptions() {
       >
         <Button 
           ref={button}
-          disabled={!inputImagesExist}
           active={actionMenuOpened}
+          disabled={!inputImagesExist}
           style={{ marginLeft: 8 }} 
         >
           <MdMoreHoriz/>
@@ -47,26 +46,19 @@ export function MoreOptions() {
         onClose={() => setActionMenuOpened(false)}
       >
         <ActionMenu.Item
-          label='Regenerate all'
-          icon={MdRefresh}
-          onClick={api.regenerate}
+          label='Select all'
+          icon={MdSelectAll}
+          onClick={api.selectAll}
         />
-        {outputImagesExist && (
-          <ActionMenu.Item
-            label='Select all'
-            icon={MdSelectAll}
-            onClick={api.selectAll}
-          />
-        )}
-        {selectedIsOutput && (
+        {(selectedIsInput || latestSelectedItemIsInput) && (
           <ActionMenu.Item
             label='Deselect all'
             icon={MdDeselect}
             onClick={appApi.deselectAll}
           />
         )}
-        {selectedIsOutput && <ActionMenu.Divider/>}
-        {selectedIsOutput && (
+        <ActionMenu.Divider/>
+        {selectedIsInput && (
           <ActionMenu.Item
             label='Delete selected'
             dangerous
@@ -74,7 +66,14 @@ export function MoreOptions() {
             onClick={appApi.deleteSelectedItems}
           />
         )}
-    
+        {selectedItems.length !== inputImages.length && (
+          <ActionMenu.Item
+            label='Delete all'
+            dangerous
+            icon={IoMdTrash}
+            onClick={api.deleteAll}
+          />
+        )}
       </ActionMenu>
     </>
   )

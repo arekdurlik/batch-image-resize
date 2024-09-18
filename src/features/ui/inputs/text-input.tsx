@@ -1,66 +1,68 @@
-import { ReactNode, ChangeEventHandler, CSSProperties, useState, ChangeEvent } from 'react'
+import { ReactNode, useState, forwardRef, InputHTMLAttributes, FocusEvent } from 'react'
 import styled from 'styled-components'
 import { outlineRest, outlineActive } from '../../../styles/mixins'
 
 type Props = {
   label?: string
   value: string | number
-  placeholder?: string
   prefix?: ReactNode
   suffix?: ReactNode
-  spellCheck?: boolean
-  onChange?: ChangeEventHandler<HTMLInputElement>
-  onBlur?: ChangeEventHandler<HTMLInputElement>
-  style?: CSSProperties
-};
+  bold?: boolean
+  align?: CanvasTextAlign
+} & InputHTMLAttributes<HTMLInputElement>; 
 
-export function TextInput({ label, value, placeholder, prefix, suffix, spellCheck = false, onChange, onBlur, style }: Props) {
+export const TextInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
+  const { label, value, prefix, suffix, bold, align, style, ...rest } = props;
   const [isFocused, setIsFocused] = useState(false);
 
-  function handleBlur(event: ChangeEvent<HTMLInputElement>) {
+  function handleBlur(event: FocusEvent<HTMLInputElement>) {
     setIsFocused(false);
-    onBlur?.(event);
+    rest.onBlur?.(event);
   }
 
   return (
-    <Wrapper style={style}>
-      {label && <Label htmlFor={label}>{label}</Label>}
-      <InputContainer $focused={isFocused}>
+    <TextInputWrapper style={style}>
+      {label && <TextInputLabel htmlFor={label}>{label}:</TextInputLabel>}
+      <TextInputContainer $focused={isFocused}>
         {prefix && <Icon>{prefix}</Icon>}
         <Input
+          ref={ref}
           name={label}
           type='text'
           value={value}
-          placeholder={placeholder}
-          onChange={onChange}
+          placeholder={rest.placeholder}
+          onChange={rest.onChange}
           onFocus={() => setIsFocused(true)}
           onBlur={handleBlur}
-          spellCheck={spellCheck}
+          spellCheck={rest.spellCheck}
+          style={{
+            ...(bold) && { fontWeight: 500 },
+            ...(align) && { textAlign: align }
+          }}
+          {...rest}
           >
         </Input>
         {suffix && <Icon>{suffix}</Icon>}
-      </InputContainer>
-    </Wrapper>
+      </TextInputContainer>
+    </TextInputWrapper>
   )
-}
+});
 
-const Wrapper = styled.div`
+export const TextInputWrapper = styled.div`
 position: relative;
 display: flex;
-flex-direction: column;
 justify-content: center;
-margin-top: 5px;
-margin-bottom: 5px;
+align-items: center;
+gap: 5px;
 white-space: nowrap;
-width: min-content;
-min-width: 90px;
+width: 100%;
 `
 
-const Label = styled.label`
+export const TextInputLabel = styled.label`
 font-weight: 500;
 `
 
-const InputContainer = styled.div<{ $focused: boolean }>`
+export const TextInputContainer = styled.div<{ $focused: boolean }>`
 ${outlineRest}
 ${props => props.$focused && outlineActive}
 background-color: var(--control-default-bgColor-rest);
@@ -78,7 +80,7 @@ gap: 4px;
 const Input = styled.input`
 font-weight: 400;
 width: 100%;
-min-height: 30px;
+height: 27px;
 outline: none;
 border: none;
 background-color: transparent;

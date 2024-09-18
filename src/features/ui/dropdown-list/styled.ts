@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Placement } from '../types'
 import { OVERLAY_Z_INDEX } from '../../../lib/constants'
 
@@ -17,7 +17,7 @@ ${props => props.$highlighted && 'background-color: var(--control-default-bgColo
 export const Container = styled.ul<{ 
   $floating: boolean
   $slideIn: boolean
-  $renderParams: { placement: Placement, x: number, y: number },
+  $renderParams: { placement: Placement, x: number, y: number, width: string | number },
 }>`
 z-index: ${OVERLAY_Z_INDEX.DROPDOWN};
 list-style: none;
@@ -34,6 +34,11 @@ cursor: default;
 opacity: 0;
 ${props => props.$renderParams.x && `left: ${props.$renderParams.x}px;`}
 ${props => props.$renderParams.y && `top: ${props.$renderParams.y}px;`}
+${props => props.$renderParams && css`
+  left: ${props.$renderParams.x}px;
+  top: ${props.$renderParams.y}px;
+  width: ${props.$renderParams.width}${typeof props.$renderParams.width === 'string' ? '' : 'px'};
+`}
 
 @keyframes fade-in {
   from  {

@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import { MdMoreHoriz } from 'react-icons/md'
 import styled from 'styled-components'
-import { compare, removeFileExtension } from '../../../lib/helpers'
+import { compare, getFileNameWithoutExtension } from '../../../lib/helpers'
 import { useOutputImages } from '../../../store/output-images'
 import { OutputImageData } from '../../../store/types'
 import { useVariants } from '../../../store/variants'
@@ -40,8 +40,8 @@ export function OutputImages() {
           : compare(b.image.full.file.size, a.image.full.file.size);
       default: // FILENAME
         return sortDirection === SortDirection.ASC 
-          ? collator.compare(removeFileExtension(a.filename), removeFileExtension(b.filename))
-          : collator.compare(removeFileExtension(b.filename), removeFileExtension(a.filename));
+          ? collator.compare(getFileNameWithoutExtension(a.filename), getFileNameWithoutExtension(b.filename))
+          : collator.compare(getFileNameWithoutExtension(b.filename), getFileNameWithoutExtension(a.filename));
       }
   }, [sortOption, sortDirection, variants]);
 

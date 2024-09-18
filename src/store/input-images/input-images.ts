@@ -66,7 +66,7 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
       const variants = useVariants.getState().variants;
 
       variants.forEach(v => {
-        useOutputImages.getState().api.generateVariant(v);
+        useOutputImages.getState().api.generateVariant(v.id);
       });
     },
     deleteByIds: (ids) => {
@@ -91,6 +91,7 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
     },
     deleteAll: () => {
       set({ images: [] });
+      useOutputImages.setState({ images: [] });
     },
     selectAll: () => {
       const images = get().images;

@@ -1,3 +1,5 @@
+import { DimensionMode } from '../types'
+
 export type UploadedImage = { file: File, width: number, height: number };
 
 export type InputImageData = { 
@@ -31,6 +33,12 @@ export type OutputImageData = {
   },
   variantId: string
 
+  crop: {
+    x: number,
+    y: number,
+    scale: number,
+  },
+
   image: {
     full: {
       file: Blob,
@@ -59,13 +67,24 @@ export type ImageData = InputImageData | OutputImageData;
 export type Variant = {
   id: string
   index: number
-  width?: number
-  height?: number
+  name: string
+  width: {
+    mode: DimensionMode
+    value?: number
+  }
+  height: {
+    mode: DimensionMode
+    value?: number
+  }
   prefix: string
   suffix: string
   crop: boolean
   overWriteQuality: boolean
   quality: number
+  aspectRatio: {
+    enabled: boolean
+    value: string
+  }
 };
 
 export type VariantUpdate = keyof Partial<Omit<Variant, 'id'>>;

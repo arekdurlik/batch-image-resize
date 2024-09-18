@@ -2,10 +2,11 @@ import { useOutputImages } from '.'
 import { THUMBNAIL_SIZE } from '../../lib/constants'
 import { filenameToJpg, insertVariantDataToFilename, isJpg } from '../../lib/helpers'
 import { Log } from '../../lib/log'
-import { processImage } from '../../lib/utils'
+import { calculateOuputDimensions, loadImage, processImage } from '../utils'
 import { useApp } from '../app'
-import { InputImageData, OutputImageData, Variant } from '../types'
+import { InputImageData, OutputImageData } from '../types'
 import { useVariants } from '../variants'
+import { DEFAULT_CROP_SETTINGS } from '../../lib/config'
 
 function alreadyExists(id: string, images: OutputImageData[]) {
   const alreadyExists = images.findIndex(i => i.id === id) > -1;
@@ -26,7 +27,7 @@ export async function generateOutputImageVariants(inputImage: InputImageData, ch
   for (let j = 0; j < variants.length; j++) {
     const variant = variants[j];
 
-    const image = await generateOutputImage(inputImage, variant, checkForDuplicate);
+    const image = await generateOutputImage(inputImage, variant.id, checkForDuplicate);
 
     if (image) {
       outputImages.push(image);
@@ -35,32 +36,56 @@ export async function generateOutputImageVariants(inputImage: InputImageData, ch
   return outputImages;
 }
 
+export function getUpToDateVariant(variantId: string) {
+  const variant = useVariants.getState().variants.find(v => v.id === variantId);
+
+  if (!variant) {
+    throw new Error(`Variant with id ${variantId} not found.`);
+  }
+
+  return variant;
+}
+
 export async function generateOutputImage(
   inputImage: InputImageData, 
-  variant: Variant, 
+  variantId: string, 
   checkForDuplicate = true
 ): Promise<OutputImageData | undefined> {
-  Log.debug_verbose('Generating output image', { inputImage, variant });
+  Log.debug_verbose('Generating output image', { inputImage, variantId });
 
-  const id = `${inputImage.id}-${variant.id}`;
+  const id = `${inputImage.id}-${variantId}`;
   
   if (checkForDuplicate) {
     const currentImages = useOutputImages.getState().images;
     if (alreadyExists(id, currentImages)) return undefined;
   }
-  
-  const quality = useApp.getState().quality;
-  const ratio = inputImage.dimensions.width / inputImage.dimensions.height;
-  let newWidth = inputImage.dimensions.width;
-  let newHeight = inputImage.dimensions.height;
 
-  if (variant.width) {
-    newWidth = variant.width;
-    newHeight = Math.ceil(newWidth / ratio);
-  } else if (variant?.height) {
-    newHeight = variant.height;
-    newWidth = Math.ceil(newHeight * ratio);
-  }
+  let variant = getUpToDateVariant(variantId);
+  const quality = useApp.getState().quality;
+
+  const image = await loadImage(inputImage.image.full.file);
+  const finalDimensions = calculateOuputDimensions(
+    image, 
+    { 
+      widthMode: variant.width.mode, 
+      width: variant.width.value, 
+      heightMode: variant.height.mode,
+      height: variant.height.value,
+      aspectRatioEnabled: variant.aspectRatio.enabled,
+      aspectRatio: variant.aspectRatio.value
+    }
+  );
+
+  const processedFull = await processImage(
+    image,
+    inputImage.image.full.file.name, 
+    quality, 
+    finalDimensions.width, 
+    finalDimensions.height,
+    DEFAULT_CROP_SETTINGS
+  );
+
+  variant = getUpToDateVariant(variantId);
 
   let filename = insertVariantDataToFilename(
     inputImage.filename, 
@@ -72,14 +97,6 @@ export async function generateOutputImage(
     filename = filenameToJpg(filename);
   }
 
-  const processedFull = await processImage(
-    inputImage.image.full.file, 
-    quality, 
-    variant.width, 
-    variant.height, 
-    variant.crop
-  );
-
   const processedFile = new File([processedFull.blob], inputImage.filename);
 
   // generate thumbnail - use full pic if smaller than THUMBNAIL_SIZE
@@ -88,18 +105,25 @@ export async function generateOutputImage(
   const needsThumbnail = width > THUMBNAIL_SIZE || height > THUMBNAIL_SIZE;
 
   if (needsThumbnail) {
-    let scaleWidth = undefined;
-    let scaleHeight = undefined;
+    const image = await loadImage(processedFile);
+    const finalDimensions = calculateOuputDimensions(
+      image, 
+      { 
+        widthMode: 'upto', 
+        width: THUMBNAIL_SIZE, 
+        heightMode: 'upto',
+        height: THUMBNAIL_SIZE,
+        aspectRatioEnabled: variant.aspectRatio.enabled,
+        aspectRatio: variant.aspectRatio.value
+      }
+    );
     
-    width > height
-      ? scaleWidth = THUMBNAIL_SIZE
-      : scaleHeight = THUMBNAIL_SIZE
-
     processedThumbnail = await processImage(
-      processedFile, 
+      image,
+      processedFile.name,
       isJpg(inputImage.filename) ? 0.9 : 1, 
-      scaleWidth, 
-      scaleHeight
+      finalDimensions.width, 
+      finalDimensions.height,
     );
   }
 
@@ -118,6 +142,8 @@ export async function generateOutputImage(
       size: inputImage.image.full.file.size
     },
     variantId: variant.id,
+
+    crop: DEFAULT_CROP_SETTINGS,
 
     image: {
       full: {

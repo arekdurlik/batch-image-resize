@@ -4,13 +4,14 @@ import { outline } from '../../../styles/mixins'
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & { 
   disabled?: boolean
+  active?: boolean
   onClick?: MouseEventHandler<HTMLButtonElement> 
   children: ReactNode, 
   style?: CSSProperties
 };
 
 export const Button = forwardRef<HTMLButtonElement, Props>((props, ref) => {
-  const { disabled, onClick, children, style, ...rest } = props;
+  const { disabled, active, onClick, children, style, ...rest } = props;
 
   function handleClick(event: MouseEvent<HTMLButtonElement>) {
     !disabled && onClick?.(event);
@@ -22,6 +23,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>((props, ref) => {
       ref={ref}
       onClick={handleClick} 
       style={style} 
+      $active={active}
       $disabled={disabled}
       {...rest}
     >
@@ -30,7 +32,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>((props, ref) => {
   )
 });
 
-const StyledButton = styled.button<{ $disabled?: boolean }>`
+export const StyledButton = styled.button<{ $disabled?: boolean, $active?: boolean }>`
   ${outline}
 
   display: flex;
@@ -43,6 +45,7 @@ const StyledButton = styled.button<{ $disabled?: boolean }>`
   background-color: var(--control-default-bgColor-rest);
   color: var(--control-default-fgColor-rest);
   padding: 3px 7px;
+  font-size: 14px;
   font-weight: 500;
   min-height: 29px;
   width: fit-content;
@@ -55,8 +58,11 @@ const StyledButton = styled.button<{ $disabled?: boolean }>`
     background-color: var(--control-default-bgColor-hover);
   }
 
+  ${props => props.$active && css`
+    background-color: var(--control-default-bgColor-active) !important;
+  `}
   &:active {
-    background-color: var(--control-default-bgColor-active);
+    background-color: var(--control-default-bgColor-active) !important;
   }
 
   &:focus-visible {
@@ -75,5 +81,6 @@ const StyledButton = styled.button<{ $disabled?: boolean }>`
 
   svg {
     font-size: 16px;
+    min-width: 16px;
   }
 `

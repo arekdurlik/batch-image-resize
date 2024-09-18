@@ -1,5 +1,5 @@
 import { createGlobalStyle } from 'styled-components'
-import { fontStack } from './mixins'
+import { fontStack, outline } from './mixins'
 
 export const GlobalStyles = createGlobalStyle`
 * {
@@ -15,6 +15,7 @@ body {
   ${fontStack};
 
   overflow: hidden;
+  user-select: none;
 
   background-color: var(--bgColor-default);
   color: var(--fgColor-default);
@@ -44,7 +45,7 @@ input, button, textarea, select {
   font: inherit;
 }
 
-input, textarea, div, button {
+textarea, div, button {
   outline: transparent;
 }
 
@@ -54,6 +55,12 @@ p, h1, h2, h3, h4, h5, h6 {
 
 ul {
   padding: unset;
+}
+
+input[type="range"]:focus {
+  ${outline};
+  outline-offset: 1px;
+  border-radius: var(--borderRadius-default);
 }
 
 #root {

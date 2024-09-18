@@ -14,7 +14,7 @@ function App() {
   const panelGroup = useRef<ImperativePanelGroupHandle>(null!);
 
   function handleReset() {
-    panelGroup.current.setLayout([80, 20]);
+    panelGroup.current.setLayout([85, 15]);
   }
 
   return (
@@ -32,7 +32,7 @@ function App() {
               <MainView/>
             </Panel>
             <Resizer direction='horizontal' onReset={handleReset}/>
-            <Panel minSize={15} maxSize={30} defaultSize={20}>
+            <Panel minSize={15} maxSize={30} defaultSize={15}>
               <RightSidebar/>
             </Panel>
           </StyledPanelGroup>

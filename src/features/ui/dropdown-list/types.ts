@@ -1,4 +1,5 @@
 import { ReactNode, RefObject } from 'react'
+import { Placement } from '../types'
 
 export type Props = { 
   children: ReactNode, 
@@ -12,3 +13,5 @@ export type Props = {
 };
 
 export type Alignment = 'left' | 'center' | 'right';
+
+export type RenderParams = { x: number, y: number, placement: Placement, width: string | number };

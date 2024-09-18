@@ -1,8 +1,8 @@
 import pica from 'pica'
-import { getFileExtension } from './helpers'
-import { lerp } from '../helpers'
-import { DimensionMode } from '../types'
-import { CropSettings } from './config'
+import { DimensionMode } from '../../types'
+import { getFileExtension } from '../../lib/helpers'
+import { lerp } from '../../helpers'
+import { CropSettings } from '../../lib/config'
 
 const resizer = new pica({ features: ['js', 'wasm', 'ww']});
 
@@ -97,9 +97,13 @@ export function calculateOuputDimensions(
     width: number | undefined,
     height: number | undefined,
     widthMode: DimensionMode,
-    heightMode: DimensionMode
+    heightMode: DimensionMode,
+    aspectRatioEnabled: boolean,
+    aspectRatio: string
   }
 ) {
+  const inputWidth = image.naturalWidth;
+  const inputHeight = image.naturalHeight;
   const outputWidth = settings?.width ?? 0;  
   const outputHeight = settings?.height ?? 0;
 
@@ -108,52 +112,122 @@ export function calculateOuputDimensions(
 
   if (!settings) return { width: finalWidth, height: finalHeight };
 
-  if (outputWidth && outputHeight) {
-    // both width and height are provided
-    if (settings.widthMode === 'exact' && settings.heightMode === 'exact') {
-        finalWidth = outputWidth;
-        finalHeight = outputHeight;
-    } else if (settings.widthMode === 'exact' && settings.heightMode === 'upto') {
-        finalWidth = outputWidth;
-        finalHeight = Math.min(outputHeight, outputWidth * image.height / image.width);
-    } else if (settings.widthMode === 'upto' && settings.heightMode === 'exact') {
-        finalHeight = outputHeight;
-        finalWidth = Math.min(outputWidth, outputHeight * image.width / image.height);
-    } else if (settings.widthMode === 'upto' && settings.heightMode === 'upto') {
-        // both dimensions flexible (preserve aspect ratio)
-        if (image.width / image.height > outputWidth / outputHeight) {
-            finalWidth = Math.min(outputWidth, image.width);
-            finalHeight = finalWidth * image.height / image.width;
-        } else {
-            finalHeight = Math.min(outputHeight, image.height);
-            finalWidth = finalHeight * image.width / image.height;
-        }
-    }
-} else if (outputWidth) {
-    // only width is provided
-    if (settings.widthMode === 'exact') {
-        finalWidth = outputWidth;
-        finalHeight = outputWidth * image.height / image.width;
-    } else if (settings.widthMode === 'upto') {
-        finalWidth = Math.min(outputWidth, image.width);
-        finalHeight = finalWidth * image.height / image.width;
-    }
-} else if (outputHeight) {
-    // only height is provided
-    if (settings.heightMode === 'exact') {
-        finalHeight = outputHeight;
-        finalWidth = outputHeight * image.width / image.height;
-    } else if (settings.heightMode === 'upto') {
-        finalHeight = Math.min(outputHeight, image.height);
-        finalWidth = finalHeight * image.width / image.height;
-    }
-} else {
-    // no output dimensions provided, return original input size
-    finalWidth = image.width;
-    finalHeight = image.height;
-}
+  const inputAspectRatio = inputWidth / inputHeight;
 
-  return { width: finalWidth, height: finalHeight };
+  // Parse the aspect ratio if it's provided in the settings, else use the image's original aspect ratio
+  let aspectRatio = inputAspectRatio;
+  if (settings.aspectRatioEnabled && settings.aspectRatio) {
+    const split = settings.aspectRatio.split(':').map(v => Number(v));
+    aspectRatio = split[0] / split[1];
+  }
+
+  // When both width and height are provided
+  if (outputWidth && outputHeight) {
+    if (settings.widthMode === 'exact' && settings.heightMode === 'exact') {
+      if (settings.aspectRatioEnabled) {
+        finalWidth = outputWidth;
+        finalHeight = finalWidth / aspectRatio;
+      } else {
+        finalWidth = outputWidth;
+        finalHeight = outputHeight;
+      }
+    } else if (settings.widthMode === 'upto' && settings.heightMode === 'upto') {
+      if (settings.aspectRatioEnabled) {
+        // Check the width and height to ensure both stay within bounds
+        finalWidth = Math.min(outputWidth, inputWidth);
+        finalHeight = finalWidth / aspectRatio;
+        if (finalHeight > outputHeight) {
+          finalHeight = Math.min(outputHeight, inputHeight);
+          finalWidth = finalHeight * aspectRatio;
+        }
+      } else {
+        if (inputAspectRatio > outputWidth / outputHeight) {
+          finalWidth = Math.min(outputWidth, inputWidth);
+          finalHeight = (finalWidth * inputHeight) / inputWidth;
+        } else {
+          finalHeight = Math.min(outputHeight, inputHeight);
+          finalWidth = (finalHeight * inputWidth) / inputHeight;
+        }
+      }
+    } else if (settings.widthMode === 'upto' && settings.heightMode === 'exact') {
+      finalHeight = outputHeight;
+      if (settings.aspectRatioEnabled) {
+        finalWidth = finalHeight * aspectRatio;
+        if (finalWidth > outputWidth) {
+          finalWidth = outputWidth;
+        }
+      } else {
+        finalWidth = Math.min(outputWidth, (outputHeight * inputWidth) / inputHeight);
+      }
+    } else if (settings.widthMode === 'exact' && settings.heightMode === 'upto') {
+      finalWidth = outputWidth;
+      if (settings.aspectRatioEnabled) {
+        finalHeight = finalWidth / aspectRatio;
+        if (finalHeight > outputHeight) {
+          finalHeight = outputHeight;
+        }
+      } else {
+        finalHeight = Math.min(outputHeight, (outputWidth * inputHeight) / inputWidth);
+      }
+    }
+  } 
+  // When width is provided but height is empty
+  else if (outputWidth && !outputHeight) {
+    if (settings.widthMode === 'exact') {
+      if (settings.aspectRatioEnabled) {
+        finalWidth = outputWidth;
+        finalHeight = finalWidth / aspectRatio;
+      } else {
+        finalWidth = outputWidth;
+        finalHeight = (outputWidth * inputHeight) / inputWidth;
+      }
+    } else if (settings.widthMode === 'upto') {
+      if (settings.aspectRatioEnabled) {
+        finalWidth = Math.min(outputWidth, inputWidth);
+        finalHeight = finalWidth / aspectRatio;
+      } else {
+        finalWidth = Math.min(outputWidth, inputWidth);
+        finalHeight = (finalWidth * inputHeight) / inputWidth;
+      }
+    }
+  } 
+  // When height is provided but width is empty
+  else if (!outputWidth && outputHeight) {
+    if (settings.heightMode === 'exact') {
+      if (settings.aspectRatioEnabled) {
+        finalHeight = outputHeight;
+        finalWidth = finalHeight * aspectRatio;
+      } else {
+        finalHeight = outputHeight;
+        finalWidth = (outputHeight * inputWidth) / inputHeight;
+      }
+    } else if (settings.heightMode === 'upto') {
+      if (settings.aspectRatioEnabled) {
+        finalHeight = Math.min(outputHeight, inputHeight);
+        finalWidth = finalHeight * aspectRatio;
+      } else {
+        finalHeight = Math.min(outputHeight, inputHeight);
+        finalWidth = (finalHeight * inputWidth) / inputHeight;
+      }
+    }
+  } 
+  // When both width and height are empty
+  else {
+    if (settings.aspectRatioEnabled) {
+      if (inputAspectRatio > aspectRatio) {
+        finalWidth = inputWidth;
+        finalHeight = finalWidth / aspectRatio;
+      } else {
+        finalHeight = inputHeight;
+        finalWidth = finalHeight * aspectRatio;
+      }
+    } else {
+      finalWidth = inputWidth;
+      finalHeight = inputHeight;
+    }
+  }
+
+  return { width: Math.ceil(finalWidth), height: Math.ceil(finalHeight) };
 }
 
 function canvasToBlob(image: HTMLCanvasElement, quality: number, extension: string): Promise<Blob> {

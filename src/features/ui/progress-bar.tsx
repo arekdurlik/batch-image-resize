@@ -2,10 +2,11 @@ import { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
 export function ProgressBar({ value, max }: { value: number, max: number }) {
+
   const bar = useRef<HTMLDivElement>(null!);
   const fraction = value / max;
   const width = fraction * 100 + '%';
-  const showBar = !isNaN(fraction) && fraction !== 1;
+  const showBar = !isNaN(fraction) && fraction !== 1 && fraction !== Infinity;
   const dynamicOpacity = 1.25 - (fraction * 1.25);
 
   useEffect(() => {

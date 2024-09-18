@@ -24,7 +24,6 @@ padding: 0 10px;
 height: ${SECTION_HEADER_HEIGHT}px;
 border-bottom: 1px solid var(--borderColor-default);
 ${props => props.$borderTop && css`border-top: 1px solid var(--borderColor-default);`}
-pointer-events: none;
 
 * {
   pointer-events: initial;
@@ -46,4 +45,8 @@ export const SideBarSection = styled.div<{ $animate?: boolean }>`
 export const SectionGroup = styled.div`
   padding: 10px;
   border-bottom: 1px solid var(--borderColor-default);
+  
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-default);
 `

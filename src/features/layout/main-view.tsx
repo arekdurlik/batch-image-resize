@@ -32,6 +32,5 @@ position: relative;
 width: 100%;
 display: flex;
 flex-direction: column;
-user-select: none;
 height: 100%;
 `

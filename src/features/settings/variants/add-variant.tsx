@@ -2,7 +2,7 @@ import { IoMdAdd } from 'react-icons/io'
 import { useVariants } from '../../../store/variants'
 import { Button } from '../../ui/inputs/button'
 
-let index = 0;
+let index = 1;
 
 export function AddVariant() {
   const api = useVariants(state => state.api);
@@ -13,13 +13,24 @@ export function AddVariant() {
     api.add({
       id: `v-${Date.now()}`,
       index,
-      width: undefined,
-      height: undefined,
+      name: `Variant ${index}`,
+      width: {
+        mode: 'exact',
+        value: undefined
+      },
+      height: {
+        mode: 'exact',
+        value: undefined
+      },
       prefix: '',
       suffix: '',
       crop: false,
       overWriteQuality: false,
-      quality: 1
+      quality: 1,
+      aspectRatio: {
+        enabled: false,
+        value: '1:1'
+      }
     });
   }
 

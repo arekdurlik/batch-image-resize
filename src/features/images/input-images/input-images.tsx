@@ -1,11 +1,13 @@
 import { DropZone } from './drop-zone'
 import { SectionHeader, SectionTitle } from '../../layout/styled'
 import { useMemo } from 'react'
-import { removeFileExtension } from '../../../lib/helpers'
+import { getFileNameWithoutExtension } from '../../../lib/helpers'
 import { useInputImages } from '../../../store/input-images'
 import { ProgressBar } from '../../ui/progress-bar'
-import { ImageListWrapper, ProgressBarWrapper, Wrapper } from '../styled'
+import { HeaderOptions, ImageListWrapper, ProgressBarWrapper, Wrapper } from '../styled'
 import { ImageList } from '../image-list'
+import { MoreOptions } from './more-options'
+import { UploadButton } from './upload-button'
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
@@ -14,13 +16,17 @@ export function InputImages() {
   const progress = useInputImages(state => state.progress);
 
   const sortedImages = useMemo(() => (
-    images.sort((a, b) => collator.compare(removeFileExtension(a.filename), removeFileExtension(b.filename)))
+    images.sort((a, b) => collator.compare(getFileNameWithoutExtension(a.filename), getFileNameWithoutExtension(b.filename)))
   ), [images]);
 
   return (
     <Wrapper>
       <SectionHeader>
         <SectionTitle>Input images</SectionTitle>
+        <HeaderOptions>
+          <UploadButton/>
+          <MoreOptions/>
+        </HeaderOptions>
       </SectionHeader>
       <ImageListWrapper>
         <ProgressBarWrapper>
@@ -32,8 +38,3 @@ export function InputImages() {
     </Wrapper>
   )
 }
-
-
-
-
-
