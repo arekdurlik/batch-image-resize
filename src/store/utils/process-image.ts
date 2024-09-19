@@ -3,6 +3,7 @@ import { DimensionMode } from '../../types'
 import { getFileExtension } from '../../lib/helpers'
 import { lerp } from '../../helpers'
 import { CropSettings } from '../../lib/config'
+import { PicaFilter } from '../types'
 
 const resizer = new pica({ features: ['js', 'wasm', 'ww']});
 
@@ -22,6 +23,7 @@ export function resizeImage(
   image: HTMLCanvasElement | HTMLImageElement, 
   width: number | undefined, 
   height: number | undefined,
+  filter: PicaFilter = 'mks2013'
 ): Promise<HTMLCanvasElement> {
   return new Promise(resolve => {
     try {
@@ -45,7 +47,7 @@ export function resizeImage(
 
       offScreenCanvas.width = newWidth;
       offScreenCanvas.height = newHeight;
-      const resized = resizer.resize(image, offScreenCanvas, { filter: 'lanczos3' });
+      const resized = resizer.resize(image, offScreenCanvas, { filter: filter });
       resolve(resized);
     } catch {
       throw new Error('Failed to resize image.');
@@ -244,10 +246,11 @@ function canvasToBlob(image: HTMLCanvasElement, quality: number, extension: stri
 // TODO: maybe store the image on file upload so it doesn't have to be loaded again
 export async function processImage(
   image: HTMLImageElement, 
-  filename: string, 
+  extension: string, 
   quality: number, 
   width: number, 
   height: number, 
+  filter?: PicaFilter,
   crop?: CropSettings
 ) {
   let cropped: HTMLCanvasElement | HTMLImageElement = image;
@@ -256,9 +259,7 @@ export async function processImage(
     cropped = cropImage(image, width, height, crop.x, crop.y, crop.scale);
   }
   
-  const resized = await resizeImage(cropped, width, height);
-
-  const extension = quality < 1 ? 'jpeg' : getFileExtension(filename);
+  const resized = await resizeImage(cropped, width, height, filter);
 
   const blob = await canvasToBlob(resized, quality, extension);
 

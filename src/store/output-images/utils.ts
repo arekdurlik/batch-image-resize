@@ -1,9 +1,8 @@
 import { useOutputImages } from '.'
 import { THUMBNAIL_SIZE } from '../../lib/constants'
-import { filenameToJpg, insertVariantDataToFilename, isJpg } from '../../lib/helpers'
+import { filenameToJpg, getFileExtension, insertVariantDataToFilename, isJpg } from '../../lib/helpers'
 import { Log } from '../../lib/log'
 import { calculateOuputDimensions, loadImage, processImage } from '../utils'
-import { useApp } from '../app'
 import { InputImageData, OutputImageData } from '../types'
 import { useVariants } from '../variants'
 import { DEFAULT_CROP_SETTINGS } from '../../lib/config'
@@ -61,7 +60,7 @@ export async function generateOutputImage(
   }
 
   let variant = getUpToDateVariant(variantId);
-  const quality = useApp.getState().quality;
+  const quality = variant.quality;
 
   const image = await loadImage(inputImage.image.full.file);
   const finalDimensions = calculateOuputDimensions(
@@ -76,16 +75,7 @@ export async function generateOutputImage(
     }
   );
 
-  const processedFull = await processImage(
-    image,
-    inputImage.image.full.file.name, 
-    quality, 
-    finalDimensions.width, 
-    finalDimensions.height,
-    DEFAULT_CROP_SETTINGS
-  );
-
-  variant = getUpToDateVariant(variantId);
+  const extension = quality < 1 ? 'jpeg' : getFileExtension(inputImage.filename);
 
   let filename = insertVariantDataToFilename(
     inputImage.filename, 
@@ -93,9 +83,21 @@ export async function generateOutputImage(
     variant.suffix
   );
 
-  if (quality < 1) {
+  if (extension === 'jpeg') {
     filename = filenameToJpg(filename);
   }
+
+  const processedFull = await processImage(
+    image,
+    extension, 
+    quality, 
+    finalDimensions.width, 
+    finalDimensions.height,
+    variant.filter,
+    DEFAULT_CROP_SETTINGS
+  );
+
+  variant = getUpToDateVariant(variantId);
 
   const processedFile = new File([processedFull.blob], inputImage.filename);
 
@@ -123,7 +125,7 @@ export async function generateOutputImage(
       processedFile.name,
       isJpg(inputImage.filename) ? 0.9 : 1, 
       finalDimensions.width, 
-      finalDimensions.height,
+      finalDimensions.height
     );
   }
 
@@ -162,7 +164,7 @@ export async function generateOutputImage(
     },
 
     overwriteFilename: false,
-    filename: filename,
+    filename,
 
     overwriteQuality: false,
     quality: quality

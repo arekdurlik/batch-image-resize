@@ -35,7 +35,7 @@ export function startProgress(store: Store, max: number) {
   }));
 
   const unsub = store.subscribe(state => state.progress, state => {
-    if (state.processedItems / state.totalItems === 1) {
+    if (state.processedItems >= state.totalItems) {
       setTimeout(() => {
         store.setState(({ 
           progress: { 

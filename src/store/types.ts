@@ -64,6 +64,8 @@ export type OutputImageData = {
 
 export type ImageData = InputImageData | OutputImageData;
 
+export type PicaFilter = 'box' | 'hamming' | 'lanczos2' | 'lanczos3' | 'mks2013';
+
 export type Variant = {
   id: string
   index: number
@@ -80,6 +82,7 @@ export type Variant = {
   suffix: string
   crop: boolean
   overWriteQuality: boolean
+  filter: PicaFilter,
   quality: number
   aspectRatio: {
     enabled: boolean

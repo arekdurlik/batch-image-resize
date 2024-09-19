@@ -26,6 +26,7 @@ export function AddVariant() {
       suffix: '',
       crop: false,
       overWriteQuality: false,
+      filter: 'mks2013',
       quality: 1,
       aspectRatio: {
         enabled: false,

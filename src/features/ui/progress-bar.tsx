@@ -31,9 +31,7 @@ export function ProgressBar({ value, max }: { value: number, max: number }) {
       ref={bar} 
       style={{ 
         width, 
-        opacity: isNaN(dynamicOpacity) 
-          ? 1 
-          : dynamicOpacity 
+        opacity: isNaN(dynamicOpacity) || dynamicOpacity == -Infinity ? 1 : dynamicOpacity 
       }}
     />
   </Wrapper>

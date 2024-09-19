@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Variant } from './types'
+import { PicaFilter, Variant } from './types'
 import { useOutputImages } from './output-images'
 import { v1 as uuid } from 'uuid'
 import { DimensionMode } from '../types'
@@ -14,11 +14,12 @@ type Variants = {
     delete: (variantId: string) => void
     rename: (variantId: string, name: string) => void
     setFilenamePart: (part: 'prefix' | 'suffix', variantId: string, value: string) => void
+    setFilter: (variantId: string, filter: PicaFilter) => void
+    setQuality: (variantId: string, quality: number) => void
     setDimension: (dimension: 'width' | 'height', variantId: string, value: number | undefined) => void
     setDimensions: (variantId: string, width: number | undefined, height: number | undefined) => void
     setWidthMode: (variantId: string, mode: DimensionMode) => void
     setHeightMode: (variantId: string, mode: DimensionMode) => void
-    setCrop: (variantId: string, value: boolean) => void
     toggleAspectRatioEnabled: (variantId: string) => void
     setAspectRatioEnabled: (variantId: string, value: boolean) => void
     setAspectRatioValue: (variantId: string, value: string) => void
@@ -42,6 +43,7 @@ export const useVariants = create<Variants>((set, get) => ({
     prefix: '',
     suffix: '_400w',
     overWriteQuality: false,
+    filter: 'mks2013',
     quality: 1,
     crop: false,
     aspectRatio: {
@@ -69,25 +71,38 @@ export const useVariants = create<Variants>((set, get) => ({
 
       set({ variants });
     },
-    setCrop(variantId, value) {
-      const { variants, variant } = getVariantsWithIdCheck(variantId);
-
-      variant.crop = value;
-      set({ variants });
-      useOutputImages.getState().api.regenerateVariant(variant.id);
-    },
     rename(variantId, name) {
       const { variants, variant } = getVariantsWithIdCheck(variantId);
 
       variant.name = name;
+      
       set({ variants });
     },
     setFilenamePart(part, variantId, value) {
       const { variants, variant } = getVariantsWithIdCheck(variantId);
 
       variant[part] = value;
-      set({ variants });
       useOutputImages.getState().api.updateVariantData(variant);
+      
+      set({ variants });
+    },
+    setFilter(variantId, filter) {
+      const { variants, variant } = getVariantsWithIdCheck(variantId);
+
+      variant.filter = filter;
+
+      regenerateVariant(variant.id);
+
+      set({ variants });
+    },
+    setQuality(variantId, quality) {
+      const { variants, variant } = getVariantsWithIdCheck(variantId);
+
+      variant.quality = quality;
+
+      regenerateVariant(variant.id);
+
+      set({ variants });
     },
     setDimension(dimension, variantId, value) {
       const { variants, variant } = getVariantsWithIdCheck(variantId);

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { InputImageData, OutputImageData, SelectedItem, Variant } from '../types'
-import { insertVariantDataToFilename} from '../../lib/helpers'
+import { filenameToJpg, insertVariantDataToFilename} from '../../lib/helpers'
 import { useInputImages } from '../input-images'
 import { Log } from '../../lib/log'
 import { subscribeWithSelector } from 'zustand/middleware'
@@ -126,18 +126,27 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
     },
     async regenerateVariant(variantId) {
       Log.debug('Regenerating output images for variant.', { variantId });
-      
-      const outputImages = [...get().images];
+
+      if (get().images.length === 0) {
+        Log.debug('No images to regenerate.', { variantId });
+        return;
+      }
+
       regenerateVariantOutputImagesIndex += 1;
       const currentIndex = regenerateVariantOutputImagesIndex;
       const inputImages = useInputImages.getState().images;
 
-      const progress = startProgress(useOutputImages, outputImages.length);
+      const progress = startProgress(useOutputImages, inputImages.length);
 
       try {
-        for (let i = 0; i < outputImages.length; i++) {
-          if (outputImages[i].variantId === variantId) {
-            const inputImage = inputImages.find(img => img.id === outputImages[i].inputImage.id);
+        const outputImages: OutputImageData[] = [];
+        const urlsToRevoke: string[] = [];
+
+        let i = 0;
+        let outputImage = get().images[i];
+        do {  
+          if (outputImage.variantId === variantId) {
+            const inputImage = inputImages.find(img => img.id === outputImage.inputImage.id);
   
             if (!inputImage) {
               throw new Error(`Variant with id ${variantId} not found.`);
@@ -146,36 +155,50 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
             const image = await generateOutputImage(inputImage, variantId, false);
             
             if (image) {
-              URL.revokeObjectURL(outputImages[i].image.full.src);
-              URL.revokeObjectURL(outputImages[i].image.thumbnail.src);
-              outputImages[i] = image;
+              urlsToRevoke.push(outputImage.image.full.src);
+              urlsToRevoke.push(outputImage.image.thumbnail.src);
+              outputImages.push(image);
             }
-          }
 
-          if (currentIndex !== regenerateVariantOutputImagesIndex) {
-            Log.debug('Variant regeneration cancelled.');
-            progress.cancel();
-            return;
-          } 
+            if (currentIndex !== regenerateVariantOutputImagesIndex) {
+              Log.debug('Variant regeneration cancelled.');
+              progress.cancel();
+              return;
+            } 
+            
+            progress.advance();
+          }
           
-          progress.advance();
-        }
+          i++;
+          outputImage = get().images[i]; 
+        } while (outputImage !== undefined);
+
 
         const variant = getUpToDateVariant(variantId);
 
         for (let i = 0; i < outputImages.length; i++) {
-          const image = outputImages[i];
-
-          if (!image.overwriteFilename) {
-            outputImages[i].filename = insertVariantDataToFilename(
-              image.inputImage.filename, 
-              variant.prefix, 
-              variant.suffix
-            );
+          if (outputImages[i].variantId === variantId) {
+            const image = outputImages[i];
+  
+            if (!image.overwriteFilename) {
+              outputImages[i].filename = insertVariantDataToFilename(
+                variant.quality < 1 ? filenameToJpg(image.inputImage.filename) : image.inputImage.filename, 
+                variant.prefix, 
+                variant.suffix
+              );
+            }
           }
         }
 
-        set({ images: outputImages });
+
+        const updates = Object.fromEntries(outputImages.map(i => [i.id, i]));
+        const result = [...get().images].map(i => updates[i.id] || i);
+
+        urlsToRevoke.forEach(url => {
+          URL.revokeObjectURL(url);
+        });
+
+        set({ images: result });
       } catch (error) {
         progress.cancel();
         Log.error('Error regenerating output images.', error);

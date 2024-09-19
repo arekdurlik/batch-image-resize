@@ -85,6 +85,7 @@ ${outline}
 outline-offset: 0px;
 width: 100%;
 border-radius: var(--borderRadius-default);
+overflow: hidden;
 text-overflow: ellipsis;
 white-space: nowrap;
 cursor: default;

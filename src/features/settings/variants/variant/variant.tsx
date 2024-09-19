@@ -41,5 +41,4 @@ font-size: inherit;
 gap: 5px;
 justify-content: space-between;
 align-items: center;
-padding-bottom: 5px;
 `

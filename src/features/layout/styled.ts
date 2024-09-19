@@ -48,5 +48,8 @@ export const SectionGroup = styled.div`
   
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-default);
+
+  &:last-child:not(:nth-child(2)) {
+    border-bottom: none;
+  }
 `
