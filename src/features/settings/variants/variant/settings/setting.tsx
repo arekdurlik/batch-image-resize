@@ -1,11 +1,11 @@
 import { ReactNode } from 'react'
 import styled from 'styled-components'
 
-export function Setting({ label, unit, children }: { label?: string, unit?: string, children: ReactNode }) {
+export function Setting({ label, unit, noUnitSpace, children }: { label?: string, unit?: string, noUnitSpace?: boolean, children: ReactNode }) {
   return <Wrapper>
     {label && <Label>{label}:</Label>}
     {children}
-    <Unit>{unit}</Unit>
+    {!noUnitSpace && <Unit>{unit}</Unit>}
   </Wrapper>
 }
 

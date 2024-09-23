@@ -49,11 +49,21 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
           progress.advance();
         } catch(error) {
           progress.cancel();
+
+          if (String(error).includes('fingerprint')) {
+            openToast(
+              ToastType.ERROR, 
+              "Error processing input image. Make sure fingerprinting protection isn't enabled in the browser settings."
+            );
+            return;
+          }
+
           Log.error(`Error processing input image: "${images[i].file.name}".`, error);
           openToast(
             ToastType.ERROR, 
             `Error processing input image: "${images[i].file.name}". Please try again.`
           );
+          return;
         }
       }
 

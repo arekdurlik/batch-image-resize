@@ -66,11 +66,11 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
 
   // jump to new active item if out of view
   useEffect(() => {
-    useApp.subscribe(state => state.selectedItems, items => {
+    const unsub1 = useApp.subscribe(state => state.selectedItems, items => {
       selected.current = items;
     });
 
-    useApp.subscribe(state => state.latestSelectedItem, item => {
+    const unsub2 = useApp.subscribe(state => state.latestSelectedItem, item => {
       latestSelectedItem.current = item;
 
       if (!mouse.lmb && item) {
@@ -78,6 +78,11 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
         el && jumpToElement(list.current, el);
       }
     });
+
+    return () => {
+      unsub1();
+      unsub2();
+    }
   }, [itemRefMap, mouse]);
 
   useKeyDownEvents((event) => {

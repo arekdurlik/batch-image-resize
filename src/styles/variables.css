@@ -39,7 +39,7 @@
 
   --fgColor-default:  hsl(200, 3%, 17%);
   --fgColor-muted:    hsl(200, 3%, 25%);
-  --fgColor-icon:    hsl(200, 3%, 50%);
+  --fgColor-icon:    hsl(200, 3%, 65%);
   --fgColor-inverse:  hsl(208, 33%, 91%);
 
   --bgColor-default:              hsl(0, 0%, 98%);
@@ -52,6 +52,7 @@
   --control-default-fgColor-rest:      var(--fgColor-default);
   --control-default-fgColor-disabled:  color-mix(in hsl, var(--fgColor-default), transparent 60%);
   --control-default-bgColor-rest:      hsl(218, 65%, 97%);
+  --control-default-bgColor-error:      color-mix(in hsl, var(--color-red-5), transparent 85%);
   --control-default-bgColor-hover:     hsl(218, 65%, 94%);
   --control-default-bgColor-active:    hsl(218, 65%, 90%);
   --control-default-bgColor-selected:  var(--control-default-bgColor-active);

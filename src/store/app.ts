@@ -202,7 +202,7 @@ export const useApp = create<App>()(subscribeWithSelector((set, get) => ({
     async setQuality(quality) {
       set({ quality })
 
-      useOutputImages.getState().api.regenerate();
+      useOutputImages.getState().api.regenerateAll();
     },
     setIndexAsName: (indexAsName) => {
       set({ indexAsName })

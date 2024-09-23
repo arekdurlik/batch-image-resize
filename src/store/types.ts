@@ -30,13 +30,18 @@ export type OutputImageData = {
     id: string
     filename: string
     size: number
+    dimensions: {
+      width: number,
+      height: number
+    }
   },
   variantId: string
 
   crop: {
     x: number,
     y: number,
-    scale: number,
+    zoom: number,
+    minZoom: number
   },
 
   image: {

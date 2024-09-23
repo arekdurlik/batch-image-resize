@@ -15,3 +15,11 @@ export function lerp(x: number, y: number, a: number) {
 export function invlerp(x: number, y: number, a: number) {
   return clamp((a - x) / (y - x));
 }
+
+export function countDecimals(value: string) {
+  if (value.indexOf(".") !== -1) {
+    return value.split(".")[1].length || 0;
+  } else {
+    return 0;
+  }
+}

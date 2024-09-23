@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import { OVERLAY_ID } from '../../../lib/constants'
 import { PreviewImageData } from '../preview-picture'
-import { Thumbnails } from './thumbnails'
 import { fadeIn } from '../../../styles/mixins'
 
 type Props = { 
@@ -28,7 +27,6 @@ export function Lightbox({ src, onClose }: Props) {
       <Slide>
         <Image src={src}/>
       </Slide>
-      <Thumbnails/>
     </Wrapper>
   ), overlay.current);
 }
@@ -39,10 +37,8 @@ inset: 0;
 overflow: hidden;
 cursor: zoom-out;
 user-select: none;
-padding: 10px;
 
 display: flex;
-flex-direction: column;
 align-items: center;
 gap: 5px;
 transition: var(--transition-default);
@@ -52,12 +48,18 @@ ${fadeIn}
 `
 
 const Slide = styled.div`
+padding: var(--spacing-large);
 overflow: hidden;
 display: flex;
 align-items: center;
 flex: 1;
+width: 100%;
+justify-content: center;
 `
 const Image = styled.img`
 max-width: 100%;
 max-height: 100%;
+
+&:hover {
+}
 `

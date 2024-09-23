@@ -256,7 +256,7 @@ export async function processImage(
   let cropped: HTMLCanvasElement | HTMLImageElement = image;
 
   if (crop) {
-    cropped = cropImage(image, width, height, crop.x, crop.y, crop.scale);
+    cropped = cropImage(image, width, height, crop.x, crop.y, crop.zoom);
   }
   
   const resized = await resizeImage(cropped, width, height, filter);

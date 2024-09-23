@@ -28,8 +28,8 @@ background-position: 0% 50%;
 const Container = styled.div`
 position: relative;
 height: 100%;
-width: 275px;
-min-width: 275px;
+width: 267px;
+min-width: 267px;
 display: flex;
 flex-direction: column;
 justify-content: space-between;

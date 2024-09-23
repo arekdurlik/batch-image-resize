@@ -8,6 +8,7 @@ import { initialProgress, Progress, startProgress } from '../utils'
 import { generateOutputImage, generateOutputImageVariants, getUpToDateVariant } from './utils'
 import { openToast, ToastType } from '../toasts'
 import { useApp } from '../app'
+import { CropSettings } from '../../lib/config'
 
 type OutputImagesState = {
   images: OutputImageData[]
@@ -15,9 +16,11 @@ type OutputImagesState = {
   api: {
     generate: (images: InputImageData[]) => void
     generateVariant: (variantId: string) => void
-    regenerate: () => void
+    regenerate: (imageId: string) => void
+    regenerateAll: () => void
     regenerateVariant: (variantId: string) => void
     updateVariantData: (variant: Variant) => void
+    setCropData: (imageId: string, cropData: CropSettings) => void
     deleteByInputImageIds: (ids: string[]) => void
     deleteAll: () => void
     selectAll: () => void
@@ -53,8 +56,40 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
         openToast(ToastType.ERROR, 'Error generating output images. Please try again.');
       }
     },
-    async regenerate() {
+    async regenerate(imageId) {
+      const outputImages = [...get().images];
+      const index = outputImages.findIndex(i => i.id === imageId);
+      if (index === -1) {
+        throw new Error(`No output image with id ${imageId} found.`);
+      }
+
+      const outputImage = outputImages[index];
+      const progress = startProgress(useOutputImages, 1);
+
+      try {
+        const inputImages = useInputImages.getState().images;
+        const inputImage = inputImages.find(i => i.id === outputImage.inputImage.id);
+
+        if (!inputImage) {
+          throw new Error(`No input image with id "${outputImage.inputImage.id}" found.`);
+        }
+        const image = await generateOutputImage(inputImage, outputImage.variantId, false, outputImage);
+
+        if (image) {
+          progress.advance();
+          outputImages[index] = image;
+          set({ images: outputImages });
+        }
+      } catch (error) {
+        progress.cancel();
+
+        Log.error('Error generating output image.', error);
+        openToast(ToastType.ERROR, 'Error generating output image. Please try again.');
+      }
+    },
+    async regenerateAll() {
       Log.debug('Regenerating output images.');
+      const out = [...get().images];
 
       regenerateIndex++;
       const currentIndex = regenerateIndex;
@@ -65,7 +100,7 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
 
       try {
         for (let i = 0; i < inputImages.length; i++) {
-          const images = await generateOutputImageVariants(inputImages[i], false);
+          const images = await generateOutputImageVariants(inputImages[i], false, out);
           outputImages.push(...images);
           
           progress.advance();
@@ -135,6 +170,7 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
       regenerateVariantOutputImagesIndex += 1;
       const currentIndex = regenerateVariantOutputImagesIndex;
       const inputImages = useInputImages.getState().images;
+      const out = get().images;
 
       const progress = startProgress(useOutputImages, inputImages.length);
 
@@ -143,7 +179,7 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
         const urlsToRevoke: string[] = [];
 
         let i = 0;
-        let outputImage = get().images[i];
+        let outputImage = out[i];
         do {  
           if (outputImage.variantId === variantId) {
             const inputImage = inputImages.find(img => img.id === outputImage.inputImage.id);
@@ -152,7 +188,7 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
               throw new Error(`Variant with id ${variantId} not found.`);
             }
             
-            const image = await generateOutputImage(inputImage, variantId, false);
+            const image = await generateOutputImage(inputImage, variantId, false, outputImage);
             
             if (image) {
               urlsToRevoke.push(outputImage.image.full.src);
@@ -226,6 +262,21 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
       });
 
       set({ images });
+    },
+    setCropData: (imageId, cropData) => {
+      const outputImages = [...get().images];
+      const index = outputImages.findIndex(i => i.id === imageId);
+
+      if (index === -1) {
+        Log.error(`No output image with id "${imageId}" found.`);
+        openToast(ToastType.ERROR, `No output image with id "${imageId}" found.`);
+        return;
+      }
+      
+      outputImages[index].crop = cropData;
+
+      set({ images: outputImages });
+      useOutputImages.getState().api.regenerate(imageId);
     },
     deleteByInputImageIds: (ids) => {
       let outputImages = [...get().images];

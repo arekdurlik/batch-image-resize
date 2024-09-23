@@ -1,8 +1,9 @@
 import { MdEdit } from 'react-icons/md'
 import { OutputImageData } from '../../store/types'
-import { Details, Field, Filename, Label } from './styled'
+import { Details, Field, Filename, Header, Label, Value } from './styled'
 import styled from 'styled-components'
 import { bytesToSizeFormatted } from '../../lib/helpers'
+import { Button } from '../ui/inputs/button'
 
 export function OutputImageDetails({ image }: { image: OutputImageData }) {
   const inputSize = image.inputImage.size;
@@ -14,27 +15,27 @@ export function OutputImageDetails({ image }: { image: OutputImageData }) {
   return (
     <>
       <Details>
-        <Field>
-          <Label>Filename<Icons></Icons></Label>
+        <Header>
           <Filename>{image.filename}</Filename>
-        </Field>
+          <Button><MdEdit/>Edit</Button>
+        </Header>
 
         <Field>
-          <Label>Size</Label>
-          <Filename>
-            {bytesToSizeFormatted(outputSize)}
-            <PercentageChange $value={percentageRounded}> ({increase && '+'}{percentageRounded}%)</PercentageChange>
-          </Filename>
+          <Label>Quality</Label>
+          <Value>{Math.round(image.quality * 100 * 10) / 10}%</Value>
         </Field>
 
         <Field>
           <Label>Dimensions</Label>
-          <Filename>{image.dimensions.width} x {image.dimensions.height}</Filename>
+          <Value>{image.dimensions.width} x {image.dimensions.height}</Value>
         </Field>
-
+        
         <Field>
-          <Label>Quality</Label>
-          <Filename>{Math.round(image.quality * 100 * 10) / 10}%</Filename>
+          <Label>Size</Label>
+          <Value>
+            {bytesToSizeFormatted(outputSize)}
+            <PercentageChange $value={percentageRounded}> ({increase && '+'}{percentageRounded}%)</PercentageChange>
+          </Value>
         </Field>
       </Details>
     </>
@@ -50,16 +51,10 @@ ${props => props.$value && (
       : ''
 )};
 `
-const Icons = styled.div`
-display: flex;
 
-`
-const Edit = styled(MdEdit)`
+
+export const Edit = styled(MdEdit)`
 fill: var(--fgColor-icon);
 font-size: 16px;
 `
 
-/* const Refresh = styled(MdRefresh)`
-font-size: 16px;
-fill: var(--fgColor-icon);
-` */

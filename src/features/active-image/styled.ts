@@ -4,7 +4,6 @@ export const ImageWrapper = styled.div`
 position: relative;
 width: 100%;
 aspect-ratio: 1/1;
-max-height: 300px;
 overflow: hidden;
 display: grid;
 place-items: center;
@@ -50,6 +49,18 @@ align-items: center;
 font-weight: 500;
 `
 
-export const Filename = styled.span`
-
+export const Value = styled.span`
 `
+
+export const Header = styled.div`
+display: flex;
+justify-content: space-between;
+align-items: center;
+min-height: 30px;
+`
+
+export const Filename = styled.h3`
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+`;

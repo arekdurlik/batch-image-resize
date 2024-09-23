@@ -49,7 +49,7 @@ export function MoreOptions() {
         <ActionMenu.Item
           label='Regenerate all'
           icon={MdRefresh}
-          onClick={api.regenerate}
+          onClick={api.regenerateAll}
         />
         {outputImagesExist && (
           <ActionMenu.Item

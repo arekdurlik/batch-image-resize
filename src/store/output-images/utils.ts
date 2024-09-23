@@ -17,22 +17,24 @@ function alreadyExists(id: string, images: OutputImageData[]) {
   }
 }
 
-export async function generateOutputImageVariants(inputImage: InputImageData, checkForDuplicate = true) {
+export async function generateOutputImageVariants(inputImage: InputImageData, checkForDuplicate = true, outputImages?: OutputImageData[]) {
   Log.debug_verbose('Generating output image variants', { inputImage });
 
   const variants = useVariants.getState().variants;
-  const outputImages = [];
+  const newOutputImages = [];
   
   for (let j = 0; j < variants.length; j++) {
     const variant = variants[j];
 
-    const image = await generateOutputImage(inputImage, variant.id, checkForDuplicate);
+    const oldOutputImage = outputImages?.find(i => i.inputImage.id === inputImage.id && i.variantId === variant.id);
+
+    const image = await generateOutputImage(inputImage, variant.id, checkForDuplicate, oldOutputImage);
 
     if (image) {
-      outputImages.push(image);
+      newOutputImages.push(image);
     }
   }
-  return outputImages;
+  return newOutputImages;
 }
 
 export function getUpToDateVariant(variantId: string) {
@@ -48,7 +50,8 @@ export function getUpToDateVariant(variantId: string) {
 export async function generateOutputImage(
   inputImage: InputImageData, 
   variantId: string, 
-  checkForDuplicate = true
+  checkForDuplicate = true,
+  outputImage?: OutputImageData
 ): Promise<OutputImageData | undefined> {
   Log.debug_verbose('Generating output image', { inputImage, variantId });
 
@@ -87,6 +90,17 @@ export async function generateOutputImage(
     filename = filenameToJpg(filename);
   }
 
+  let cropData = {...DEFAULT_CROP_SETTINGS};
+
+  if (outputImage) {
+    cropData = {
+      x: outputImage.crop.x,
+      y: outputImage.crop.y,
+      zoom: outputImage.crop.zoom,
+      minZoom: outputImage.crop.minZoom
+    }
+  }
+
   const processedFull = await processImage(
     image,
     extension, 
@@ -94,7 +108,7 @@ export async function generateOutputImage(
     finalDimensions.width, 
     finalDimensions.height,
     variant.filter,
-    DEFAULT_CROP_SETTINGS
+    {...cropData, zoom: cropData.zoom / cropData.minZoom }
   );
 
   variant = getUpToDateVariant(variantId);
@@ -141,11 +155,15 @@ export async function generateOutputImage(
     inputImage: {
       id: inputImage.id,
       filename: inputImage.filename,
-      size: inputImage.image.full.file.size
+      size: inputImage.image.full.file.size,
+      dimensions: {
+        width: inputImage.dimensions.width,
+        height: inputImage.dimensions.height
+      }
     },
     variantId: variant.id,
 
-    crop: DEFAULT_CROP_SETTINGS,
+    crop: cropData,
 
     image: {
       full: {
