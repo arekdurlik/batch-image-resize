@@ -57,6 +57,7 @@ display: flex;
 justify-content: space-between;
 align-items: center;
 min-height: 30px;
+margin-bottom: var(--spacing-large);
 `
 
 export const Filename = styled.h3`

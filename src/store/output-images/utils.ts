@@ -108,7 +108,12 @@ export async function generateOutputImage(
     finalDimensions.width, 
     finalDimensions.height,
     variant.filter,
-    {...cropData, zoom: cropData.zoom / cropData.minZoom }
+    {...cropData, zoom: cropData.zoom / cropData.minZoom },
+    {
+      amount: variant.sharpenAmount,
+      radius: variant.sharpenRadius,
+      threshold: variant.sharpenThreshold,
+    }
   );
 
   variant = getUpToDateVariant(variantId);

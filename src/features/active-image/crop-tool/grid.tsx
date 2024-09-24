@@ -1,9 +1,13 @@
-import { CSSProperties } from 'react'
+import { CSSProperties, forwardRef } from 'react'
 import styled from 'styled-components'
 
-export function Grid({ style }: { style: CSSProperties}) {
+type Props = { 
+  style: CSSProperties
+};
+
+export const Grid = forwardRef<HTMLDivElement, Props>((props, ref) => {
   return (
-    <Container style={style}>
+    <Container ref={ref} style={props.style}>
       <div></div>
       <div></div>
       <div></div>
@@ -15,7 +19,7 @@ export function Grid({ style }: { style: CSSProperties}) {
       <div></div>
     </Container>
   )
-}
+});
 
 const Container = styled.div`
 position: absolute;

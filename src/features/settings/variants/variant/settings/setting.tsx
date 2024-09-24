@@ -1,11 +1,11 @@
 import { ReactNode } from 'react'
 import styled from 'styled-components'
 
-export function Setting({ label, unit, noUnitSpace, children }: { label?: string, unit?: string, noUnitSpace?: boolean, children: ReactNode }) {
+export function Setting({ label, unit, noUnitSpace, unitWidth = 17, children }: { label?: string, unit?: string, noUnitSpace?: boolean, unitWidth?: number, children: ReactNode }) {
   return <Wrapper>
     {label && <Label>{label}:</Label>}
     {children}
-    {!noUnitSpace && <Unit>{unit}</Unit>}
+    {!noUnitSpace && <Unit $width={unitWidth}>{unit}</Unit>}
   </Wrapper>
 }
 
@@ -24,8 +24,8 @@ bottom: 2px;
 font-weight: 500;
 `
 
-const Unit = styled.span`
+const Unit = styled.span<{ $width: number }>`
 width: 100%;
-max-width: 12px;
+max-width: ${props => props.$width}px;
 cursor: default;
 `

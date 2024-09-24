@@ -32,7 +32,7 @@ function App() {
               <MainView/>
             </Panel>
             <Resizer direction='horizontal' onReset={handleReset}/>
-            <Panel minSize={15} maxSize={30} defaultSize={15} style={{ minWidth: 250 }}>
+            <Panel minSize={19} maxSize={30} defaultSize={19} style={{ minWidth: 305 }}>
               <RightSidebar/>
             </Panel>
           </StyledPanelGroup>

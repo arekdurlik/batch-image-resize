@@ -89,6 +89,9 @@ export type Variant = {
   overWriteQuality: boolean
   filter: PicaFilter,
   quality: number
+  sharpenAmount: number
+  sharpenRadius: number
+  sharpenThreshold: number
   aspectRatio: {
     enabled: boolean
     value: string

@@ -28,6 +28,9 @@ export function AddVariant() {
       overWriteQuality: false,
       filter: 'mks2013',
       quality: 1,
+      sharpenAmount: 0,
+      sharpenRadius: 0.5,
+      sharpenThreshold: 0,
       aspectRatio: {
         enabled: false,
         value: '1:1'

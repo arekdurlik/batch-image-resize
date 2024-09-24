@@ -20,11 +20,15 @@ export function CropSettings({ onConfirm, onCancel }: { onConfirm: () => void, o
       
       <Details>
         <Header>
-          <Filename>Crop settings</Filename>
+          <Filename>Crop image</Filename>
+          <ButtonGroup >
+            <Button style={{ flex: 1 }} onClick={onConfirm}><MdCheck/>Apply</Button>
+            <Button style={{ flex: 1 }} onClick={onCancel}><MdClose/></Button>
+          </ButtonGroup>
         </Header>
 
-        <HorizontalInputGroup>
-          <VerticalInputGroup>
+        <HorizontalInputGroup style={{ marginRight: 13 }}>
+          <VerticalInputGroup style={{ marginLeft: 39 }}>
             <Setting label='X' noUnitSpace>
               <NumberInput 
                 value={cropState.x}
@@ -47,12 +51,12 @@ export function CropSettings({ onConfirm, onCancel }: { onConfirm: () => void, o
             </Setting>
           </VerticalInputGroup>
           <ButtonGroup>
-          <Button onClick={() => api.setX(0.5)}><MdAlignHorizontalCenter/></Button>
-          <Button onClick={() => api.setY(0.5)}><MdAlignVerticalCenter/></Button>
-        </ButtonGroup>
+            <Button onClick={() => api.setX(0.5)}><MdAlignHorizontalCenter/></Button>
+            <Button onClick={() => api.setY(0.5)}><MdAlignVerticalCenter/></Button>
+          </ButtonGroup>
         </HorizontalInputGroup>
         <VerticalInputGroup>
-            <Setting label='Zoom' unit='x'>
+            <Setting label='Zoom' unit='x' unitWidth={7}>
               <input 
                 type='range'
                 style={{ width: '100%' }}
@@ -70,9 +74,8 @@ export function CropSettings({ onConfirm, onCancel }: { onConfirm: () => void, o
               />
             </Setting>
           </VerticalInputGroup>
-          <HorizontalInputGroup>
-          <Button onClick={onConfirm}><MdCheck/>Confirm</Button>
-          <Button onClick={onCancel}><MdClose/>Cancel</Button>
+          <HorizontalInputGroup style={{ justifyContent: 'center'}}>
+          
           </HorizontalInputGroup>
       </Details>
     </>

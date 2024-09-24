@@ -9,6 +9,7 @@ import { Quality } from './settings/quality'
 import { Dimensions } from './settings/dimensions'
 import { AspectRatios } from './settings/aspect-ratios'
 import { Rename } from './settings/rename'
+import { Sharpening } from './settings/sharpening'
 
 export function Variant(variant: VariantType) {
   const api = useVariants(state => state.api);
@@ -28,6 +29,7 @@ export function Variant(variant: VariantType) {
       <SideBarSection>
         <Filename variant={variant}/>
         <Quality variant={variant}/>
+        <Sharpening variant={variant}/>
         <Dimensions variant={variant}/>
         <AspectRatios variant={variant}/>
       </SideBarSection>

@@ -23,6 +23,7 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
   const cropData = useRef({ x: 0.5, y: 0.5, zoom: 1 });
   const containerRef = useRef<HTMLDivElement>(null!);
   const editorRef = useRef<HTMLDivElement>(null!);
+  const gridRef = useRef<HTMLDivElement>(null!);
   const imageRef = useRef<HTMLImageElement>(null!);
   const currentCoords = useRef({ x: 0, y: 0 });
   const dragging = useRef(false);
@@ -45,6 +46,8 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
 
     imageRef.current.style.left = pos.left + 'px';
     imageRef.current.style.top = pos.top + 'px';
+
+    editorRef.current.style.height = gridRef.current.getBoundingClientRect().height + 'px';
   }));
 
   useEffect(() => {
@@ -115,20 +118,20 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
   }, []);
 
   useEffect(() => {
-      const editor = editorRef.current;
-      if (!editor || dragging.current) return;
-      
-      const pos = normalizedToPosition(
-        imageRef.current.width, 
-        imageRef.current.height, 
-        editorRef.current.offsetWidth, 
-        editorRef.current.offsetHeight, 
-        cropData.current.zoom, 
-        cropData.current.x, 
-        cropData.current.y
-      );
-      imageRef.current.style.left = pos.left + 'px';
-      imageRef.current.style.top = pos.top + 'px';
+    const editor = editorRef.current;
+    if (!editor || dragging.current) return;
+    
+    const pos = normalizedToPosition(
+      imageRef.current.width, 
+      imageRef.current.height, 
+      editorRef.current.offsetWidth, 
+      editorRef.current.offsetHeight, 
+      cropData.current.zoom, 
+      cropData.current.x, 
+      cropData.current.y
+    );
+    imageRef.current.style.left = pos.left + 'px';
+    imageRef.current.style.top = pos.top + 'px';
   }, [cropData]);
   
   useEffect(() => {
@@ -362,7 +365,7 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
               height: image.dimensions.height,
             }}
           >
-            <Grid style={{ aspectRatio: `${image.dimensions.width}/${image.dimensions.height}` }}/>
+            <Grid ref={gridRef} style={{ aspectRatio: `${image.dimensions.width}/${image.dimensions.height}` }}/>
             <EditorWrapper 
               ref={editorRef} 
               $height={image.inputImage.dimensions.height} 

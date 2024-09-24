@@ -6,14 +6,14 @@ import { Bold } from './styled'
 import { Setting } from './setting'
 import { useVariants } from '../../../../../store/variants'
 import { ChangeEvent } from 'react'
+import { RangeInput } from '../../../../ui/inputs/range-input'
+import { NumberInput } from '../../../../ui/inputs/number-input'
 
 export function Quality({ variant }: { variant: Variant }) {
   const api = useVariants(state => state.api);
   const qualityPercentage = Math.round(variant.quality * 100);
 
-  function handleQuality(event: ChangeEvent<HTMLInputElement>) {
-    const percentage = Number(event.target.value);
-
+  function handleQuality(percentage: number) {
     api.setQuality(variant.id, percentage / 100);
   }
 
@@ -36,14 +36,19 @@ export function Quality({ variant }: { variant: Variant }) {
           />
         </Setting>
         <Setting label='Quality' unit='%'>
-          <input 
-            type='range'
+          <RangeInput 
             value={qualityPercentage}
+            min={0}
+            max={100}
+            step={1}
             onChange={handleQuality}
             style={{ maxWidth: 98 }}
           />
-          <TextInput 
+          <NumberInput 
             value={qualityPercentage}
+            min={0}
+            max={100}
+            step={1}
             onChange={handleQuality}
             align='end'
             style={{ maxWidth: 41 }} 

@@ -5,6 +5,10 @@ import { CropSettings } from './crop-settings'
 import { useCropState } from './store'
 import { useInputImages } from '../../../store/input-images'
 import { useOutputImages } from '../../../store/output-images'
+import { SectionHeader } from '../../layout/styled'
+import { ButtonGroup } from '../../ui/inputs/styled'
+import { Button } from '../../ui/inputs/button'
+import { MdAlignHorizontalCenter, MdAlignVerticalCenter, MdZoomIn, MdZoomOut } from 'react-icons/md'
 
 type Props = { 
   thumbnailSrc?: string
@@ -21,7 +25,7 @@ export function CropTool({ thumbnailSrc, outputImageData: image, onClose }: Prop
   useEffect(() => {
     const inputAspectRatio = image.inputImage.dimensions.width / image.inputImage.dimensions.height;
     const outputAspectRatio = image.dimensions.width / image.dimensions.height;
-    const minZoom = inputAspectRatio / outputAspectRatio;
+    const minZoom = Math.max(1, inputAspectRatio / outputAspectRatio);
 
     api.setMinZoom(minZoom);
     api.setX(image.crop.x);
@@ -36,6 +40,7 @@ export function CropTool({ thumbnailSrc, outputImageData: image, onClose }: Prop
 
   return (
     <>
+      
       <CropEditor
         thumbnailSrc={thumbnailSrc} 
         inputImageData={inputImage}

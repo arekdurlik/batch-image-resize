@@ -11,11 +11,15 @@ type Variants = {
   variants: Variant[]
   api: {
     add: (variant: Variant) => void
+    regenerate: (variantId: string) => void
     delete: (variantId: string) => void
     rename: (variantId: string, name: string) => void
     setFilenamePart: (part: 'prefix' | 'suffix', variantId: string, value: string) => void
     setFilter: (variantId: string, filter: PicaFilter) => void
     setQuality: (variantId: string, quality: number) => void
+    setSharpenAmount: (variantId: string, sharpenAmount: number, regenerate?: boolean) => void
+    setSharpenRadius: (variantId: string, sharpenRadius: number,regenerate?: boolean) => void
+    setSharpenThreshold: (variantId: string, sharpenThreshold: number, regenerate?: boolean) => void
     setDimension: (dimension: 'width' | 'height', variantId: string, value: number | undefined) => void
     setDimensions: (variantId: string, width: number | undefined, height: number | undefined) => void
     setWidthMode: (variantId: string, mode: DimensionMode) => void
@@ -45,6 +49,9 @@ export const useVariants = create<Variants>((set, get) => ({
     overWriteQuality: false,
     filter: 'mks2013',
     quality: 1,
+    sharpenAmount: 0,
+    sharpenRadius: 0.5,
+    sharpenThreshold: 0,
     crop: false,
     aspectRatio: {
       enabled: false,
@@ -59,6 +66,9 @@ export const useVariants = create<Variants>((set, get) => ({
       set({ variants });
       
       useOutputImages.getState().api.generateVariant(variant.id);
+    },
+    regenerate(variantId) {
+      regenerateVariant(variantId);
     },
     delete(variantId) {
       const { variants, index } = getVariantsWithIdCheck(variantId);
@@ -101,6 +111,33 @@ export const useVariants = create<Variants>((set, get) => ({
       variant.quality = quality;
 
       regenerateVariant(variant.id);
+
+      set({ variants });
+    },
+    setSharpenAmount(variantId, sharpenAmount, regenerate = true) {
+      const { variants, variant } = getVariantsWithIdCheck(variantId);
+
+      variant.sharpenAmount = sharpenAmount;
+
+      regenerate && regenerateVariant(variant.id);
+
+      set({ variants });
+    },
+    setSharpenRadius(variantId, sharpenRadius, regenerate = true) {
+      const { variants, variant } = getVariantsWithIdCheck(variantId);
+
+      variant.sharpenRadius = sharpenRadius;
+
+      regenerate && regenerateVariant(variant.id);
+
+      set({ variants });
+    },
+    setSharpenThreshold(variantId, sharpenThreshold, regenerate = true) {
+      const { variants, variant } = getVariantsWithIdCheck(variantId);
+
+      variant.sharpenThreshold = sharpenThreshold;
+
+      regenerate && regenerateVariant(variant.id);
 
       set({ variants });
     },
@@ -244,9 +281,11 @@ export const useVariants = create<Variants>((set, get) => ({
       variant.aspectRatio.value = flipped;
       
       if (variant.aspectRatio.enabled) {
-        const oldWidth = variant.width.value;
-        variant.width.value = variant.height.value;
-        variant.height.value = oldWidth;
+        if (variant.width.mode === 'exact' && variant.height.mode === 'exact') {
+          const oldWidth = variant.width.value;
+          variant.width.value = variant.height.value;
+          variant.height.value = oldWidth;
+        } 
 
         if (Number(split[0]) !== Number(split[1])) {
           regenerateVariant(variant.id);

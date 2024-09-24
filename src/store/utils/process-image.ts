@@ -1,7 +1,5 @@
 import pica from 'pica'
 import { DimensionMode } from '../../types'
-import { getFileExtension } from '../../lib/helpers'
-import { lerp } from '../../helpers'
 import { CropSettings } from '../../lib/config'
 import { PicaFilter } from '../types'
 
@@ -23,7 +21,12 @@ export function resizeImage(
   image: HTMLCanvasElement | HTMLImageElement, 
   width: number | undefined, 
   height: number | undefined,
-  filter: PicaFilter = 'mks2013'
+  filter: PicaFilter = 'mks2013',
+  sharpen?: {
+    amount: number
+    radius: number
+    threshold: number
+  }
 ): Promise<HTMLCanvasElement> {
   return new Promise(resolve => {
     try {
@@ -47,7 +50,16 @@ export function resizeImage(
 
       offScreenCanvas.width = newWidth;
       offScreenCanvas.height = newHeight;
-      const resized = resizer.resize(image, offScreenCanvas, { filter: filter });
+      const resized = resizer.resize(
+        image, 
+        offScreenCanvas, 
+        { 
+          filter, 
+          unsharpAmount: sharpen?.amount ?? 0, 
+          unsharpRadius: sharpen?.radius ?? 0.5, 
+          unsharpThreshold: sharpen?.threshold ??0 
+        }
+      );
       resolve(resized);
     } catch {
       throw new Error('Failed to resize image.');
@@ -55,16 +67,23 @@ export function resizeImage(
   });
 }
 
-export function cropImage(image: HTMLImageElement, width: number, height: number, x = 0.5, y = 0.5, scale = 1) {
+export function cropImage(
+  image: HTMLImageElement, 
+  width: number, 
+  height: number, 
+  x = 0.5, 
+  y = 0.5, 
+  zoom = 1
+) {
   const cropCanvas = document.createElement('canvas');
   const cropContext = cropCanvas.getContext('2d')!;
 
   const inputAspectRatio = image.width / image.height;
   const outputAspectRatio = width / height;
 
-  let cropWidth = image.width, cropHeight = image.height;
+  let cropWidth = image.width;
+  let cropHeight = image.height;
 
-  
   if (inputAspectRatio > outputAspectRatio) {
     cropWidth = image.height * outputAspectRatio;
     cropHeight = image.height;
@@ -73,21 +92,21 @@ export function cropImage(image: HTMLImageElement, width: number, height: number
     cropHeight = image.width / outputAspectRatio;
   }
 
+  cropWidth = cropWidth / zoom;
+  cropHeight = cropHeight / zoom;
+
+  const offsetX = (image.width - cropWidth) * x;
+  const offsetY = (image.height - cropHeight) * y;
+
   cropCanvas.width = cropWidth;
   cropCanvas.height = cropHeight;
 
-  const min = 0;
-
-  const maxX = -(image.width * scale) + cropWidth;
-  const xPos = lerp(min, maxX, x);
-
-  const maxY = -(image.height * scale) + cropHeight;
-  const yPos = lerp(min, maxY, y);
-
   cropContext.drawImage(
-    image, 
-    0, 0, image.width, image.height, 
-    xPos, yPos, image.width * scale, image.height * scale
+    image,
+    offsetX, offsetY,
+    cropWidth, cropHeight,
+    0, 0,
+    cropWidth, cropHeight
   );
 
   return cropCanvas;
@@ -101,7 +120,7 @@ export function calculateOuputDimensions(
     widthMode: DimensionMode,
     heightMode: DimensionMode,
     aspectRatioEnabled: boolean,
-    aspectRatio: string
+    aspectRatio?: string
   }
 ) {
   const inputWidth = image.naturalWidth;
@@ -116,14 +135,13 @@ export function calculateOuputDimensions(
 
   const inputAspectRatio = inputWidth / inputHeight;
 
-  // Parse the aspect ratio if it's provided in the settings, else use the image's original aspect ratio
   let aspectRatio = inputAspectRatio;
   if (settings.aspectRatioEnabled && settings.aspectRatio) {
     const split = settings.aspectRatio.split(':').map(v => Number(v));
     aspectRatio = split[0] / split[1];
   }
 
-  // When both width and height are provided
+  // both width and height are provided
   if (outputWidth && outputHeight) {
     if (settings.widthMode === 'exact' && settings.heightMode === 'exact') {
       if (settings.aspectRatioEnabled) {
@@ -135,7 +153,7 @@ export function calculateOuputDimensions(
       }
     } else if (settings.widthMode === 'upto' && settings.heightMode === 'upto') {
       if (settings.aspectRatioEnabled) {
-        // Check the width and height to ensure both stay within bounds
+        // check the width and height to ensure both stay within bounds
         finalWidth = Math.min(outputWidth, inputWidth);
         finalHeight = finalWidth / aspectRatio;
         if (finalHeight > outputHeight) {
@@ -173,7 +191,7 @@ export function calculateOuputDimensions(
       }
     }
   } 
-  // When width is provided but height is empty
+  // width is provided but height is empty
   else if (outputWidth && !outputHeight) {
     if (settings.widthMode === 'exact') {
       if (settings.aspectRatioEnabled) {
@@ -193,7 +211,7 @@ export function calculateOuputDimensions(
       }
     }
   } 
-  // When height is provided but width is empty
+  // height is provided but width is empty
   else if (!outputWidth && outputHeight) {
     if (settings.heightMode === 'exact') {
       if (settings.aspectRatioEnabled) {
@@ -213,15 +231,15 @@ export function calculateOuputDimensions(
       }
     }
   } 
-  // When both width and height are empty
+  //both width and height are empty
   else {
     if (settings.aspectRatioEnabled) {
       if (inputAspectRatio > aspectRatio) {
-        finalWidth = inputWidth;
-        finalHeight = finalWidth / aspectRatio;
-      } else {
         finalHeight = inputHeight;
         finalWidth = finalHeight * aspectRatio;
+      } else {
+        finalWidth = inputWidth;
+        finalHeight = finalWidth / aspectRatio;
       }
     } else {
       finalWidth = inputWidth;
@@ -243,6 +261,12 @@ function canvasToBlob(image: HTMLCanvasElement, quality: number, extension: stri
   });
 }
 
+export type SharpenSettings = {
+  amount: number
+  radius: number
+  threshold: number
+}
+
 // TODO: maybe store the image on file upload so it doesn't have to be loaded again
 export async function processImage(
   image: HTMLImageElement, 
@@ -251,7 +275,8 @@ export async function processImage(
   width: number, 
   height: number, 
   filter?: PicaFilter,
-  crop?: CropSettings
+  crop?: CropSettings,
+  sharpen?: SharpenSettings
 ) {
   let cropped: HTMLCanvasElement | HTMLImageElement = image;
 
@@ -259,7 +284,7 @@ export async function processImage(
     cropped = cropImage(image, width, height, crop.x, crop.y, crop.zoom);
   }
   
-  const resized = await resizeImage(cropped, width, height, filter);
+  const resized = await resizeImage(cropped, width, height, filter, sharpen);
 
   const blob = await canvasToBlob(resized, quality, extension);
 

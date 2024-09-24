@@ -1,8 +1,8 @@
 import { THUMBNAIL_SIZE } from '../../lib/constants'
 import { Log } from '../../lib/log'
-import { calculateOuputDimensions, loadImage, processImage } from '../../lib/utils'
 import { InputImageData, UploadedImage } from '../types'
 import { v1 as uuid } from 'uuid'
+import { calculateOuputDimensions, loadImage, processImage } from '../utils'
 
 export async function generateInputImage(image: UploadedImage): Promise<InputImageData | null> {
   Log.debug_verbose('Generating input image', { image });
@@ -23,7 +23,8 @@ export async function generateInputImage(image: UploadedImage): Promise<InputIma
         widthMode: 'upto', 
         width: THUMBNAIL_SIZE, 
         heightMode: 'upto',
-        height: THUMBNAIL_SIZE
+        height: THUMBNAIL_SIZE,
+        aspectRatioEnabled: false
       }
     );
 

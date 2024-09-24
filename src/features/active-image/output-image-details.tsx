@@ -16,8 +16,8 @@ export function OutputImageDetails({ image }: { image: OutputImageData }) {
     <>
       <Details>
         <Header>
-          <Filename>{image.filename}</Filename>
-          <Button><MdEdit/>Edit</Button>
+          <Filename title={image.filename}>{image.filename}</Filename>
+            <Button><MdEdit/>Edit</Button>
         </Header>
 
         <Field>

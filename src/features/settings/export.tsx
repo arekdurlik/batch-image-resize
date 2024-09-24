@@ -80,9 +80,12 @@ export function Export() {
 
 const Wrapper = styled.div`
 border-top: 1px solid var(--borderColor-default);
+background-color: var(--bgColor-default);
 display: grid;
 place-items: center;
 gap: 5px;
 z-index: 2;
 padding: 5px;
+position: relative;
+top: -1px;
 `
