@@ -17,7 +17,6 @@ export function CropSettings({ onConfirm, onCancel }: { onConfirm: () => void, o
 
   return (
     <>
-      
       <Details>
         <Header>
           <Filename>Crop image</Filename>

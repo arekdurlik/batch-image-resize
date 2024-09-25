@@ -28,7 +28,12 @@ export async function generateInputImage(image: UploadedImage): Promise<InputIma
       }
     );
 
-    thumbnailFile = (await processImage(image, file.name, 1, finalDimensions.width, finalDimensions.height)).blob;
+    thumbnailFile = (await processImage(
+      image, 
+      file.name, 
+      finalDimensions.width, 
+      finalDimensions.height
+    )).blob;
   }
 
   const fullSrc = URL.createObjectURL(file);

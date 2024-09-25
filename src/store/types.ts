@@ -25,44 +25,52 @@ export type InputImageData = {
 };
 
 export type OutputImageData = {
-  id: string,
+  id: string
+  filename: string,
   inputImage: {
     id: string
     filename: string
     size: number
     dimensions: {
-      width: number,
+      width: number
       height: number
     }
   },
   variantId: string
 
   crop: {
-    x: number,
-    y: number,
-    zoom: number,
+    x: number
+    y: number
+    zoom: number
     minZoom: number
   },
 
   image: {
     full: {
-      file: Blob,
+      file: Blob
       src: string,
     }
     thumbnail: {
-      file: Blob,
+      file: Blob
       src: string
     }
   },
 
-  overwriteFilename: boolean
-  filename: string
+  resampling: {
+    enabled: boolean
+    filter: PicaFilter
+    quality: number
+  }
 
-  overwriteQuality: boolean
-  quality: number
+  sharpening: {
+    enabled: boolean
+    amount: number
+    radius: number
+    threshold: number
+  }
 
   dimensions: {
-    width: number,
+    width: number
     height: number
   }
 };

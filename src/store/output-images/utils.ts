@@ -2,7 +2,7 @@ import { useOutputImages } from '.'
 import { THUMBNAIL_SIZE } from '../../lib/constants'
 import { filenameToJpg, getFileExtension, insertVariantDataToFilename, isJpg } from '../../lib/helpers'
 import { Log } from '../../lib/log'
-import { calculateOuputDimensions, loadImage, processImage } from '../utils'
+import { calculateOuputDimensions, loadImage, processImage, ResamplingSettings, SharpenSettings } from '../utils'
 import { InputImageData, OutputImageData } from '../types'
 import { useVariants } from '../variants'
 import { DEFAULT_CROP_SETTINGS } from '../../lib/config'
@@ -78,19 +78,18 @@ export async function generateOutputImage(
     }
   );
 
-  const extension = quality < 1 ? 'jpeg' : getFileExtension(inputImage.filename);
-
-  let filename = insertVariantDataToFilename(
-    inputImage.filename, 
-    variant.prefix, 
-    variant.suffix
-  );
-
-  if (extension === 'jpeg') {
-    filename = filenameToJpg(filename);
-  }
-
   let cropData = {...DEFAULT_CROP_SETTINGS};
+  let sharpeningData: SharpenSettings = { 
+    enabled: false,
+    amount: variant.sharpenAmount,
+    radius: variant.sharpenRadius,
+    threshold: variant.sharpenThreshold
+  };
+  let resamplingData: ResamplingSettings = {
+    enabled: false,
+    filter: variant.filter,
+    quality: variant.quality
+  };
 
   if (outputImage) {
     cropData = {
@@ -98,22 +97,46 @@ export async function generateOutputImage(
       y: outputImage.crop.y,
       zoom: outputImage.crop.zoom,
       minZoom: outputImage.crop.minZoom
-    }
+    };
+  }
+
+  if (outputImage?.resampling.enabled) {
+    resamplingData = {
+      enabled: true,
+      filter: outputImage.resampling.filter,
+      quality: outputImage.resampling.quality
+    };
+  }
+
+
+  if (outputImage?.sharpening.enabled) {
+    sharpeningData = {
+      enabled: true,
+      amount: outputImage.sharpening.amount,
+      radius: outputImage.sharpening.radius,
+      threshold: outputImage.sharpening.threshold,
+    };
+  }
+
+  let filename = insertVariantDataToFilename(
+    inputImage.filename, 
+    variant.prefix, 
+    variant.suffix
+  );
+  
+  const extension = resamplingData.quality < 1 ? 'jpeg' : getFileExtension(inputImage.filename);
+  if (extension === 'jpeg') {
+    filename = filenameToJpg(filename);
   }
 
   const processedFull = await processImage(
     image,
     extension, 
-    quality, 
     finalDimensions.width, 
     finalDimensions.height,
-    variant.filter,
     {...cropData, zoom: cropData.zoom / cropData.minZoom },
-    {
-      amount: variant.sharpenAmount,
-      radius: variant.sharpenRadius,
-      threshold: variant.sharpenThreshold,
-    }
+    resamplingData,
+    sharpeningData
   );
 
   variant = getUpToDateVariant(variantId);
@@ -142,9 +165,10 @@ export async function generateOutputImage(
     processedThumbnail = await processImage(
       image,
       processedFile.name,
-      isJpg(inputImage.filename) ? 0.9 : 1, 
       finalDimensions.width, 
-      finalDimensions.height
+      finalDimensions.height,
+      undefined,
+      { enabled: true, filter: 'mks2013', quality: isJpg(inputImage.filename) ? 0.9 : 1}
     );
   }
 
@@ -167,9 +191,7 @@ export async function generateOutputImage(
       }
     },
     variantId: variant.id,
-
-    crop: cropData,
-
+    
     image: {
       full: {
         file: processedFull.blob,
@@ -180,16 +202,16 @@ export async function generateOutputImage(
         src: needsThumbnail ? URL.createObjectURL(processedThumbnail.blob) : fullSrc
       }
     },
-
+    
     dimensions: {
       width: processedFull.dimensions.width,
       height: processedFull.dimensions.height
     },
-
-    overwriteFilename: false,
+    
     filename,
-
-    overwriteQuality: false,
-    quality: quality
+    
+    crop: cropData,
+    resampling: resamplingData,
+    sharpening: sharpeningData
   };
 }

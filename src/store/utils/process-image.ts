@@ -261,7 +261,14 @@ function canvasToBlob(image: HTMLCanvasElement, quality: number, extension: stri
   });
 }
 
+export type ResamplingSettings = {
+  enabled: boolean
+  filter: PicaFilter
+  quality: number
+}
+
 export type SharpenSettings = {
+  enabled: boolean
   amount: number
   radius: number
   threshold: number
@@ -271,12 +278,11 @@ export type SharpenSettings = {
 export async function processImage(
   image: HTMLImageElement, 
   extension: string, 
-  quality: number, 
   width: number, 
   height: number, 
-  filter?: PicaFilter,
   crop?: CropSettings,
-  sharpen?: SharpenSettings
+  resamplingData?: ResamplingSettings,
+  sharpeningData?: SharpenSettings
 ) {
   let cropped: HTMLCanvasElement | HTMLImageElement = image;
 
@@ -284,9 +290,9 @@ export async function processImage(
     cropped = cropImage(image, width, height, crop.x, crop.y, crop.zoom);
   }
   
-  const resized = await resizeImage(cropped, width, height, filter, sharpen);
+  const resized = await resizeImage(cropped, width, height, resamplingData?.filter, sharpeningData);
 
-  const blob = await canvasToBlob(resized, quality, extension);
+  const blob = await canvasToBlob(resized, resamplingData?.quality ?? 1, extension);
 
   return {
     blob, 

@@ -8,7 +8,8 @@ import { OutputImageDetails } from './output-image-details'
 import { PreviewPicture } from './preview-picture'
 import styled from 'styled-components'
 import { useEffect, useState } from 'react'
-import { CropTool } from './crop-tool'
+import { CropImage } from './crop-image/crop-image'
+import { EditImage } from './edit-image'
 
 export function ActiveImage() {
   const inputImages = useInputImages(state => state.images);
@@ -27,7 +28,9 @@ export function ActiveImage() {
     activeOutputImage.image.full.src, 
     activeOutputImage.image.thumbnail.src
   ] : [undefined, undefined];
+
   const [cropActive, setCropActive] = useState(false);
+  const [editActive, setEditActive] = useState(false);
 
   useEffect(() => {
     if (cropActive) {
@@ -36,10 +39,15 @@ export function ActiveImage() {
   }, [activeInputImage, activeOutputImage]);
 
   return cropActive && activeOutputImage ? (
-    <CropTool key={activeOutputImage.id} thumbnailSrc={thumbnailSrc} outputImageData={activeOutputImage} onClose={() => setCropActive(false)} />
+    <CropImage 
+      key={activeOutputImage.id} 
+      thumbnailSrc={thumbnailSrc} 
+      outputImageData={activeOutputImage} 
+      onClose={() => setCropActive(false)} 
+    />
   ) : hasActiveImage ? (
     <>
-      {!cropActive && activeOutputImage && (
+      {!editActive && !cropActive && activeOutputImage && (
         <CropButtonWrapper>
           <Button onClick={() => setCropActive(true)}>
             <MdCrop/>Crop
@@ -55,8 +63,13 @@ export function ActiveImage() {
 
       {activeInputImage ? (
         <InputImageDetails image={activeInputImage}/>
+      ) : editActive && activeOutputImage ? (
+        <EditImage image={activeOutputImage} onClose={() => setEditActive(false)}/>
       ) : (
-        <OutputImageDetails image={activeOutputImage!}/> 
+        <OutputImageDetails 
+          image={activeOutputImage!}
+          onEnableEdit={() => setEditActive(true)} 
+        /> 
       )}
     </>
   ) : <></>

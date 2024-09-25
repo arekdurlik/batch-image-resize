@@ -2,7 +2,7 @@ import { MouseEvent, useRef, useState } from 'react'
 import { BackgroundImage, Image, ImageWrapper } from './styled'
 import { Lightbox } from './lightbox'
 import styled from 'styled-components'
-import { CropAdjust } from './crop-tool/crop-adjust'
+import { CropAdjust } from './crop-image/crop-adjust'
 import { OutputImageData } from '../../store/types'
 
 export type PreviewImageData = {

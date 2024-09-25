@@ -1,8 +1,8 @@
-import { ReactNode } from 'react'
+import { CSSProperties, ReactNode } from 'react'
 import styled from 'styled-components'
 
-export function Setting({ label, unit, noUnitSpace, unitWidth = 17, children }: { label?: string, unit?: string, noUnitSpace?: boolean, unitWidth?: number, children: ReactNode }) {
-  return <Wrapper>
+export function Setting({ label, unit, noUnitSpace, unitWidth = 17, style, children }: { label?: string, unit?: string, noUnitSpace?: boolean, unitWidth?: number, style?: CSSProperties, children: ReactNode }) {
+  return <Wrapper style={style}>
     {label && <Label>{label}:</Label>}
     {children}
     {!noUnitSpace && <Unit $width={unitWidth}>{unit}</Unit>}

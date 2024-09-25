@@ -1,10 +1,10 @@
 import { create } from 'zustand'
-import { InputImageData, OutputImageData, SelectedItem, Variant } from '../types'
+import { InputImageData, OutputImageData, PicaFilter, SelectedItem, Variant } from '../types'
 import { filenameToJpg, insertVariantDataToFilename} from '../../lib/helpers'
 import { useInputImages } from '../input-images'
 import { Log } from '../../lib/log'
 import { subscribeWithSelector } from 'zustand/middleware'
-import { initialProgress, Progress, startProgress } from '../utils'
+import { getOutputImagesWithIdCheck, getVariantsWithIdCheck, initialProgress, Progress, ResamplingSettings, SharpenSettings, startProgress } from '../utils'
 import { generateOutputImage, generateOutputImageVariants, getUpToDateVariant } from './utils'
 import { openToast, ToastType } from '../toasts'
 import { useApp } from '../app'
@@ -21,6 +21,15 @@ type OutputImagesState = {
     regenerateVariant: (variantId: string) => void
     updateVariantData: (variant: Variant) => void
     setCropData: (imageId: string, cropData: CropSettings) => void
+    setResamplingData: (imageId: string, data: ResamplingSettings, regenerate?: boolean) => void
+    setResamplingEnabled: (imageId: string, enabled: boolean, regenerate?: boolean) => void
+    setFilter: (imageId: string, filter: PicaFilter, regenerate?: boolean) => void
+    setQuality: (imageId: string, quality: number, regenerate?: boolean) => void
+    setSharpenData: (imageId: string, data: SharpenSettings, regenerate?: boolean) => void
+    setSharpenEnabled: (imageId: string, enabled: boolean) => void
+    setSharpenAmount: (imageId: string, amount: number, regenerate?: boolean) => void
+    setSharpenRadius: (imageId: string, radius: number, regenerate?: boolean) => void
+    setSharpenThreshold: (imageId: string, threshold: number, regenerate?: boolean) => void
     deleteByInputImageIds: (ids: string[]) => void
     deleteAll: () => void
     selectAll: () => void
@@ -216,13 +225,11 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
           if (outputImages[i].variantId === variantId) {
             const image = outputImages[i];
   
-            if (!image.overwriteFilename) {
-              outputImages[i].filename = insertVariantDataToFilename(
-                variant.quality < 1 ? filenameToJpg(image.inputImage.filename) : image.inputImage.filename, 
-                variant.prefix, 
-                variant.suffix
-              );
-            }
+            outputImages[i].filename = insertVariantDataToFilename(
+              variant.quality < 1 ? filenameToJpg(image.inputImage.filename) : image.inputImage.filename, 
+              variant.prefix, 
+              variant.suffix
+            );
           }
         }
 
@@ -247,17 +254,12 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
 
       images.forEach(image => {
         if (image.variantId === variant.id) {
-          if (!image.overwriteQuality) {
-            image.quality = variant.quality;
-          }
-          
-          if (!image.overwriteFilename) {
-            image.filename = insertVariantDataToFilename(
-              image.inputImage.filename,
-              variant.prefix,
-              variant.suffix
-            );
-          }
+     
+          image.filename = insertVariantDataToFilename(
+            image.inputImage.filename,
+            variant.prefix,
+            variant.suffix
+          );
         }
       });
 
@@ -277,6 +279,130 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
 
       set({ images: outputImages });
       useOutputImages.getState().api.regenerate(imageId);
+    },
+    setResamplingData: (imageId, data, regenerate = true) => {
+      const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
+
+      image.resampling.enabled = data.enabled;
+      image.resampling.filter = data.filter;
+      image.resampling.quality = data.quality;
+      
+      set({ images: outputImages });
+      
+      regenerate && get().api.regenerate(imageId);
+    },
+    setResamplingEnabled: (imageId, enabled, regenerate = true) => {
+      const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
+
+      image.resampling.enabled = enabled;
+
+      set({ images: outputImages });
+
+      regenerate && get().api.regenerate(imageId);
+    },
+    setFilter: (imageId, filter, regenerate = true) => {
+      const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
+
+      if (!image.resampling.enabled) {
+        image.resampling.enabled = true;
+        const { variant } = getVariantsWithIdCheck(image.variantId);
+
+        image.resampling.quality = variant.quality;
+      }
+
+      image.resampling.filter = filter;
+
+      set({ images: outputImages });
+
+      regenerate && get().api.regenerate(imageId);
+    },
+    setQuality: (imageId, quality, regenerate = true) => {
+      const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
+
+      if (!image.resampling.enabled) {
+        image.resampling.enabled = true;
+        const { variant } = getVariantsWithIdCheck(image.variantId);
+
+        image.resampling.filter = variant.filter;
+      }
+
+      image.resampling.quality = quality;
+
+      set({ images: outputImages });
+
+      regenerate && get().api.regenerate(imageId);
+    },
+    setSharpenData: (imageId, data, regenerate = true) => {
+      const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
+
+      image.sharpening.enabled = data.enabled;
+      image.sharpening.amount = data.amount;
+      image.sharpening.radius = data.radius;
+      image.sharpening.threshold = data.threshold;
+      
+      set({ images: outputImages });
+      
+      regenerate && get().api.regenerate(imageId);
+    },
+    setSharpenEnabled: (imageId, enabled, regenerate = true) => {
+      const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
+
+      image.sharpening.enabled = enabled;
+
+      set({ images: outputImages });
+
+      regenerate && get().api.regenerate(imageId);
+    },
+    setSharpenAmount: (imageId, amount, regenerate = true) => {
+      const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
+
+      if (!image.sharpening.enabled) {
+        image.sharpening.enabled = true;
+        const { variant } = getVariantsWithIdCheck(image.variantId);
+
+        image.sharpening.radius = variant.sharpenRadius;
+        image.sharpening.threshold = variant.sharpenThreshold;
+      }
+
+      image.sharpening.amount = amount;
+
+      set({ images: outputImages });
+
+      regenerate && get().api.regenerate(imageId);
+    },
+    setSharpenRadius: (imageId, radius, regenerate = true) => {
+      const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
+
+      if (!image.sharpening.enabled) {
+        image.sharpening.enabled = true;
+        const { variant } = getVariantsWithIdCheck(image.variantId);
+
+        image.sharpening.amount = variant.sharpenAmount;
+        image.sharpening.threshold = variant.sharpenThreshold;
+      }
+
+      image.sharpening.radius = radius;
+
+      set({ images: outputImages });
+
+      regenerate && get().api.regenerate(imageId);
+    },
+    setSharpenThreshold: (imageId, threshold, regenerate = true) => {
+      const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
+
+      if (!image.sharpening.enabled) {
+        image.sharpening.enabled = true;
+        const { variant } = getVariantsWithIdCheck(image.variantId);
+
+        image.sharpening.amount = variant.sharpenAmount;
+        image.sharpening.radius = variant.sharpenRadius;
+      }
+
+      image.sharpening.threshold = threshold;
+
+      set({ images: outputImages });
+
+      regenerate && get().api.regenerate(imageId);
     },
     deleteByInputImageIds: (ids) => {
       let outputImages = [...get().images];

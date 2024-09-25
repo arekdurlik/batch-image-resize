@@ -16,7 +16,7 @@ type Variants = {
     rename: (variantId: string, name: string) => void
     setFilenamePart: (part: 'prefix' | 'suffix', variantId: string, value: string) => void
     setFilter: (variantId: string, filter: PicaFilter) => void
-    setQuality: (variantId: string, quality: number) => void
+    setQuality: (variantId: string, quality: number, regenerate?: boolean) => void
     setSharpenAmount: (variantId: string, sharpenAmount: number, regenerate?: boolean) => void
     setSharpenRadius: (variantId: string, sharpenRadius: number,regenerate?: boolean) => void
     setSharpenThreshold: (variantId: string, sharpenThreshold: number, regenerate?: boolean) => void
@@ -105,12 +105,12 @@ export const useVariants = create<Variants>((set, get) => ({
 
       set({ variants });
     },
-    setQuality(variantId, quality) {
+    setQuality(variantId, quality, regenerate = true) {
       const { variants, variant } = getVariantsWithIdCheck(variantId);
 
       variant.quality = quality;
 
-      regenerateVariant(variant.id);
+      regenerate && regenerateVariant(variant.id);
 
       set({ variants });
     },

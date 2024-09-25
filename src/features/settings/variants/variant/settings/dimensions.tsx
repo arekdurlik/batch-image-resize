@@ -38,13 +38,13 @@ export function Dimensions({ variant }: { variant: Variant }) {
             ]}
             value={variant.width.mode}
             onChange={v => api.setWidthMode(variant.id, v as DimensionMode)}
-            style={{ maxWidth: 78, marginLeft: 4 }}
+            style={{ maxWidth: 81 }}
             />
           <TextInput 
             value={variant.width.value ?? ''} 
             onChange={handleDimensionChange('width')}
             align='end'
-            style={{ maxWidth: 70 }} 
+            style={{ maxWidth: 81 }} 
           />
         </Setting>
         <Setting label='Height' unit='px'>
@@ -54,13 +54,13 @@ export function Dimensions({ variant }: { variant: Variant }) {
             ]}
             value={variant.height.mode}
             onChange={v => api.setHeightMode(variant.id, v as DimensionMode)}
-            style={{ maxWidth: 78 }}
+            style={{ maxWidth: 81 }}
           />
           <TextInput 
             value={variant.height.value ?? ''} 
             onChange={handleDimensionChange('height')}
             align='end'
-            style={{ maxWidth: 70 }} 
+            style={{ maxWidth: 81 }} 
           />
         </Setting>
       </VerticalInputGroup>

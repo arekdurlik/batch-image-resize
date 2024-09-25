@@ -4,25 +4,28 @@ import { Details, Field, Filename, Header, Label, Value } from './styled'
 import styled from 'styled-components'
 import { bytesToSizeFormatted } from '../../lib/helpers'
 import { Button } from '../ui/inputs/button'
+import { useVariants } from '../../store/variants'
 
-export function OutputImageDetails({ image }: { image: OutputImageData }) {
+export function OutputImageDetails({ image, onEnableEdit }: { image: OutputImageData, onEnableEdit: () => void }) {
   const inputSize = image.inputImage.size;
   const outputSize = image.image.full.file.size;
   const increase = outputSize > inputSize;
   const percentage = (outputSize - inputSize) / inputSize * 100;
   const percentageRounded = Math.round(percentage * 10) / 10;
+  const variant = useVariants(state => state.variants).find(v => v.id === image.variantId)!;
+  const quality = Math.round((image.resampling.enabled ? image.resampling.quality : variant.quality) * 100 * 10) / 10;
 
   return (
     <>
       <Details>
         <Header>
           <Filename title={image.filename}>{image.filename}</Filename>
-            <Button><MdEdit/>Edit</Button>
+            <Button onClick={onEnableEdit}><MdEdit/>Edit</Button>
         </Header>
 
         <Field>
           <Label>Quality</Label>
-          <Value>{Math.round(image.quality * 100 * 10) / 10}%</Value>
+          <Value>{quality}%</Value>
         </Field>
 
         <Field>

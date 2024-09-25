@@ -10,13 +10,14 @@ type Props = {
   numberInput?: boolean
   numberInputRef?: RefObject<HTMLInputElement>
   numberInputStyle?: CSSProperties
+  numberInputAlign?: CanvasTextAlign
   onRangeChange?: (value: number) => void
-  onRangeChangeEnd: (event: PointerEvent<HTMLInputElement>, value: number) => void
+  onRangeChangeEnd: (value: number) => void
   onInputChange?: (value: number) => void
 }; 
 
 export const RangeInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
-  const { value, step = 0.01, min = 0, max = 100, style, numberInput, numberInputRef, numberInputStyle, onRangeChange, onRangeChangeEnd, onInputChange } = props;
+  const { value, step = 0.01, min = 0, max = 100, style, numberInput, numberInputRef, numberInputStyle, numberInputAlign, onRangeChange, onRangeChangeEnd, onInputChange } = props;
 
   function handleRangeChange(event: ChangeEvent<HTMLInputElement>) {
     if (onRangeChange) {
@@ -25,9 +26,9 @@ export const RangeInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
     }
   }
 
-  function handleRangeChangeEnd(event: PointerEvent<HTMLInputElement>) {
+  function handleRangeChangeEnd() {
     if (onRangeChangeEnd) {
-      onRangeChangeEnd(event, value);
+      onRangeChangeEnd(value);
     }
   } 
 
@@ -53,6 +54,7 @@ export const RangeInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
           max={max}
           onChange={onInputChange}
           style={numberInputStyle}
+          align={numberInputAlign}
         />
       )}
     </>

@@ -23,14 +23,14 @@ export function Filename({ variant }: { variant: Variant }) {
           <TextInput 
             value={variant.prefix} 
             onChange={handleFilenamePart('prefix', variant.id)}
-            style={{ maxWidth: 144 }}
+            style={{ maxWidth: 166 }}
             />
         </Setting>
         <Setting label='Suffix'>
         <TextInput 
             value={variant.suffix} 
             onChange={handleFilenamePart('suffix', variant.id)} 
-            style={{ maxWidth: 144 }}
+            style={{ maxWidth: 166 }}
           />
         </Setting>
       </VerticalInputGroup>

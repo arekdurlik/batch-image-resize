@@ -1,3 +1,4 @@
+import { useOutputImages } from '../output-images'
 import { SelectedItem } from '../types'
 import { useVariants } from '../variants'
 
@@ -17,4 +18,15 @@ export function getVariantsWithIdCheck(variantId: string) {
   }
 
   return { variants, variant: variants[index], index };
+}
+
+export function getOutputImagesWithIdCheck(imageId: string) {
+  const outputImages = [...useOutputImages.getState().images];
+  const index = outputImages.findIndex(i => i.id === imageId);
+
+  if (index === -1) {
+    throw new Error(`No output image with id "${imageId}" found.`);
+  }
+
+  return { outputImages, image: outputImages[index], index };
 }
