@@ -2,8 +2,6 @@ import { MouseEvent, useRef, useState } from 'react'
 import { BackgroundImage, Image, ImageWrapper } from './styled'
 import { Lightbox } from './lightbox'
 import styled from 'styled-components'
-import { CropAdjust } from './crop-image/crop-adjust'
-import { OutputImageData } from '../../store/types'
 
 export type PreviewImageData = {
   x: number
@@ -12,7 +10,7 @@ export type PreviewImageData = {
   height: number
 };
 
-export function PreviewPicture({ src, thumbnailSrc, outputImageData }: { src?: string, thumbnailSrc?: string, outputImageData?: OutputImageData }) {
+export function PreviewPicture({ src, thumbnailSrc }: { src?: string, thumbnailSrc?: string }) {
   const [lightBoxOpened, setLightBoxOpened] = useState(false);
   const [imageData, setImageData] = useState<PreviewImageData>({ x: 0, y: 0, width: 0, height: 0 });
   const imageRef = useRef<HTMLImageElement>(null!);

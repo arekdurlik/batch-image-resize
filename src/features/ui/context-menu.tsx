@@ -88,7 +88,7 @@ export function ContextMenu({
     if (!actuator.current) return;
     const ref = actuator.current;
     
-    if (isOpen && el.computedStyleMap().get('display')?.toString() === 'none') {
+    if (isOpen && el.style.display === 'none') {
       el.style.display = 'initial';
       const rect = ref.getBoundingClientRect();
       el.style.left = rect.left + (ref.offsetWidth / 2) + 'px';

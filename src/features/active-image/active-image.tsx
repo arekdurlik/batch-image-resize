@@ -58,7 +58,6 @@ export function ActiveImage() {
       <PreviewPicture 
         src={src} 
         thumbnailSrc={thumbnailSrc}
-        outputImageData={activeOutputImage} 
       />
 
       {activeInputImage ? (

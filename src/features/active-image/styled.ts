@@ -46,7 +46,7 @@ export const Label = styled.span`
 display: flex;
 gap: 5px;
 align-items: center;
-font-weight: 500;
+font-weight: 600;
 `
 
 export const Value = styled.span`

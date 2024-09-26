@@ -40,16 +40,16 @@ export const SectionTitle = styled.h2`
 export const SideBarSection = styled.div<{ $animate?: boolean }>`
   display: flex;
   flex-direction: column;
+  padding: var(--spacing-large);
 `
 
 export const SectionGroup = styled.div`
-  padding: 10px;
   border-bottom: 1px solid var(--borderColor-default);
   
   display: flex;
   flex-direction: column;
 
-  &:last-child:not(:nth-child(2)) {
+  /* &:last-child:not(:nth-child(2)) {
     border-bottom: none;
-  }
+  } */
 `

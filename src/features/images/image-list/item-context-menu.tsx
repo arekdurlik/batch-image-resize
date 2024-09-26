@@ -5,6 +5,7 @@ import { ContextMenu } from '../../ui/context-menu'
 import { IoMdTrash } from 'react-icons/io'
 import { MdFileCopy, MdImage, MdSaveAs } from 'react-icons/md'
 import { openToast, ToastType } from '../../../store/toasts'
+import { getFileExtension } from '../../../lib/helpers'
 
 type Props = { 
   actuator: RefObject<HTMLElement>, 
@@ -43,7 +44,7 @@ export function ItemContextMenu({ actuator, type, image, lastSelected, listFocus
     }
   }
 
-  function copyImage() {
+  function handleCopyImage() {
     try {
       navigator.clipboard.write([
         new ClipboardItem({
@@ -56,6 +57,58 @@ export function ItemContextMenu({ actuator, type, image, lastSelected, listFocus
     }
   }
 
+  function handleSaveAs() {
+    if (typeof window.showSaveFilePicker !== "undefined") {
+      downloadWithPicker();
+    } else {
+      downloadRegular();
+    }
+  }
+
+  async function downloadWithPicker() {
+    let type = {
+      description: '',
+      accept: {}
+    }
+
+    switch (getFileExtension(image.filename)) {
+      case 'jpg':
+      case 'pjp': 
+      case 'pjpeg':
+      case 'jfif':
+      case 'jpeg':
+        type = {
+          description: 'JPEG Image',
+          accept: { 'image/jpeg': ['.jpg'] }
+        };
+        break;
+      case 'png':
+        type = {
+          description: 'PNG Image',
+          accept: { 'image/png': ['.png'] }
+        };
+        break;
+    }
+
+    const newHandle = await window.showSaveFilePicker({
+      suggestedName: image.filename,
+      types: [
+        type
+      ],
+    });
+
+    const writableStream = await newHandle.createWritable();
+    await writableStream.write(image.image.full.file);
+    await writableStream.close();
+  }
+
+  function downloadRegular() {
+    const a = document.createElement('a');
+    a.href = image.image.full.src;
+    a.download = image.filename;
+    a.click();
+  }
+
   return (
     <ContextMenu 
       actuator={actuator} 
@@ -63,12 +116,6 @@ export function ItemContextMenu({ actuator, type, image, lastSelected, listFocus
       onOpen={handleContextMenuOpen} 
       onClose={() => setIsOpen(false)} 
     >
-      {type !== 'input' && selectedItems.length > 1 && (
-        <ContextMenu.Item
-          label='Save images as...'
-          icon={MdSaveAs}
-        />
-      )}
       {selectedItems.length  === 1 && (
         <ContextMenu.Item
           label='Open image in a new tab'
@@ -76,20 +123,21 @@ export function ItemContextMenu({ actuator, type, image, lastSelected, listFocus
           onClick={() => window.open(image.image.full.src)}
         />
       )}
-      {type !== 'input' && selectedItems.length  === 1 && (
+      {type === 'output' && selectedItems.length  === 1 && (
         <ContextMenu.Item
           label='Save image as...'
           icon={MdSaveAs}
+          onClick={handleSaveAs}
         />
       )}
       {selectedItems.length  === 1 && (
         <ContextMenu.Item
           label='Copy image'
           icon={MdFileCopy}
-          onClick={copyImage}
+          onClick={handleCopyImage}
         />
       )}
-      {!(type === 'input' && selectedItems.length > 1) && <ContextMenu.Divider/>}
+      {selectedItems.length < 2 && <ContextMenu.Divider/>}
       <ContextMenu.Item
         label='Delete'
         icon={IoMdTrash}

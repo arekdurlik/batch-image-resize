@@ -26,12 +26,20 @@ export function CropImage({ thumbnailSrc, outputImageData: image, onClose }: Pro
     api.setMinZoom(minZoom);
     api.setX(image.crop.x);
     api.setY(image.crop.y);
-    api.setZoom(Math.max(minZoom, image.crop.zoom));
+    api.setZoom(image.crop.zoom);
   }, [api, image]);
 
   function handleConfirm() {
     const state = useCropState.getState();
-    outputImagesApi.setCropData(image.id, { x: state.x, y: state.y, zoom: state.zoom, minZoom: state.minZoom });
+    outputImagesApi.setCropData(
+      image.id, 
+      { 
+        x: state.x, 
+        y: state.y, 
+        zoom: state.zoom, 
+        minZoom: state.minZoom 
+      }
+    );
   }
 
   return (

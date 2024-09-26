@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, MouseEventHandler, ReactNode, CSSProperties, forwardRef, MouseEvent, useEffect, useRef } from 'react'
+import { ButtonHTMLAttributes, MouseEventHandler, ReactNode, CSSProperties, forwardRef, MouseEvent } from 'react'
 import styled, { css } from 'styled-components'
 import { outline } from '../../../styles/mixins'
 
@@ -46,7 +46,7 @@ export const StyledButton = styled.button<{ $disabled?: boolean, $active?: boole
   color: var(--control-default-fgColor-rest);
   padding: 3px 7px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   min-height: 29px;
   width: fit-content;
   cursor: pointer;

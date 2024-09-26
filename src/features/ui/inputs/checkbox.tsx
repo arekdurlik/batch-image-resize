@@ -27,11 +27,11 @@ const Container = styled.div`
 display: flex;
 align-items: center;
 gap: 7px;
-font-weight: 500;
+font-weight: 600;
 `
 
 const Label = styled.label`
-font-weight: 500;
+font-weight: 600;
 user-select: none;
 display: flex;
 gap: 5px;

@@ -21,7 +21,7 @@ const Label = styled.span`
 cursor: default;
 position: relative;
 bottom: 2px;
-font-weight: 500;
+font-weight: 600;
 `
 
 const Unit = styled.span<{ $width: number }>`

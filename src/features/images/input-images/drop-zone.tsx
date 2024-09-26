@@ -33,11 +33,11 @@ margin-bottom: 5px;
 
 const Cue = styled.span`
 font-size: 1.5em;
-font-weight: 500;
+font-weight: 600;
 `
 
 const Browse = styled.span`
-font-weight: 500;
+font-weight: 600;
 `
 
 const DropArea = styled.div`

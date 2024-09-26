@@ -7,6 +7,7 @@ import { RangeInput } from '../../../../ui/inputs/range-input'
 import { Button } from '../../../../ui/inputs/button'
 import { MdRefresh } from 'react-icons/md'
 import { CSSProperties } from 'react'
+import { picaFilters } from '../../../../../lib/constants'
 
 type Props = { 
   enabled?: boolean
@@ -52,13 +53,9 @@ export function Resampling({
       <VerticalInputGroup>
         <Setting label='Filter' style={filterStyle}>
           <SelectInput 
-            options={[
-              { label: 'Nearest neighbor', value: 'box' },
-              { label: 'Hamming', value: 'hamming' },
-              { label: 'Lanczos 2', value: 'lanczos2' },
-              { label: 'Lanczos 3', value: 'lanczos3' },
-              { label: 'MKS 2013', value: 'mks2013' },
-            ]}
+            options={Object.keys(picaFilters).map(key => (
+              { label: picaFilters[key as PicaFilter], value: key }
+            ))}
             value={filter}
             onChange={v => onFilterChange(v as PicaFilter)}
             style={{ maxWidth: filterWidth }}

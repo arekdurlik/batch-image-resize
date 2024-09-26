@@ -5,12 +5,17 @@ import { useInputImages } from '../../store/input-images'
 import { useOutputImages } from '../../store/output-images'
 import { OutputImageData } from '../../store/types'
 import { Button } from '../ui/inputs/button'
+import { MdDownload } from 'react-icons/md'
+import { PercentageChange } from '../active-image/output-image-details'
 
 export function Export() {
-  const totalInputBytes = useInputImages(state => state.totalSize);
   const outputImages = useOutputImages(state => state.images);
+  const totalInputBytes = useInputImages(state => state.totalSize);
   const totalOutputBytes = outputImages.reduce((a, b) => a + b.image.full.file.size, 0);
-  
+  const increase = totalOutputBytes > totalInputBytes;
+  const percentage = (totalOutputBytes - totalInputBytes) / totalInputBytes * 100;
+  const percentageRounded = Math.round(percentage * 10) / 10;
+
   function zipItUp(zip: JSZip, outputImages: OutputImageData[]): Promise<JSZip[]> {
     const promises: Promise<JSZip>[] = [];
     const duplicateIndexes: { [key:string]: number } = {}
@@ -69,10 +74,13 @@ export function Export() {
   return (
     <Wrapper>
       {totalOutputBytes > 0 && 
-        `${bytesToSizeFormatted(totalInputBytes)} → ≈${bytesToSizeFormatted(totalOutputBytes)}`
+        <Size>
+        {bytesToSizeFormatted(totalInputBytes)} → ≈{bytesToSizeFormatted(totalOutputBytes)}
+        <PercentageChange $value={percentageRounded}> ({increase && '+'}{percentageRounded}%)</PercentageChange>
+        </Size>
       }
       <Button onClick={handleClick}>
-        Export
+      <MdDownload/>Export
       </Button>
     </Wrapper>
   )
@@ -85,7 +93,12 @@ display: grid;
 place-items: center;
 gap: 5px;
 z-index: 2;
-padding: 5px;
+padding: var(--spacing-large);
 position: relative;
 top: -1px;
+`
+
+const Size = styled.div`
+display: flex;
+gap: 5px;
 `

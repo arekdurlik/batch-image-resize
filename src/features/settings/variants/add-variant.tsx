@@ -4,14 +4,16 @@ import { Button } from '../../ui/inputs/button'
 
 let index = 1;
 
-export function AddVariant() {
+export function AddVariant({ onAdd }: { onAdd?: (variantId: string) => void }) {
   const api = useVariants(state => state.api);
 
   function handleAdd() {
     index++;
 
+    const id = `v-${Date.now()}`;
+
     api.add({
-      id: `v-${Date.now()}`,
+      id,
       index,
       name: `Variant ${index}`,
       width: {
@@ -36,6 +38,8 @@ export function AddVariant() {
         value: '1:1'
       }
     });
+
+    onAdd?.(id)
   }
 
   return <Button onClick={handleAdd}><IoMdAdd/>Add</Button>;

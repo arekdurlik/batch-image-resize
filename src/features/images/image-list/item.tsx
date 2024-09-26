@@ -1,4 +1,4 @@
-import { forwardRef, useRef, useEffect, MouseEvent, KeyboardEvent, useState } from 'react'
+import { forwardRef, useRef, useEffect, MouseEvent, useState } from 'react'
 import { bytesToSizeFormatted } from '../../../lib/helpers'
 import { useApp } from '../../../store/app'
 import { SortOption } from '../types'

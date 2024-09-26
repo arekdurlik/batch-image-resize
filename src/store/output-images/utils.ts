@@ -63,7 +63,6 @@ export async function generateOutputImage(
   }
 
   let variant = getUpToDateVariant(variantId);
-  const quality = variant.quality;
 
   const image = await loadImage(inputImage.image.full.file);
   const finalDimensions = calculateOuputDimensions(

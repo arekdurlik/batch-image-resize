@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 export const Bold = styled.span`
-font-weight: 500;
+font-weight: 600;
 margin-top: 10px;
 margin-bottom: 5px;
 display: flex;

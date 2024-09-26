@@ -136,15 +136,16 @@ export const useOutputImages = create<OutputImagesState>()(subscribeWithSelector
       try {
         for (let i = 0; i < inputImages.length; i++) {
 
-          let currentInputImages = useInputImages.getState().images;
-          if (!currentInputImages.some(img => img.id === inputImages[i].id)) {
-            progress.advance();
-            continue;
-          }
-          
           const image = await generateOutputImage(inputImages[i], variantId);
 
-          currentInputImages = useInputImages.getState().images;
+          try {
+            getUpToDateVariant(variantId);
+          } catch (error) {
+            progress.cancel();
+            return;
+          }
+
+          const currentInputImages = useInputImages.getState().images;
           if (!currentInputImages.some(img => img.id === inputImages[i].id)) {
             progress.advance();
             continue;

@@ -1,14 +1,14 @@
-import { ChangeEvent, KeyboardEvent, useRef, useState } from 'react'
+import { ChangeEvent, KeyboardEvent, PointerEvent, useRef, useState } from 'react'
 import { useVariants } from '../../../../../store/variants'
 import { TextInput } from '../../../../ui/inputs/text-input'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Variant } from '../../../../../store/types'
 import { useOutsideClick } from '../../../../../hooks'
 import { useDidUpdateEffect } from '../../../../../hooks/use-did-update-effect'
 import { outline } from '../../../../../styles/mixins'
 import { Tooltip } from '../../../../ui/tooltip'
 
-export function Rename({ variant }: { variant: Variant }) {
+export function Rename({ variant, active }: { variant: Variant, active: boolean }) {
   const [editing, setEditing] = useState(false);
   const api = useVariants(state => state.api);
   const labelRef = useRef<HTMLHeadingElement>(null!);
@@ -49,6 +49,19 @@ export function Rename({ variant }: { variant: Variant }) {
     }
   }
 
+  function handleClick(event: PointerEvent<HTMLDivElement>) {
+    if (active) {
+      event.stopPropagation();
+    }
+  }
+  function handleDoubleClick(event: PointerEvent<HTMLDivElement>) {
+    event.stopPropagation();
+
+    if (active) {
+      setEditing(true);
+    }
+  }
+
   return (
     editing ? (
       <TextInput 
@@ -58,9 +71,11 @@ export function Rename({ variant }: { variant: Variant }) {
         onKeyDown={handleInputKey}
         spellCheck={false}
         onBlur={() => setEditing(false)}
+        style={{ justifyContent: 'flex-start' }}
       />
     ) : (
       <Tooltip
+        disabled={!active}
         content={
           <Tooltip.Content>
             Double click to edit
@@ -71,7 +86,9 @@ export function Rename({ variant }: { variant: Variant }) {
           ref={labelRef}
           tabIndex={0} 
           onKeyDown={handleLabelKey} 
-          onDoubleClick={() => setEditing(true)}
+          onDoubleClick={handleDoubleClick}
+          onClick={handleClick}
+          $active={active}
         >
           {variant.name}
         </VariantName>
@@ -80,13 +97,14 @@ export function Rename({ variant }: { variant: Variant }) {
   )
 }
 
-const VariantName = styled.h3`
+const VariantName = styled.h3<{ $active: boolean }>`
 ${outline}
 outline-offset: 0px;
-width: 100%;
 border-radius: var(--borderRadius-default);
 overflow: hidden;
 text-overflow: ellipsis;
 white-space: nowrap;
-cursor: default;
+${props => props.$active && css`
+  cursor: default;
+`}
 `

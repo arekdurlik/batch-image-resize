@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { bytesToSizeFormatted } from '../../lib/helpers'
 import { Button } from '../ui/inputs/button'
 import { useVariants } from '../../store/variants'
+import { picaFilters } from '../../lib/constants'
 
 export function OutputImageDetails({ image, onEnableEdit }: { image: OutputImageData, onEnableEdit: () => void }) {
   const inputSize = image.inputImage.size;
@@ -14,6 +15,14 @@ export function OutputImageDetails({ image, onEnableEdit }: { image: OutputImage
   const percentageRounded = Math.round(percentage * 10) / 10;
   const variant = useVariants(state => state.variants).find(v => v.id === image.variantId)!;
   const quality = Math.round((image.resampling.enabled ? image.resampling.quality : variant.quality) * 100 * 10) / 10;
+  const filter = image.resampling.enabled ? image.resampling.filter : variant.filter;
+  const sharpening = image.sharpening.enabled 
+    ? image.sharpening 
+    : { 
+      amount: variant.sharpenAmount, 
+      radius: variant.sharpenRadius, 
+      threshold: variant.sharpenThreshold 
+    };
 
   return (
     <>
@@ -22,10 +31,20 @@ export function OutputImageDetails({ image, onEnableEdit }: { image: OutputImage
           <Filename title={image.filename}>{image.filename}</Filename>
             <Button onClick={onEnableEdit}><MdEdit/>Edit</Button>
         </Header>
+        
+        <Field>
+          <Label>Variant</Label>
+          <Value>{variant.name}</Value>
+        </Field>
 
         <Field>
-          <Label>Quality</Label>
-          <Value>{quality}%</Value>
+          <Label>Resampling</Label>
+          <Value>{picaFilters[filter]} / {quality}% quality</Value>
+        </Field>
+
+        <Field>
+          <Label>Sharpening</Label>
+          <Value>{sharpening.amount}% / {sharpening.radius}px / {sharpening.threshold} levels</Value>
         </Field>
 
         <Field>

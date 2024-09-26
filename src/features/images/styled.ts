@@ -27,6 +27,6 @@ gap: 5px;
 align-items: center;
 
 span {
-  font-weight: 500;
+  font-weight: 600;
 }
 `

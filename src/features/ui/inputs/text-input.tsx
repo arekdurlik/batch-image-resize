@@ -59,7 +59,7 @@ width: 100%;
 `
 
 export const TextInputLabel = styled.label`
-font-weight: 500;
+font-weight: 600;
 `
 
 export const TextInputContainer = styled.div<{ $focused: boolean }>`

@@ -59,7 +59,7 @@ export function bytesToSizeFormatted(bytes: number) {
 
   const size = bytes * (kb ? 0.001 : 0.000001);
 
-  return `${Math.round(size * 100) / 100}${kb ? 'kb' : 'mb'}`;
+  return `${Math.round(size * 100) / 100}${kb ? ' KB' : ' MB'}`;
 }
 
 export function difference(a: number, b: number) {

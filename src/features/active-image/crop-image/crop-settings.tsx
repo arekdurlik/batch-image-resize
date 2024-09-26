@@ -60,8 +60,8 @@ export function CropSettings({ onConfirm, onCancel }: { onConfirm: () => void, o
                 type='range'
                 style={{ width: '100%' }}
                 value={cropState.zoom} 
-                min={cropState.minZoom} 
-                max={cropState.minZoom * 10}
+                min={1} 
+                max={10}
                 step={0.01} 
                 onChange={handleZoom}
               />
@@ -73,9 +73,6 @@ export function CropSettings({ onConfirm, onCancel }: { onConfirm: () => void, o
               />
             </Setting>
           </VerticalInputGroup>
-          <HorizontalInputGroup style={{ justifyContent: 'center'}}>
-          
-          </HorizontalInputGroup>
       </Details>
     </>
   )

@@ -56,22 +56,27 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
     const currentCropState = useCropState.getState();
     cropData.current.x = currentCropState.x;
     cropData.current.y = currentCropState.y;
-    cropData.current.zoom = currentCropState.zoom;
-
-    const pos = normalizedToPosition(
-      imageRef.current.width, 
-      imageRef.current.height, 
-      editorRef.current.offsetWidth, 
-      editorRef.current.offsetHeight, 
-      currentCropState.zoom,
-      currentCropState.x,
-      currentCropState.y
-    );
+    cropData.current.zoom = currentCropState.zoom * currentCropState.minZoom;
     
-    imageRef.current.style.transform = `scale(${currentCropState.zoom})`;
-    imageRef.current.style.left = pos.left + 'px';
-    imageRef.current.style.top = pos.top + 'px';
+    function setInitialPosition() {
+      const pos = normalizedToPosition(
+        imageRef.current.width, 
+        imageRef.current.height, 
+        editorRef.current.offsetWidth, 
+        editorRef.current.offsetHeight, 
+        cropData.current.zoom, 
+        cropData.current.x, 
+        cropData.current.y
+      );
+      imageRef.current.style.transform = `scale(${cropData.current.zoom})`;
+      imageRef.current.style.left = pos.left + 'px';
+      imageRef.current.style.top = pos.top + 'px';
+    } 
 
+    setInitialPosition();
+    setTimeout(() => {
+      setInitialPosition();
+    })
 
     const unsub1 = useCropState.subscribe(state => ({ x: state.x, y: state.y }), state => {
       cropData.current.x = state.x;
@@ -94,8 +99,9 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
     
     const unsub2 = useCropState.subscribe(state => state.zoom, (zoom, prevZoom) => {
       if (zoom !== prevZoom) {
-        image.style.transform = `scale(${zoom})`;
-        cropData.current.zoom = zoom;
+        const minZoom = useCropState.getState().minZoom;
+        image.style.transform = `scale(${zoom * minZoom})`;
+        cropData.current.zoom = zoom * minZoom;
         handleZoom();
       }
     });
