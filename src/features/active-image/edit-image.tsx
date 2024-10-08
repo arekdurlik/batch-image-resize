@@ -40,11 +40,11 @@ export function EditImage({ image, onClose }: { image: OutputImageData, onClose:
   const initialSharpeningData = useRef(sharpeningData);
   const applied = useRef(false);
   const touched = useRef(false);
-  
+
   useEffect(() => {
     return () => {
       if (!applied.current && touched.current) {
-        if (shallowEqual(resamplingData, initialResamplingData.current) 
+        if (shallowEqual(resamplingData, initialResamplingData.current)
         && shallowEqual(sharpeningData, initialSharpeningData.current)) {
           return;
         }
@@ -85,7 +85,7 @@ export function EditImage({ image, onClose }: { image: OutputImageData, onClose:
         </ButtonGroup>
       </Header>
 
-      <Resampling 
+      <Resampling
         enabled={resamplingData.enabled}
         filter={resamplingData.filter}
         quality={resamplingData.quality}
@@ -99,7 +99,7 @@ export function EditImage({ image, onClose }: { image: OutputImageData, onClose:
         onRevert={() => handleChange(() => api.setResamplingEnabled(image.id, false))}
       />
 
-      <Sharpening 
+      <Sharpening
         enabled={sharpeningData.enabled}
         amount={sharpeningData.amount}
         radius={sharpeningData.radius}

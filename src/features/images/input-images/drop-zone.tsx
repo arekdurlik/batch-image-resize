@@ -4,12 +4,12 @@ import { MdCloudUpload } from 'react-icons/md'
 import { handleUpload } from './utils'
 
 export function DropZone() {
-  const { getRootProps, getInputProps, isDragActive,  } = useDropzone({ 
-    onDrop: handleUpload, 
+  const { getRootProps, getInputProps, isDragActive,  } = useDropzone({
+    onDrop: handleUpload,
     accept: {
       'image/jpeg': [],
       'image/png': []
-    } 
+    }
   });
 
   return (

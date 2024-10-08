@@ -27,21 +27,21 @@ type Store = UseBoundStore<Write<StoreApi<HasProgress>, StoreSubscribeWithSelect
 export function startProgress(store: Store, max: number) {
   let leftToProcess = max;
 
-  store.setState(({ progress }) => ({ 
-    progress: { 
-      ...progress, 
-      totalItems: progress.totalItems + max 
-    } 
+  store.setState(({ progress }) => ({
+    progress: {
+      ...progress,
+      totalItems: progress.totalItems + max
+    }
   }));
 
   const unsub = store.subscribe(state => state.progress, state => {
     if (state.processedItems >= state.totalItems) {
       setTimeout(() => {
-        store.setState(({ 
-          progress: { 
+        store.setState(({
+          progress: {
             processedItems: 0,
             totalItems: 0
-          } 
+          }
         }));
       }, 150);
       unsub();
@@ -52,20 +52,20 @@ export function startProgress(store: Store, max: number) {
     advance: () => {
       leftToProcess--;
 
-      store.setState(({ progress }) => ({ 
-        progress: { 
-          ...progress, 
-          processedItems: progress.processedItems + 1 
-        } 
+      store.setState(({ progress }) => ({
+        progress: {
+          ...progress,
+          processedItems: progress.processedItems + 1
+        }
       }));
     },
     cancel: () => {
       unsub();
-      store.setState(({ progress }) => ({ 
-        progress: { 
-          ...progress, 
-          totalItems: progress.totalItems - leftToProcess 
-        } 
+      store.setState(({ progress }) => ({
+        progress: {
+          ...progress,
+          totalItems: progress.totalItems - leftToProcess
+        }
       }));
     }
   };

@@ -1,14 +1,14 @@
 import { THUMBNAIL_SIZE } from '../../lib/constants'
 import { Log } from '../../lib/log'
 import { InputImageData, UploadedImage } from '../types'
-import { v1 as uuid } from 'uuid'
+import { nanoid } from 'nanoid'
 import { calculateOuputDimensions, loadImage, processImage } from '../utils'
 
 export async function generateInputImage(image: UploadedImage): Promise<InputImageData | null> {
   Log.debug_verbose('Generating input image', { image });
   let inputImage: InputImageData | null = null;
 
-  const id = uuid();
+  const id = nanoid();
   const { file, height, width } = image;
 
   const needsThumbnail = width > THUMBNAIL_SIZE || height > THUMBNAIL_SIZE;
@@ -18,10 +18,10 @@ export async function generateInputImage(image: UploadedImage): Promise<InputIma
   if (needsThumbnail) {
     const image = await loadImage(file);
     const finalDimensions = calculateOuputDimensions(
-      image, 
-      { 
-        widthMode: 'upto', 
-        width: THUMBNAIL_SIZE, 
+      image,
+      {
+        widthMode: 'upto',
+        width: THUMBNAIL_SIZE,
         heightMode: 'upto',
         height: THUMBNAIL_SIZE,
         aspectRatioEnabled: false
@@ -29,17 +29,17 @@ export async function generateInputImage(image: UploadedImage): Promise<InputIma
     );
 
     thumbnailFile = (await processImage(
-      image, 
-      file.name, 
-      finalDimensions.width, 
+      image,
+      file.name,
+      finalDimensions.width,
       finalDimensions.height
     )).blob;
   }
 
   const fullSrc = URL.createObjectURL(file);
 
-  inputImage = { 
-    id, 
+  inputImage = {
+    id,
     index: 0,
     image: {
       full: {
@@ -50,11 +50,11 @@ export async function generateInputImage(image: UploadedImage): Promise<InputIma
         file: thumbnailFile,
         src: needsThumbnail ? URL.createObjectURL(thumbnailFile) : fullSrc
       }
-    }, 
-    filename: file.name, 
-    dimensions: { 
-      width, 
-      height 
+    },
+    filename: file.name,
+    dimensions: {
+      width,
+      height
     }
   };
 

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { PicaFilter, Variant } from './types'
 import { useOutputImages } from './output-images'
-import { v1 as uuid } from 'uuid'
+import { nanoid } from 'nanoid'
 import { DimensionMode } from '../types'
 import { Log } from '../lib/log'
 import { getVariantsWithIdCheck } from './utils'
@@ -33,7 +33,7 @@ type Variants = {
 
 export const useVariants = create<Variants>((set, get) => ({
   variants: [{
-    id: uuid(),
+    id: nanoid(),
     index: 0,
     name: '400w',
     width: {
@@ -61,10 +61,10 @@ export const useVariants = create<Variants>((set, get) => ({
   api: {
     async add(variant) {
       const variants = [...get().variants];
-      
+
       variants.push(variant);
       set({ variants });
-      
+
       useOutputImages.getState().api.generateVariant(variant.id);
     },
     regenerate(variantId) {
@@ -72,7 +72,7 @@ export const useVariants = create<Variants>((set, get) => ({
     },
     delete(variantId) {
       const { variants, index } = getVariantsWithIdCheck(variantId);
-      
+
       const outputImages = useOutputImages.getState().images;
       const filtered = outputImages.filter(i => i.variantId !== variantId);
       useOutputImages.setState({ images: filtered });
@@ -85,7 +85,7 @@ export const useVariants = create<Variants>((set, get) => ({
       const { variants, variant } = getVariantsWithIdCheck(variantId);
 
       variant.name = name;
-      
+
       set({ variants });
     },
     setFilenamePart(part, variantId, value) {
@@ -93,7 +93,7 @@ export const useVariants = create<Variants>((set, get) => ({
 
       variant[part] = value;
       useOutputImages.getState().api.updateVariantData(variant);
-      
+
       set({ variants });
     },
     setFilter(variantId, filter) {
@@ -152,7 +152,7 @@ export const useVariants = create<Variants>((set, get) => ({
           if (value !== undefined) {
             const splitAspectRatio = variant.aspectRatio.value.split(':');
             const ratio = Number(splitAspectRatio[0]) / Number(splitAspectRatio[1]);
-    
+
             if (dimension === 'height') {
               const ratioedWidth = Math.floor(value * ratio);
               variant.width.value = ratioedWidth;
@@ -172,7 +172,7 @@ export const useVariants = create<Variants>((set, get) => ({
     },
     setDimensions(variantId, width, height) {
       const { variants, variant } = getVariantsWithIdCheck(variantId);
-  
+
       variant.width.value = width;
       variant.height.value = height;
 
@@ -190,7 +190,7 @@ export const useVariants = create<Variants>((set, get) => ({
       if (variant.width.value && variant.width.mode === 'exact') {
         const splitAspectRatio = variant.aspectRatio.value.split(':');
         const ratio = Number(splitAspectRatio[0]) / Number(splitAspectRatio[1]);
-  
+
         const ratioedHeight = Math.floor(variant.width.value / ratio);
         variant.height.value = ratioedHeight;
       }
@@ -213,7 +213,7 @@ export const useVariants = create<Variants>((set, get) => ({
       if (variant.width.value && variant.width.mode === 'exact') {
         const splitAspectRatio = variant.aspectRatio.value.split(':');
         const ratio = Number(splitAspectRatio[0]) / Number(splitAspectRatio[1]);
-  
+
         const ratioedHeight = Math.floor(variant.width.value / ratio);
         variant.height.value = ratioedHeight;
       }
@@ -240,7 +240,7 @@ export const useVariants = create<Variants>((set, get) => ({
     },
     setAspectRatioEnabled(variantId, value) {
       const { variants, variant } = getVariantsWithIdCheck(variantId);
-  
+
       variant.aspectRatio.enabled = value;
 
       if (value) {
@@ -251,14 +251,14 @@ export const useVariants = create<Variants>((set, get) => ({
     },
     setAspectRatioValue(variantId, value) {
       const { variants, variant } = getVariantsWithIdCheck(variantId);
-  
+
       if (variant.aspectRatio.value === value) return;
 
       variant.aspectRatio.value = value;
 
       if (value) {
         handleAspectRatioChange(variants, variant);
-        
+
         if (variant.aspectRatio.enabled) {
           regenerateVariant(variant.id);
         }
@@ -269,29 +269,29 @@ export const useVariants = create<Variants>((set, get) => ({
     },
     flipAspectRatio(variantId) {
       const { variants, variant } = getVariantsWithIdCheck(variantId);
-      
+
       const split = variant.aspectRatio.value.split(':');
-      
+
       if (split.length !== 2) {
         Log.error('Error flipping aspect ratio.');
         return;
       }
-      
+
       const flipped = split[1] + ':' + split[0];
       variant.aspectRatio.value = flipped;
-      
+
       if (variant.aspectRatio.enabled) {
         if (variant.width.mode === 'exact' && variant.height.mode === 'exact') {
           const oldWidth = variant.width.value;
           variant.width.value = variant.height.value;
           variant.height.value = oldWidth;
-        } 
+        }
 
         if (Number(split[0]) !== Number(split[1])) {
           regenerateVariant(variant.id);
         }
       }
-      
+
       set({ variants });
     }
   },

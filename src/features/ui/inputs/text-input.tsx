@@ -9,7 +9,7 @@ type Props = {
   suffix?: ReactNode
   bold?: boolean
   align?: CanvasTextAlign
-} & InputHTMLAttributes<HTMLInputElement>; 
+} & InputHTMLAttributes<HTMLInputElement>;
 
 export const TextInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
   const { label, value, prefix, suffix, bold, align, style, ...rest } = props;
