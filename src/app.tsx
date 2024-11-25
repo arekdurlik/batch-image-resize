@@ -3,7 +3,6 @@ import { ImperativePanelGroupHandle, Panel, PanelGroup } from 'react-resizable-p
 import styled from 'styled-components'
 import { LeftSidebar } from './features/layout/left-sidebar'
 import { MainView } from './features/layout/main-view'
-import { Navbar } from './features/layout/navbar'
 import { RightSidebar } from './features/layout/right-sidebar'
 import { AppWrapper, AppContent } from './features/layout/styled'
 import { Resizer } from './features/ui/resizer'
@@ -23,7 +22,6 @@ function App() {
       <Toasts/>
 
       <AppWrapper>
-        <Navbar/>
         <AppContent>
           <LeftSidebar/>
           

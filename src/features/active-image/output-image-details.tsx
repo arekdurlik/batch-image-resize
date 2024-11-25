@@ -29,7 +29,7 @@ export function OutputImageDetails({ image, onEnableEdit }: { image: OutputImage
       <Details>
         <Header>
           <Filename title={image.filename}>{image.filename}</Filename>
-            <Button onClick={onEnableEdit}><MdEdit/>Edit</Button>
+          <Button onClick={onEnableEdit}><MdEdit/>Edit</Button>
         </Header>
         
         <Field>
@@ -79,4 +79,3 @@ export const Edit = styled(MdEdit)`
 fill: var(--fgColor-icon);
 font-size: 16px;
 `
-

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-export function Navbar() {
+export function Header() {
   
   return <Container></Container>
 }

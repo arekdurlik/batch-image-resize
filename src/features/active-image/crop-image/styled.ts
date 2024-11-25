@@ -16,6 +16,7 @@ overflow: hidden;
 
 export const Wrapper = styled.div`
 position: absolute;
+overflow: hidden;
 z-index: 1;
 display: flex;
 align-items: center;

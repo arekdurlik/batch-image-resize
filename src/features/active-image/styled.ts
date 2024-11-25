@@ -54,6 +54,7 @@ export const Value = styled.span`
 
 export const Header = styled.div`
 display: flex;
+gap: var(--spacing-large);
 justify-content: space-between;
 align-items: center;
 min-height: 30px;

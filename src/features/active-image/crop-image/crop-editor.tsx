@@ -25,9 +25,12 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
   const editorRef = useRef<HTMLDivElement>(null!);
   const gridRef = useRef<HTMLDivElement>(null!);
   const imageRef = useRef<HTMLImageElement>(null!);
+  // helper image to maintain proper scaling and aspect ratio for the editor content
+  // it also prevents a flash of empty space while loading the og image into editor
+  const helperImageRef = useRef<HTMLImageElement>(null!);
   const currentCoords = useRef({ x: 0, y: 0 });
   const dragging = useRef(false);
-  const outputAspectRatio = image.dimensions.width/image.dimensions.height;
+  const outputAspectRatio = image.dimensions.width / image.dimensions.height;
   const api = useCropState(state => state.api);
   const minZoom = useCropState(state => state.minZoom);
 
@@ -361,6 +364,7 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
       <StyledImageWrapper>
         <OuterWrapper>
         <Image 
+          ref={helperImageRef}
           src={image.image.full.src} 
           draggable={false}
         />
@@ -380,6 +384,9 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
               <StyledImage 
                 draggable={false}
                 ref={imageRef}
+                onLoad={() => {
+                  helperImageRef.current.style.opacity = '0';
+                }}
                 src={inputImageData.image.full.src}
                 height={image.inputImage.dimensions.height}
                 width={image.inputImage.dimensions.width}

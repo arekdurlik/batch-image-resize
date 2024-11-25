@@ -1,30 +1,50 @@
-# React + TypeScript + Vite
+# Batch Image Resizer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React application for processing images in bulk. It offers a clear interface for resizing, cropping, and sharpening pictures, with options to apply changes to multiple images at once or individually.
 
-Currently, two official plugins are available:
+[🌐Website](https://batchresizer.netlify.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- **Multiple Image Variants**:
+  - Define multiple variants for images, each with its own dimensions, aspect ratio, quality, and sharpening settings.
+  - Add prefixes or suffixes to filenames for better organization.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Image Editing**:
+  - Resize images with exact dimensions, maximum bounds, or fixed aspect ratios.
+  - Adjust image quality and apply sharpening settings.
 
-- Configure the top-level `parserOptions` property like this:
+- **Individual Image Editing**:
+  - Edit individual images to override variant settings.
+  - Crop images with zoom and position adjustments.
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+- **Desktop-Like File Explorer**:
+  - Sort images by filename, variant, or file size.
+  - Quickly identify large files for separate adjustments.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+- **Batch Export**:
+  - Download all processed images as a ZIP file.
+
+## Key Libraries Used
+- **`react`** for building the user interface
+- **`pica`** for image processing
+- **`jszip`** for exporting images as a ZIP file
+- **`zustand`** for state management
+- **`styled-components`** for styling
+
+## How to Run
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/arekdurlik/batch-image-resize.git
+   ```
+
+3. Install the dependencies:
+   ```
+   npm install
+   ```
+
+5. To start the development server, run:
+   ```
+   npm run dev
+   ```
