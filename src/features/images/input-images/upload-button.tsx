@@ -14,8 +14,6 @@ export function UploadButton() {
   });
 
   return (
-    <div {...getRootProps()}>
-    <Button><MdUpload/>Upload</Button>
-    </div>
+    <Button {...getRootProps()}><MdUpload/>Upload</Button>
   )
 }

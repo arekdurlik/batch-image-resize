@@ -1,12 +1,14 @@
 import { create } from 'zustand'
 
+export type Toast = {
+    id: number;
+    type: ToastType;
+    message: string;
+};
+
 type ToastsState = {
   id: number,
-  toasts: {
-    id: number,
-    type: ToastType
-    message: string
-  }[],
+  toasts: Toast[],
   api: {
     openToast: (type: ToastType, message: string) => void
     closeToast: (id: number) => void
@@ -26,12 +28,7 @@ export const useToasts = create<ToastsState>((set, get) => ({
   api: {
     openToast: (type: ToastType, message: string) => {
       const id = get().id;
-      const toasts = get().toasts;
-      const lastToast = toasts[toasts.length - 1];
-  
-      if (lastToast?.type === type && lastToast?.message === message) {
-        toasts.pop();
-      }
+      const toasts = [...get().toasts];
   
       toasts.push({
         id,

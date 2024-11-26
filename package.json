@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-spring/web": "^9.7.3",
     "@types/node": "^20.14.9",
     "@types/styled-components": "^5.1.34",
     "jszip": "^3.10.1",

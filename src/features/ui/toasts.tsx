@@ -1,76 +1,103 @@
-import { animated, useTransition } from '@react-spring/web'
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState, useEffect, AnimationEvent } from 'react'
 import { IoMdClose } from 'react-icons/io'
 import { MdInfo, MdCheckCircle, MdWarning, MdError } from 'react-icons/md'
 import styled from 'styled-components'
-import { useToasts, ToastType } from '../../store/toasts'
+import { useToasts, ToastType, type Toast } from '../../store/toasts'
 
 export function Toasts() {
-  const refMap = useMemo(() => new WeakMap(), []);
-  const cancelMap = useMemo(() => new WeakMap(), []);
-  const toastsState = useToasts();
+    const refMap = useMemo(() => new WeakMap<Toast, HTMLDivElement>(), []);
+    const toastsState = useToasts();
+    const [visibleToasts, setVisibleToasts] = useState(toastsState.toasts);
 
-  const transitions = useTransition(toastsState.toasts, {
-    from: { opacity: 0, height: 0, life: '100%' },
-    enter: item => async (next, cancel) => { 
-      cancelMap.set(item, cancel);
-      await next({ opacity: 1, height: refMap.get(item).offsetHeight });
-      await next({ life: '0%' });
-    },
-    leave: [{ opacity: 0 }, { height: 0 }],
-    keys: item => item.id,
-    onRest: (_result, _ctrl, item) => {
-      toastsState.api.closeToast(item.id);
-    },
-    config: (item, _index, phase) => key => 
-      phase === 'enter' && key === 'life' 
-      ? { duration: 100 + item.message.trim().length * 75 } 
-      : { tension: 125, friction: 20, precision: 0.1 },
-  })
+    // fade out animation
+    useEffect(() => {
+        if (toastsState.toasts.length >= visibleToasts.length) {
+            setVisibleToasts(toastsState.toasts);
+        }
 
-  const getIcon = useCallback((type: ToastType) => {
-    switch (type) {
-      case ToastType.INFO:
-        return <MdInfo />
-      case ToastType.SUCCESS:
-        return <MdCheckCircle />
-      case ToastType.WARNING:
-        return <MdWarning />
-      case ToastType.ERROR:
-        return <MdError />
-    }
-  }, []);
+        visibleToasts.forEach(item => {
+          if (!toastsState.toasts.includes(item)) {
+              refMap.get(item)?.classList.add('fade-out');
+          }
+      });
+        
+    }, [toastsState.toasts]);
+    
+    // lifetime animation
+    useEffect(() => {
+        visibleToasts.forEach(toast => {
+            if (refMap.has(toast)) {
+                const el = refMap.get(toast);
+                const life = el?.querySelector('.life');
+                
+                if (
+                  life instanceof HTMLElement &&
+                  !life.hasAttribute('style')
+                ) {
+                    life.style.animationDuration = `${
+                        100 + toast.message.trim().length * 125
+                    }ms`;
+                }
+            }
+        });
+    }, [visibleToasts]);
 
-  return (
+    const getIcon = useCallback((type: ToastType) => {
+        switch (type) {
+            case ToastType.INFO:
+                return <MdInfo />;
+            case ToastType.SUCCESS:
+                return <MdCheckCircle />;
+            case ToastType.WARNING:
+                return <MdWarning />;
+            case ToastType.ERROR:
+                return <MdError />;
+        }
+    }, []);
+
+    const handleFadeOut = (itemId: number) => (event: AnimationEvent) => {
+        if (event.animationName.includes('fade-out')) {
+            setVisibleToasts(toastsState.toasts.filter(t => t.id !== itemId));
+        }
+    };
+
+    const handleEndOfLife = (itemId: number) => () => {
+        toastsState.api.closeToast(itemId);
+    };
+
+    return visibleToasts.length === 0 ? null : (
     <Wrapper>
-      {transitions(({ life, ...style }, item) => (
-        item && <animated.div key={item.id} style={style}>
-          <Toast $type={item.type} ref={(ref: HTMLDivElement) => ref && refMap.set(item, ref)}>
+        {visibleToasts.map(item => (
+          <StyledToast 
+            key={item.id}
+            $type={item.type} 
+            ref={(ref: HTMLDivElement) => ref && refMap.set(item, ref)} 
+            onAnimationEnd={handleFadeOut(item.id)}
+          >
             <Content>
               <Icon>
                 {getIcon(item.type)}
               </Icon>
               {item.message}
               <Close onClick={e => {
-                e.stopPropagation()
-                if (cancelMap.has(item) && life.get() !== '0%') {
-                  cancelMap.get(item)();
-                  toastsState.api.closeToast(item.id);
-                }
+                e.stopPropagation();
+                toastsState.api.closeToast(item.id);
               }}>
                 <IoMdClose />
               </Close>
             </Content>
-            <Life style={{ right: life }} />
-          </Toast>
-        </animated.div>
-      ))}
+            <Life 
+              className="life" 
+              onAnimationEnd={handleEndOfLife(item.id)}
+            />
+          </StyledToast>
+        ))}
     </Wrapper>
   )
 }
 
 const Wrapper = styled.div`
-position: absolute;
+position: fixed;
 overflow: hidden;
 inset: 0;
 padding: 20px;
@@ -90,10 +117,56 @@ color: #238d27;
 padding-right: 10px;
 `
 
-const Toast = styled(animated.div)<{ $type: ToastType }>`
+
+const StyledToast = styled.div<{ $type: ToastType }>`
+display: flex;
 position: relative;
-padding-top: 5px;
 pointer-events: all;
+height: 50px;
+margin-bottom: 10px;
+
+background-color: var(--bgColor-default);
+border: 1px solid var(--borderColor-default);
+border-radius: var(--borderRadius-default);
+
+@keyframes toast-fade-in {
+  0% {
+    margin-bottom: 0px;
+    opacity: 0;
+    height: 0px;
+    transform: translateY(-45%);
+  }
+  25% {
+    opacity: 0;
+  }
+  75% {
+    height: 50px;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes toast-fade-out {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+    transform: translateY(25%);
+  }
+  100% {
+    opacity: 0;
+    height: 0px;
+    margin-bottom: 0px;
+  }
+}
+
+&.fade-out {
+  animation: toast-fade-out 400ms ease-out forwards;
+}
+
+animation: toast-fade-in 400ms forwards;
 
 ${({ $type }) => {
   let color = '#ccc'
@@ -115,8 +188,6 @@ ${({ $type }) => {
 
 const Content = styled.div`
 position: relative;
-background-color: var(--bgColor-default);
-border: 1px solid var(--borderColor-default);
 padding: 10px;
 border-radius: var(--borderRadius-default);
 overflow: hidden;
@@ -156,11 +227,23 @@ svg {
 }
 `
 
-const Life = styled(animated.div)`
+const Life = styled.div`
 position: absolute;
 bottom: 0;
 left: 0px;
 height: 6px;
 background-color: var(--borderColor-default);
 opacity: 0.25;
+
+@keyframes toast-lifetime {
+    100% {
+        width: 100%;
+    }
+}
+
+animation-name: toast-lifetime;
+animation-delay: 250ms;
+animation-fill-mode: forwards;
+animation-timing-function: linear;
+pointer-events: none;
 `
