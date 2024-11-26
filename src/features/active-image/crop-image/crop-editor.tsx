@@ -61,25 +61,19 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
     cropData.current.y = currentCropState.y;
     cropData.current.zoom = currentCropState.zoom * currentCropState.minZoom;
     
-    function setInitialPosition() {
-      const pos = normalizedToPosition(
-        imageRef.current.width, 
-        imageRef.current.height, 
-        editorRef.current.offsetWidth, 
-        editorRef.current.offsetHeight, 
-        cropData.current.zoom, 
-        cropData.current.x, 
-        cropData.current.y
-      );
-      imageRef.current.style.transform = `scale(${cropData.current.zoom})`;
-      imageRef.current.style.left = pos.left + 'px';
-      imageRef.current.style.top = pos.top + 'px';
-    } 
+    const pos = normalizedToPosition(
+      imageRef.current.width, 
+      imageRef.current.height, 
+      editorRef.current.offsetWidth, 
+      editorRef.current.offsetHeight, 
+      cropData.current.zoom, 
+      cropData.current.x, 
+      cropData.current.y
+    );
+    imageRef.current.style.transform = `scale(${cropData.current.zoom})`;
+    imageRef.current.style.left = pos.left + 'px';
+    imageRef.current.style.top = pos.top + 'px';
 
-    setInitialPosition();
-    setTimeout(() => {
-      setInitialPosition();
-    })
 
     const unsub1 = useCropState.subscribe(state => ({ x: state.x, y: state.y }), state => {
       cropData.current.x = state.x;
@@ -124,7 +118,7 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
       unsub2();
       image.removeEventListener('wheel', handleWheel);
     };
-  }, []);
+  }, [minZoom]);
 
   useEffect(() => {
     const editor = editorRef.current;
