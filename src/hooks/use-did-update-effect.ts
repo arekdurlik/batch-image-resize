@@ -1,17 +1,17 @@
-import { DependencyList, EffectCallback, useEffect, useRef } from 'react'
+import { DependencyList, EffectCallback, useEffect, useRef } from 'react';
 
 export function useDidUpdateEffect(effect: EffectCallback, deps: DependencyList) {
-  const isMountingRef = useRef(false);
+    const isMountingRef = useRef(false);
 
-  useEffect(() => {
-    isMountingRef.current = true;
-  }, []);
+    useEffect(() => {
+        isMountingRef.current = true;
+    }, []);
 
-  useEffect(() => {
-    if (!isMountingRef.current) {
-      return effect();
-    } else {
-      isMountingRef.current = false;
-    }
-  }, deps);
+    useEffect(() => {
+        if (!isMountingRef.current) {
+            return effect();
+        } else {
+            isMountingRef.current = false;
+        }
+    }, deps);
 }

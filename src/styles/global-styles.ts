@@ -1,5 +1,5 @@
-import { createGlobalStyle } from 'styled-components'
-import { fontStack, outline } from './mixins'
+import { createGlobalStyle } from 'styled-components';
+import { fontStack, outline } from './mixins';
 
 export const GlobalStyles = createGlobalStyle`
 * {
@@ -104,4 +104,4 @@ input[type="range"]:focus {
   pointer-events: none;
   position: absolute;
 }
-`
+`;

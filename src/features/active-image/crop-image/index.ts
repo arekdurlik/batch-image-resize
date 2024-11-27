@@ -1,1 +1,1 @@
-export { CropImage } from './crop-image'
+export { CropImage } from './crop-image';

@@ -1,65 +1,65 @@
 :root {
-  --transition-fast:    75ms;
-  --transition-default: 150ms;
-  --transition-slow:    300ms;
+    --transition-fast: 75ms;
+    --transition-default: 150ms;
+    --transition-slow: 300ms;
 
-  --borderWidth: 1px;
-  --borderRadius-small:   2.5px;
-  --borderRadius-default: 5px;
-  --borderRadius-large:   10px;
-  --borderRadius-full:    9999px;
+    --borderWidth: 1px;
+    --borderRadius-small: 2.5px;
+    --borderRadius-default: 5px;
+    --borderRadius-large: 10px;
+    --borderRadius-full: 9999px;
 
-  --shadow-xsmall: 0px 1px 0px 0px #1f23281a;
-  --shadow-small: 0px 1px 0px 0px #1f23280a;
-  --shadow-default: 0px 3px 6px 0px #424a531f;
-  --shadow-large: 0px 0px 0px 1px #d1d9e080, 0px 6px 12px -3px #25292e0a, 0px 6px 18px 0px #25292e1f;
+    --shadow-xsmall: 0px 1px 0px 0px #1f23281a;
+    --shadow-small: 0px 1px 0px 0px #1f23280a;
+    --shadow-default: 0px 3px 6px 0px #424a531f;
+    --shadow-large: 0px 0px 0px 1px #d1d9e080, 0px 6px 12px -3px #25292e0a, 0px 6px 18px 0px #25292e1f;
 
-  --spacing-small: 2.5px;
-  --spacing-default: 5px;
-  --spacing-large: 10px;
+    --spacing-small: 2.5px;
+    --spacing-default: 5px;
+    --spacing-large: 10px;
 
-  --outlineColor: var(--color-blue-5);
-  --outlineOffset:  -2px;
+    --outlineColor: var(--color-blue-5);
+    --outlineOffset: -2px;
 
-  --lightboxBgColor: #212124ee;
+    --lightboxBgColor: #212124ee;
 
-  --color-blue-0: hsl(212, 100%, 92%); 
-  --color-blue-1: hsl(212, 100%, 85%); 
-  --color-blue-2: hsl(212, 100%, 76%); 
-  --color-blue-3: hsl(212, 100%, 66%); 
-  --color-blue-4: hsl(212, 100%, 58%);
-  --color-blue-5: hsl(212, 100%, 50%);
-  --color-blue-6: hsl(212, 100%, 42%);
-  --color-blue-7: hsl(212, 100%, 34%);
-  --color-blue-8: hsl(212, 100%, 26%);
-  --color-blue-9: hsl(212, 100%, 18%);
+    --color-blue-0: hsl(212, 100%, 92%);
+    --color-blue-1: hsl(212, 100%, 85%);
+    --color-blue-2: hsl(212, 100%, 76%);
+    --color-blue-3: hsl(212, 100%, 66%);
+    --color-blue-4: hsl(212, 100%, 58%);
+    --color-blue-5: hsl(212, 100%, 50%);
+    --color-blue-6: hsl(212, 100%, 42%);
+    --color-blue-7: hsl(212, 100%, 34%);
+    --color-blue-8: hsl(212, 100%, 26%);
+    --color-blue-9: hsl(212, 100%, 18%);
 
-  --color-red-5: hsl(356, 71%, 50%);
-  --color-green-5: hsl(128, 40%, 50%);
+    --color-red-5: hsl(356, 71%, 50%);
+    --color-green-5: hsl(128, 40%, 50%);
 
-  --fgColor-default:  hsl(200, 3%, 17%);
-  --fgColor-muted:    hsl(200, 3%, 25%);
-  --fgColor-icon:    hsl(200, 3%, 45%);
-  --fgColor-inverse:  hsl(208, 33%, 91%);
+    --fgColor-default: hsl(200, 3%, 17%);
+    --fgColor-muted: hsl(200, 3%, 25%);
+    --fgColor-icon: hsl(200, 3%, 45%);
+    --fgColor-inverse: hsl(208, 33%, 91%);
 
-  --bgColor-default:              hsl(0, 0%, 98%);
-  --bgColor-default-transparent:  hsla(0, 0%, 98%, 0.867);
-  --bgColor-muted:                hsl(0, 0%, 90%);
-  --bgColor-inverse:              hsl(0, 0%, 10%);
+    --bgColor-default: hsl(0, 0%, 98%);
+    --bgColor-default-transparent: hsla(0, 0%, 98%, 0.867);
+    --bgColor-muted: hsl(0, 0%, 90%);
+    --bgColor-inverse: hsl(0, 0%, 10%);
 
-  --borderColor-default: hsl(220, 11%, 78%);
+    --borderColor-default: hsl(220, 11%, 78%);
 
-  --control-default-fgColor-rest:      var(--fgColor-default);
-  --control-default-fgColor-disabled:  color-mix(in hsl, var(--fgColor-default), transparent 60%);
-  --control-default-bgColor-rest:      hsl(218, 65%, 97%);
-  --control-default-bgColor-error:      color-mix(in hsl, var(--color-red-5), transparent 85%);
-  --control-default-bgColor-hover:     hsl(218, 65%, 94%);
-  --control-default-bgColor-active:    hsl(218, 65%, 90%);
-  --control-default-bgColor-selected:  var(--control-default-bgColor-active);
-  --control-default-borderColor:       var(--borderColor-default);
+    --control-default-fgColor-rest: var(--fgColor-default);
+    --control-default-fgColor-disabled: color-mix(in hsl, var(--fgColor-default), transparent 60%);
+    --control-default-bgColor-rest: hsl(218, 65%, 97%);
+    --control-default-bgColor-error: color-mix(in hsl, var(--color-red-5), transparent 85%);
+    --control-default-bgColor-hover: hsl(218, 65%, 94%);
+    --control-default-bgColor-active: hsl(218, 65%, 90%);
+    --control-default-bgColor-selected: var(--control-default-bgColor-active);
+    --control-default-borderColor: var(--borderColor-default);
 
-  --control-danger-fgColor-rest: var(--color-red-5);
-  --control-danger-bgColor-hover: color-mix(in hsl, var(--color-red-5), transparent 85%);
+    --control-danger-fgColor-rest: var(--color-red-5);
+    --control-danger-bgColor-hover: color-mix(in hsl, var(--color-red-5), transparent 85%);
 
-  --input-bgColor: var(--control-default-bgColor-rest);
+    --input-bgColor: var(--control-default-bgColor-rest);
 }

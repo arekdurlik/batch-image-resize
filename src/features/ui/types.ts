@@ -1,6 +1,6 @@
 export enum Placement {
-  TOP = 'TOP',
-  BOTTOM = 'BOTTOM',
-  LEFT = 'LEFT',
-  RIGHT = 'RIGHT'
+    TOP = 'TOP',
+    BOTTOM = 'BOTTOM',
+    LEFT = 'LEFT',
+    RIGHT = 'RIGHT',
 }

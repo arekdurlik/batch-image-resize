@@ -1,114 +1,126 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type HookReturn = {
-  [key:string]: boolean
+    [key: string]: boolean;
 };
 
 export function useKeyboardInput(keysToListen = <string[]>[]) {
-  const getKeys = useCallback(() => {
-    const lowerCaseArray = <string[]>[];
-    const hookReturn = <HookReturn>{};
+    const getKeys = useCallback(() => {
+        const lowerCaseArray = <string[]>[];
+        const hookReturn = <HookReturn>{};
 
-    keysToListen.forEach((key) => {
-      const lowerCaseKey = key.toLowerCase();
-      const safeKey = getSafeKey(lowerCaseKey);
-      lowerCaseArray.push(safeKey);
-      hookReturn[safeKey] = false;
-    });
+        keysToListen.forEach(key => {
+            const lowerCaseKey = key.toLowerCase();
+            const safeKey = getSafeKey(lowerCaseKey);
+            lowerCaseArray.push(safeKey);
+            hookReturn[safeKey] = false;
+        });
 
-    return {
-      lowerCaseArray,
-      hookReturn
-    };
-  }, [keysToListen]);
+        return {
+            lowerCaseArray,
+            hookReturn,
+        };
+    }, [keysToListen]);
 
-  const [keysPressed, setPressedKeys] = useState(getKeys().hookReturn);
+    const [keysPressed, setPressedKeys] = useState(getKeys().hookReturn);
 
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      const lowerKey = e.key.toLowerCase();
-      const safeKey = getSafeKey(lowerKey);
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            const lowerKey = e.key.toLowerCase();
+            const safeKey = getSafeKey(lowerKey);
 
-      if (getKeys().lowerCaseArray.includes(safeKey)) {
-        setPressedKeys((keysPressed) => ({ ...keysPressed, [safeKey]: true }));
-      }
-    }
+            if (getKeys().lowerCaseArray.includes(safeKey)) {
+                setPressedKeys(keysPressed => ({
+                    ...keysPressed,
+                    [safeKey]: true,
+                }));
+            }
+        }
 
-    function handleKeyUp (e: KeyboardEvent) {
-      const lowerKey = e.key.toLowerCase();
-      const safeKey = getSafeKey(lowerKey);
+        function handleKeyUp(e: KeyboardEvent) {
+            const lowerKey = e.key.toLowerCase();
+            const safeKey = getSafeKey(lowerKey);
 
-      if (getKeys().lowerCaseArray.includes(safeKey)) {
-        setPressedKeys((keysPressed) => ({ ...keysPressed, [safeKey]: false }));
-      }
-    }
+            if (getKeys().lowerCaseArray.includes(safeKey)) {
+                setPressedKeys(keysPressed => ({
+                    ...keysPressed,
+                    [safeKey]: false,
+                }));
+            }
+        }
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
 
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [keysToListen, getKeys]);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [keysToListen, getKeys]);
 
-  return keysPressed;
+    return keysPressed;
 }
 
 function getSafeKey(key: string) {
-  switch(key) {
-    case ' ':
-      return 'space';
-    case '`':
-      return 'tilde';
-    default:
-      return key;
-  }
+    switch (key) {
+        case ' ':
+            return 'space';
+        case '`':
+            return 'tilde';
+        default:
+            return key;
+    }
 }
 export function useKeyboardInputRef(keysToListen = <string[]>[]) {
-  const getKeys = useCallback(() => {
-    const lowerCaseArray = <string[]>[];
-    const hookReturn = <HookReturn>{};
+    const getKeys = useCallback(() => {
+        const lowerCaseArray = <string[]>[];
+        const hookReturn = <HookReturn>{};
 
-    keysToListen.forEach((key) => {
-      const lowerCaseKey = key.toLowerCase();
-      lowerCaseArray.push(getSafeKey(lowerCaseKey));
-      hookReturn[lowerCaseKey] = false;
-    });
+        keysToListen.forEach(key => {
+            const lowerCaseKey = key.toLowerCase();
+            lowerCaseArray.push(getSafeKey(lowerCaseKey));
+            hookReturn[lowerCaseKey] = false;
+        });
 
-    return {
-      lowerCaseArray,
-      hookReturn
-    };
-  }, [keysToListen]);
+        return {
+            lowerCaseArray,
+            hookReturn,
+        };
+    }, [keysToListen]);
 
-  const keysPressed = useRef(getKeys().hookReturn);
+    const keysPressed = useRef(getKeys().hookReturn);
 
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      const lowerKey = getSafeKey(e.key.toLowerCase());
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            const lowerKey = getSafeKey(e.key.toLowerCase());
 
-      if (getKeys().lowerCaseArray.includes(lowerKey)) {
-        keysPressed.current = { ...keysPressed.current, [lowerKey]: true };
-      }
-    }
+            if (getKeys().lowerCaseArray.includes(lowerKey)) {
+                keysPressed.current = {
+                    ...keysPressed.current,
+                    [lowerKey]: true,
+                };
+            }
+        }
 
-    function handleKeyUp(e: KeyboardEvent) {
-      const lowerKey = getSafeKey(e.key.toLowerCase());
-      
-      if (getKeys().lowerCaseArray.includes(lowerKey)) {
-        keysPressed.current = { ...keysPressed.current, [lowerKey]: false };
-      }
-    }
+        function handleKeyUp(e: KeyboardEvent) {
+            const lowerKey = getSafeKey(e.key.toLowerCase());
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
+            if (getKeys().lowerCaseArray.includes(lowerKey)) {
+                keysPressed.current = {
+                    ...keysPressed.current,
+                    [lowerKey]: false,
+                };
+            }
+        }
 
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [keysToListen, getKeys]);
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
 
-  return keysPressed;
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [keysToListen, getKeys]);
+
+    return keysPressed;
 }

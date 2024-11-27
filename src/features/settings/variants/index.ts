@@ -1,1 +1,1 @@
-export { Variants } from './variants'
+export { Variants } from './variants';

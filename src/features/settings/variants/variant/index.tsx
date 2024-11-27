@@ -1,1 +1,1 @@
-export { Variant } from './variant'
+export { Variant } from './variant';

@@ -1,1 +1,1 @@
-export { ActiveImage } from './active-image'
+export { ActiveImage } from './active-image';
