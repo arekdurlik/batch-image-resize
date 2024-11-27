@@ -63,7 +63,7 @@ export function Variant({ active, onActivate, startOpen, ...variant }: Props) {
 const VariantHeader = styled.div<{ $active: boolean }>`
     display: flex;
     font-size: inherit;
-    gap: 5px;
+    gap: 30px;
     justify-content: space-between;
     width: 100%;
     height: 50px;

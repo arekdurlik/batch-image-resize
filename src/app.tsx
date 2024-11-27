@@ -1,20 +1,17 @@
-import { useRef } from 'react';
-import { ImperativePanelGroupHandle, Panel, PanelGroup } from 'react-resizable-panels';
-import styled from 'styled-components';
+import { Panel } from 'react-resizable-panels';
 import { LeftSidebar } from './features/layout/left-sidebar';
 import { MainView } from './features/layout/main-view';
 import { RightSidebar } from './features/layout/right-sidebar';
 import { AppWrapper, AppContent } from './features/layout/styled';
-import { Resizer } from './features/ui/resizer';
 import { Toasts } from './features/ui/toasts';
 import { GlobalStyles } from './styles/global-styles';
+import { useSettings } from './store/settings';
+import { PersistedPanelGroup, Resizer } from './features/layout/persisted-panel-group';
+
+const defaultLayout = [85, 15];
 
 function App() {
-    const panelGroup = useRef<ImperativePanelGroupHandle>(null!);
-
-    function handleReset() {
-        panelGroup.current.setLayout([85, 15]);
-    }
+    const { rightSidebar } = useSettings(state => state.panelGroups);
 
     return (
         <>
@@ -25,15 +22,24 @@ function App() {
                 <AppContent>
                     <LeftSidebar />
 
-                    <StyledPanelGroup ref={panelGroup} direction="horizontal">
-                        <Panel>
+                    <PersistedPanelGroup
+                        id="rightSidebar"
+                        direction="horizontal"
+                        defaultLayout={defaultLayout}
+                    >
+                        <Panel defaultSize={rightSidebar?.[0] ?? defaultLayout[0]}>
                             <MainView />
                         </Panel>
-                        <Resizer direction="horizontal" onReset={handleReset} />
-                        <Panel minSize={19} maxSize={30} defaultSize={19} style={{ minWidth: 305 }}>
+                        <Resizer />
+                        <Panel
+                            minSize={19}
+                            maxSize={30}
+                            defaultSize={rightSidebar?.[1] ?? defaultLayout[1]}
+                            style={{ minWidth: 305 }}
+                        >
                             <RightSidebar />
                         </Panel>
-                    </StyledPanelGroup>
+                    </PersistedPanelGroup>
                 </AppContent>
             </AppWrapper>
         </>
@@ -41,7 +47,3 @@ function App() {
 }
 
 export default App;
-
-const StyledPanelGroup = styled(PanelGroup)`
-    width: 100%;
-`;

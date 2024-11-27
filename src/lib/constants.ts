@@ -12,7 +12,7 @@ export const OVERLAY_Z_INDEX = {
 export const picaFilters: { [key in PicaFilter]: string } = {
     box: 'Box',
     hamming: 'Hamming',
-    lanczos2: 'Lanczos',
-    lanczos3: 'Lanczos',
+    lanczos2: 'Lanczos 2',
+    lanczos3: 'Lanczos 3',
     mks2013: 'MKS2013',
 };

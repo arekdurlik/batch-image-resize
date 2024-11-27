@@ -1,19 +1,26 @@
 import { useEffect, useState } from 'react';
 import { PanelResizeHandle } from 'react-resizable-panels';
 import styled, { css } from 'styled-components';
+import { usePanelGroup } from '../persisted-panel-group';
 
 type Direction = 'horizontal' | 'vertical';
 
-export function Resizer({
-    direction = 'horizontal',
-    onReset,
-}: {
-    direction?: Direction;
-    onReset?: () => void;
-}) {
+export function Resizer() {
+    const { direction, resetLayout, saveLayout } = usePanelGroup();
     const [dragging, setDragging] = useState(false);
     const [cancelHover, setCancelHover] = useState(false);
     const [focused, setFocused] = useState(false);
+
+    useEffect(() => {
+        if (!dragging) return;
+
+        function handlePointerUp() {
+            saveLayout();
+        }
+
+        document.addEventListener('pointerup', handlePointerUp);
+        return () => document.removeEventListener('pointerup', handlePointerUp);
+    }, [dragging]);
 
     useEffect(() => {
         if (dragging) {
@@ -28,15 +35,19 @@ export function Resizer({
     }, [direction, dragging]);
 
     function handleDoubleClick() {
-        onReset?.();
+        resetLayout();
         setCancelHover(true);
         setTimeout(() => setCancelHover(false));
+    }
+
+    function handleDragging(dragging: boolean) {
+        setDragging(dragging);
     }
 
     return (
         <PanelResizeHandle
             style={{ zIndex: 3, position: 'relative' }}
-            onDragging={setDragging}
+            onDragging={handleDragging}
             onDoubleClick={handleDoubleClick}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
