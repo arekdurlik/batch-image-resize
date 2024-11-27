@@ -112,7 +112,7 @@ const Wrapper = styled.div`
     background-color: var(--bgColor-default);
     display: grid;
     place-items: center;
-    gap: 5px;
+    gap: var(--spacing-default);
     z-index: 2;
     padding: var(--spacing-large);
     position: relative;
@@ -121,5 +121,5 @@ const Wrapper = styled.div`
 
 const Size = styled.div`
     display: flex;
-    gap: 5px;
+    gap: var(--spacing-default);
 `;

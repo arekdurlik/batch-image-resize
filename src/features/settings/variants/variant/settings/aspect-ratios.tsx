@@ -173,5 +173,5 @@ export function AspectRatios({ variant }: { variant: Variant }) {
 
 const Wrapper = styled.div`
     display: flex;
-    gap: 5px;
+    gap: var(--spacing-default);
 `;

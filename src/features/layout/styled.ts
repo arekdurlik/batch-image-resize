@@ -18,9 +18,9 @@ export const SectionHeader = styled.div<{ $borderTop?: boolean }>`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    gap: var(--spacing-large);
 
-    padding: 0 10px;
+    padding: 0 var(--spacing-large);
     height: ${SECTION_HEADER_HEIGHT}px;
     border-bottom: 1px solid var(--borderColor-default);
     ${props =>
@@ -37,8 +37,8 @@ export const SectionHeader = styled.div<{ $borderTop?: boolean }>`
 export const SectionTitle = styled.h2`
     display: flex;
     align-items: center;
-    margin-top: -5px;
-    margin-bottom: -5px;
+    margin-top: calc(-1 * var(--spacing-default));
+    margin-bottom: calc(-1 * var(--spacing-default));
 `;
 
 export const SideBarSection = styled.div<{ $animate?: boolean }>`

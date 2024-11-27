@@ -5,8 +5,8 @@ import { OVERLAY_Z_INDEX } from '../../../lib/constants';
 export const DropdownListItem = styled.div<{ $highlighted: boolean }>`
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding: 5.5px 10px;
+    gap: var(--spacing-default);
+    padding: var(--spacing-default) var(--spacing-large);
     cursor: pointer;
     transition: background-color var(--transition-default);
     border-radius: var(--borderRadius-default);

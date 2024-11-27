@@ -30,5 +30,5 @@ const Label = styled.label`
     font-weight: 600;
     user-select: none;
     display: flex;
-    gap: 5px;
+    gap: var(--spacing-default);
 `;

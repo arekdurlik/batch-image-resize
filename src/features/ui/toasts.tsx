@@ -105,7 +105,7 @@ const Icon = styled.span`
     display: flex;
     font-size: 16px;
     color: #238d27;
-    padding-right: 10px;
+    padding-right: var(--spacing-large);
 `;
 
 const StyledToast = styled.div<{ $type: ToastType }>`
@@ -113,7 +113,7 @@ const StyledToast = styled.div<{ $type: ToastType }>`
     position: relative;
     pointer-events: all;
     height: 50px;
-    margin-bottom: 10px;
+    margin-bottom: var(--spacing-large);
 
     background-color: var(--bgColor-default);
     border: 1px solid var(--borderColor-default);
@@ -186,7 +186,7 @@ const StyledToast = styled.div<{ $type: ToastType }>`
 
 const Content = styled.div`
     position: relative;
-    padding: 10px;
+    padding: var(--spacing-large);
     border-radius: var(--borderRadius-default);
     overflow: hidden;
     white-space: pre-wrap;

@@ -48,7 +48,7 @@ export const StyledButton = styled.button<{
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 5px;
+    gap: var(--spacing-default);
 
     border: 1px solid var(--borderColor-default);
     border-radius: var(--borderRadius-default);

@@ -11,7 +11,7 @@ export function Thumbnails() {
 
 const Wrapper = styled.div`
     display: flex;
-    gap: 5px;
+    gap: var(--spacing-default);
 `;
 
 const Item = styled.div`

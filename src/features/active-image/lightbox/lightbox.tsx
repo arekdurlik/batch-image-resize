@@ -41,7 +41,7 @@ const Wrapper = styled.div`
 
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--spacing-default);
     transition: var(--transition-default);
     background-color: var(--lightboxBgColor);
     backdrop-filter: blur(20px);

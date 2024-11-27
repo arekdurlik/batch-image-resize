@@ -31,7 +31,7 @@ export const ImageListWrapper = styled.div<{ $focused: boolean }>`
 export const Grid = styled.div`
     display: grid;
     grid-template-columns: repeat(10, 1fr);
-    gap: 3px 10px;
+    gap: var(--spacing-small) var(--spacing-large);
     padding: 20px;
     pointer-events: none;
 

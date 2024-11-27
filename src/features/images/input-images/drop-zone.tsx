@@ -28,7 +28,7 @@ const Icon = styled(MdCloudUpload)`
     font-size: 82px;
     min-height: 82px;
     fill: color-mix(in hsl, black, transparent 80%);
-    margin-bottom: 5px;
+    margin-bottom: var(--spacing-default);
 `;
 
 const Cue = styled.span`

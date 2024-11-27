@@ -145,7 +145,7 @@ const TextInputWrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 5px;
+    gap: var(--spacing-default);
     white-space: nowrap;
     width: 100%;
 `;
@@ -166,7 +166,7 @@ background-color: var(--control-default-bgColor-rest);
 
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--spacing-default);
 
     @keyframes error {
         0% {

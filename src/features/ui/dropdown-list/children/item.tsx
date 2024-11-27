@@ -27,7 +27,7 @@ const Wrapper = styled.div<{ $dangerous?: boolean }>`
     padding: var(--spacing-default) var(--spacing-large);
     border-radius: var(--borderRadius-default);
     align-items: center;
-    gap: 10px;
+    gap: var(--spacing-large);
     ${outline}
 
     margin-left: var(--spacing-default);

@@ -30,10 +30,10 @@ export const BackgroundImage = styled.img`
 `;
 
 export const Details = styled.div`
-    padding: 10px;
+    padding: var(--spacing-large);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-large);
 `;
 
 export const Field = styled.div`
@@ -44,7 +44,7 @@ export const Field = styled.div`
 
 export const Label = styled.span`
     display: flex;
-    gap: 5px;
+    gap: var(--spacing-default);
     align-items: center;
     font-weight: 600;
 `;

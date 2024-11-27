@@ -23,7 +23,7 @@ export const ImageListWrapper = styled.div`
 
 export const HeaderOptions = styled.div`
     display: flex;
-    gap: 5px;
+    gap: var(--spacing-large);
     align-items: center;
 
     span {

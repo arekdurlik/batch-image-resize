@@ -3,7 +3,7 @@ import { TextInputContainer, TextInputLabel, TextInputWrapper } from './text-inp
 
 export const HorizontalInputGroup = styled.div`
     display: flex;
-    gap: 10px;
+    gap: var(--spacing-large);
     align-items: center;
 `;
 
@@ -12,8 +12,8 @@ export const VerticalInputGroup = styled(HorizontalInputGroup)<{
 }>`
     flex-direction: column;
     align-items: flex-end;
-    gap: 5px;
-    margin-left: 10px;
+    gap: var(--spacing-default);
+    margin-left: var(--spacing-large);
 
     ${TextInputWrapper} {
         justify-content: flex-end;

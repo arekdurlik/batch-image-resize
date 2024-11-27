@@ -14,7 +14,7 @@ export const Select = styled.div<{ $open: boolean }>`
     display: flex;
     min-height: 29px;
     width: 100%;
-    gap: 5px;
+    gap: var(--spacing-default);
     align-items: center;
     justify-content: flex-end;
     transition: background-color var(--transition-default), border-color var(--transition-default);

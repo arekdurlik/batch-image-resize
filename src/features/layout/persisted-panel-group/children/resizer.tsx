@@ -14,12 +14,8 @@ export function Resizer() {
     useEffect(() => {
         if (!dragging) return;
 
-        function handlePointerUp() {
-            saveLayout();
-        }
-
-        document.addEventListener('pointerup', handlePointerUp);
-        return () => document.removeEventListener('pointerup', handlePointerUp);
+        document.addEventListener('pointerup', saveLayout);
+        return () => document.removeEventListener('pointerup', saveLayout);
     }, [dragging]);
 
     useEffect(() => {
