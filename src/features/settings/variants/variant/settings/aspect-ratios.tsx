@@ -7,7 +7,7 @@ import { BsFillAspectRatioFill } from 'react-icons/bs';
 import { ButtonGroup } from '../../../../ui/inputs/styled';
 import { TextInput } from '../../../../ui/inputs/text-input';
 import { useOutsideClick } from '../../../../../hooks';
-import { useVariants } from '../../../../../store/variants';
+import { useVariants } from '../../../../../store/variants/variants';
 import { Variant } from '../../../../../store/types';
 import { openToast, ToastType } from '../../../../../store/toasts';
 import { aspectRatioIsHorizontal, isValidAspectRatio, presetAspectRatios } from './utils';

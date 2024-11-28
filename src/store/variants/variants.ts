@@ -1,15 +1,18 @@
 import { create } from 'zustand';
-import { PicaFilter, Variant } from './types';
-import { useOutputImages } from './output-images';
+import { PicaFilter, Variant } from '../types';
+import { useOutputImages } from '../output-images';
 import { nanoid } from 'nanoid';
-import { DimensionMode } from '../types';
-import { Log } from '../lib/log';
-import { getVariantsWithIdCheck } from './utils';
-import { regenerateVariant } from './utils/regenerate';
+import { DimensionMode } from '../../types';
+import { Log } from '../../lib/log';
+import { getVariantsWithIdCheck } from '../utils';
+import { regenerateVariant } from '../utils/regenerate';
 
 type Variants = {
+    activeVariantId: string | undefined;
     variants: Variant[];
     api: {
+        set: (variants: Variant[]) => void;
+        setActive: (variantId: string | undefined) => void;
         add: (variant: Variant) => void;
         regenerate: (variantId: string) => void;
         delete: (variantId: string) => void;
@@ -43,10 +46,13 @@ type Variants = {
     };
 };
 
+const defaultVariantId = nanoid();
+
 export const useVariants = create<Variants>((set, get) => ({
+    activeVariantId: defaultVariantId,
     variants: [
         {
-            id: nanoid(),
+            id: defaultVariantId,
             index: 0,
             name: '400w',
             width: {
@@ -59,7 +65,6 @@ export const useVariants = create<Variants>((set, get) => ({
             },
             prefix: '',
             suffix: '_400w',
-            overWriteQuality: false,
             filter: 'mks2013',
             quality: 1,
             sharpenAmount: 0,
@@ -73,11 +78,20 @@ export const useVariants = create<Variants>((set, get) => ({
         },
     ],
     api: {
-        async add(variant) {
+        set(variants: Variant[]) {
+            set({ variants, activeVariantId: variants[0].id });
+
+            useOutputImages.getState().api.deleteAll();
+            variants.forEach(v => useOutputImages.getState().api.generateVariant(v.id));
+        },
+        setActive(variantId) {
+            set({ activeVariantId: variantId });
+        },
+        add(variant) {
             const variants = [...get().variants];
 
             variants.push(variant);
-            set({ variants });
+            set({ variants, activeVariantId: variant.id });
 
             useOutputImages.getState().api.generateVariant(variant.id);
         },
@@ -199,14 +213,14 @@ export const useVariants = create<Variants>((set, get) => ({
 
             if (variant.aspectRatio.enabled) {
                 variant.height.mode = mode;
-            }
 
-            if (variant.width.value && variant.width.mode === 'exact') {
-                const splitAspectRatio = variant.aspectRatio.value.split(':');
-                const ratio = Number(splitAspectRatio[0]) / Number(splitAspectRatio[1]);
+                if (variant.width.value && variant.width.mode === 'exact') {
+                    const splitAspectRatio = variant.aspectRatio.value.split(':');
+                    const ratio = Number(splitAspectRatio[0]) / Number(splitAspectRatio[1]);
 
-                const ratioedHeight = Math.floor(variant.width.value / ratio);
-                variant.height.value = ratioedHeight;
+                    const ratioedHeight = Math.floor(variant.width.value / ratio);
+                    variant.height.value = ratioedHeight;
+                }
             }
 
             if (variant.width.value) {
@@ -222,14 +236,14 @@ export const useVariants = create<Variants>((set, get) => ({
 
             if (variant.aspectRatio.enabled) {
                 variant.width.mode = mode;
-            }
 
-            if (variant.width.value && variant.width.mode === 'exact') {
-                const splitAspectRatio = variant.aspectRatio.value.split(':');
-                const ratio = Number(splitAspectRatio[0]) / Number(splitAspectRatio[1]);
+                if (variant.width.value && variant.width.mode === 'exact') {
+                    const splitAspectRatio = variant.aspectRatio.value.split(':');
+                    const ratio = Number(splitAspectRatio[0]) / Number(splitAspectRatio[1]);
 
-                const ratioedHeight = Math.floor(variant.width.value / ratio);
-                variant.height.value = ratioedHeight;
+                    const ratioedHeight = Math.floor(variant.width.value / ratio);
+                    variant.height.value = ratioedHeight;
+                }
             }
 
             if (variant.height.value) {

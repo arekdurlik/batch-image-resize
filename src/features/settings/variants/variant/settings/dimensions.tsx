@@ -2,30 +2,13 @@ import { SelectInput } from '../../../../ui/inputs/select-input';
 import { VerticalInputGroup } from '../../../../ui/inputs/styled';
 import { Setting } from './setting';
 import { Bold } from './styled';
-import { TextInput } from '../../../../ui/inputs/text-input';
 import { Variant } from '../../../../../store/types';
-import { useVariants } from '../../../../../store/variants';
+import { useVariants } from '../../../../../store/variants/variants';
 import { DimensionMode } from '../../../../../types';
-import { ChangeEvent } from 'react';
+import { NumberInput } from '../../../../ui/inputs/number-input';
 
 export function Dimensions({ variant }: { variant: Variant }) {
     const api = useVariants(state => state.api);
-
-    function handleDimensionChange(dimension: 'width' | 'height') {
-        return (event: ChangeEvent<HTMLInputElement>) => {
-            let value: number | undefined;
-
-            const regex = /^[0-9]+$/;
-
-            if (event.target.value.match(regex)) {
-                value = Number(event.target.value);
-            } else {
-                value = undefined;
-            }
-
-            api.setDimension(dimension, variant.id, value);
-        };
-    }
 
     return (
         <>
@@ -41,9 +24,11 @@ export function Dimensions({ variant }: { variant: Variant }) {
                         onChange={v => api.setWidthMode(variant.id, v as DimensionMode)}
                         style={{ maxWidth: 81 }}
                     />
-                    <TextInput
+                    <NumberInput
+                        min={1}
+                        step={1}
                         value={variant.width.value ?? ''}
-                        onChange={handleDimensionChange('width')}
+                        onChange={v => api.setDimension('width', variant.id, v)}
                         align="end"
                         style={{ maxWidth: 81 }}
                     />
@@ -58,9 +43,11 @@ export function Dimensions({ variant }: { variant: Variant }) {
                         onChange={v => api.setHeightMode(variant.id, v as DimensionMode)}
                         style={{ maxWidth: 81 }}
                     />
-                    <TextInput
+                    <NumberInput
+                        min={1}
+                        step={1}
                         value={variant.height.value ?? ''}
-                        onChange={handleDimensionChange('height')}
+                        onChange={v => api.setDimension('height', variant.id, v)}
                         align="end"
                         style={{ maxWidth: 81 }}
                     />

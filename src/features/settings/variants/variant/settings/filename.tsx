@@ -2,7 +2,7 @@ import { ChangeEvent } from 'react';
 import { Variant } from '../../../../../store/types';
 import { VerticalInputGroup } from '../../../../ui/inputs/styled';
 import { Bold } from './styled';
-import { useVariants } from '../../../../../store/variants';
+import { useVariants } from '../../../../../store/variants/variants';
 import { TextInput } from '../../../../ui/inputs/text-input';
 import { Setting } from './setting';
 

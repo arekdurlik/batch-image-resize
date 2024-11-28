@@ -1,6 +1,7 @@
 import { IoMdAdd } from 'react-icons/io';
-import { useVariants } from '../../../store/variants';
+import { useVariants } from '../../../store/variants/variants';
 import { Button } from '../../ui/inputs/button';
+import { defaultVariantSettings } from '../../../store/variants/utils';
 
 let index = 1;
 
@@ -16,27 +17,7 @@ export function AddVariant({ onAdd }: { onAdd?: (variantId: string) => void }) {
             id,
             index,
             name: `Variant ${index}`,
-            width: {
-                mode: 'exact',
-                value: undefined,
-            },
-            height: {
-                mode: 'exact',
-                value: undefined,
-            },
-            prefix: '',
-            suffix: '',
-            crop: false,
-            overWriteQuality: false,
-            filter: 'mks2013',
-            quality: 1,
-            sharpenAmount: 0,
-            sharpenRadius: 0.5,
-            sharpenThreshold: 0,
-            aspectRatio: {
-                enabled: false,
-                value: '1:1',
-            },
+            ...defaultVariantSettings,
         });
 
         onAdd?.(id);

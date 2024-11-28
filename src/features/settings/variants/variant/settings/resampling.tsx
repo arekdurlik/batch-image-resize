@@ -8,6 +8,7 @@ import { Button } from '../../../../ui/inputs/button';
 import { MdRefresh } from 'react-icons/md';
 import { CSSProperties } from 'react';
 import { picaFilters } from '../../../../../lib/constants';
+import { QUALITY_MAX, QUALITY_MIN } from '../../../../../store/variants/utils';
 
 type Props = {
     enabled?: boolean;
@@ -66,8 +67,8 @@ export function Resampling({
                 <Setting label="Quality" unit="%" style={qualityStyle}>
                     <RangeInput
                         value={qualityPercentage}
-                        min={0}
-                        max={100}
+                        min={QUALITY_MIN * 100}
+                        max={QUALITY_MAX * 100}
                         step={1}
                         onRangeChange={v => onQualityChange(v)}
                         onRangeChangeEnd={v => onQualityChangeEnd(v)}

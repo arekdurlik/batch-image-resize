@@ -40,3 +40,7 @@ export function shallowEqual(object1: { [x: string]: unknown }, object2: { [x: s
 
     return true;
 }
+
+export function hasDuplicate(arr: Record<string, unknown>[], key: string): boolean {
+    return new Set(arr.map((item: Record<string, unknown>) => item[key])).size !== arr.length;
+}

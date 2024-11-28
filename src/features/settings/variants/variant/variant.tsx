@@ -1,7 +1,7 @@
 import { IoMdTrash } from 'react-icons/io';
 import styled from 'styled-components';
 import { Variant as VariantType } from '../../../../store/types';
-import { useVariants } from '../../../../store/variants';
+import { useVariants } from '../../../../store/variants/variants';
 import { SectionGroup, SideBarSection } from '../../../layout/styled';
 import { Button } from '../../../ui/inputs/button';
 import { Filename } from './settings/filename';
@@ -14,10 +14,9 @@ import { Sharpening } from './settings/sharpening';
 type Props = VariantType & {
     active: boolean;
     onActivate: () => void;
-    startOpen: boolean;
 };
 
-export function Variant({ active, onActivate, startOpen, ...variant }: Props) {
+export function Variant({ active, onActivate, ...variant }: Props) {
     const api = useVariants(state => state.api);
 
     return (

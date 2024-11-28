@@ -29,7 +29,7 @@ export function MoreOptions() {
                     ref={button}
                     active={actionMenuOpened}
                     disabled={!inputImagesExist}
-                    style={{ marginLeft: 8 }}
+                    slim
                 >
                     <MdMoreHoriz />
                 </Button>

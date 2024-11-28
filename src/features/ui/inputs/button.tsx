@@ -12,13 +12,14 @@ import { outline } from '../../../styles/mixins';
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
     disabled?: boolean;
     active?: boolean;
+    slim?: boolean;
     onClick?: MouseEventHandler<HTMLButtonElement>;
     children: ReactNode;
     style?: CSSProperties;
 };
 
 export const Button = forwardRef<HTMLButtonElement, Props>((props, ref) => {
-    const { disabled, active, onClick, children, style, ...rest } = props;
+    const { disabled, active, slim, onClick, children, style, ...rest } = props;
 
     function handleClick(event: MouseEvent<HTMLButtonElement>) {
         !disabled && onClick?.(event);
@@ -31,7 +32,9 @@ export const Button = forwardRef<HTMLButtonElement, Props>((props, ref) => {
             onClick={handleClick}
             style={style}
             $active={active}
+            disabled={disabled}
             $disabled={disabled}
+            $slim={slim}
             {...rest}
         >
             {children}
@@ -42,6 +45,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>((props, ref) => {
 export const StyledButton = styled.button<{
     $disabled?: boolean;
     $active?: boolean;
+    $slim?: boolean;
 }>`
     ${outline}
 
@@ -54,7 +58,8 @@ export const StyledButton = styled.button<{
     border-radius: var(--borderRadius-default);
     background-color: var(--control-default-bgColor-rest);
     color: var(--control-default-fgColor-rest);
-    padding: 3px 7px;
+    padding: 3px var(--spacing-large);
+    ${props => props.$slim && 'padding-inline: 7px;'}
     font-size: 14px;
     font-weight: 600;
     min-height: 29px;
@@ -62,7 +67,7 @@ export const StyledButton = styled.button<{
     cursor: pointer;
     transition: background-color var(--transition-default), outline var(--transition-fast);
 
-    &:hover {
+    &:hover:not(:disabled) {
         background-color: var(--control-default-bgColor-hover);
     }
 
@@ -71,7 +76,8 @@ export const StyledButton = styled.button<{
         css`
             background-color: var(--control-default-bgColor-active) !important;
         `}
-    &:active {
+
+    &:active:not(:disabled) {
         background-color: var(--control-default-bgColor-active) !important;
     }
 

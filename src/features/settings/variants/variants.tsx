@@ -1,27 +1,36 @@
-import { useState } from 'react';
-import { useVariants } from '../../../store/variants';
+import { useEffect } from 'react';
+import { useVariants } from '../../../store/variants/variants';
 import { SectionHeader, SectionTitle } from '../../layout/styled';
 import { AddVariant } from './add-variant';
 import { Variant } from './variant';
+import { ButtonGroup } from '../../ui/inputs/styled';
+import { MoreOptions } from './more-options';
 
 export function Variants() {
+    const api = useVariants(state => state.api);
     const variants = useVariants(state => state.variants);
-    const [activeVariant, setActiveVariant] = useState<string | undefined>(variants[0]?.id);
+    const activeVariantId = useVariants(state => state.activeVariantId);
+
+    useEffect(() => {
+    
+    }, [variants]);
 
     function handleActivate(variantId: string) {
-        setActiveVariant(activeVariant === variantId ? undefined : variantId);
+        api.setActive(activeVariantId === variantId ? undefined : variantId);
     }
     return (
         <>
             <SectionHeader>
                 <SectionTitle>Variants</SectionTitle>
-                <AddVariant onAdd={setActiveVariant} />
+                <ButtonGroup>
+                    <AddVariant />
+                    <MoreOptions />
+                </ButtonGroup>
             </SectionHeader>
             {variants.map(variant => (
                 <Variant
                     key={variant.id}
-                    active={variant.id === activeVariant}
-                    startOpen={variants.length === 1}
+                    active={variant.id === activeVariantId}
                     {...variant}
                     onActivate={() => handleActivate(variant.id)}
                 />

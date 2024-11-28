@@ -19,7 +19,7 @@ type Props = {
     min?: number;
     max?: number;
     align?: CanvasTextAlign;
-    onChange?: (value: number) => void;
+    onChange?: (value?: number) => void;
     onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
     style?: CSSProperties;
     placeholder?: string;
@@ -46,6 +46,8 @@ export const NumberInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
     const inputRef = useRef<HTMLInputElement>(null!);
 
     useEffect(() => {
+        if (value === undefined || value === '') return;
+
         const valueDecimals = countDecimals(typeof value === 'string' ? value : value.toString());
         setInternalValue(Number(value).toFixed(Math.min(valueDecimals, stepDecimals)));
     }, [stepDecimals, value]);
@@ -60,10 +62,32 @@ export const NumberInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
     function checkBounds(event: ChangeEvent<HTMLInputElement>) {
         const target = event.target;
 
-        const regex = /(?<=^|)\d+(\.\d+)?(?=$| )/;
-        if (!regex.test(target.value)) {
-            setInternalValue(target.value);
+        if (target.value === '') {
+            setInternalValue('');
+            onChange?.();
             return;
+        }
+
+        if (step && Number.isInteger(step)) {
+            const regex = /^\d*$/;
+
+            if (!regex.test(target.value)) {
+                return;
+            }
+        } else {
+            // digits and leading or trailing dot
+            const inputRegex = /^\d*\.?\d*$|^$ /;
+
+            if (inputRegex.test(target.value)) {
+                setInternalValue(target.value);
+            }
+
+            // same but no trailing dot
+            const changeEventRegex = /^\d*\.?\d+$|^\.\d+$|^\d+$|^$/;
+
+            if (!changeEventRegex.test(target.value)) {
+                return;
+            }
         }
 
         const numberValue = Number(target.value);

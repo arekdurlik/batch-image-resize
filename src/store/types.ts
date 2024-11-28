@@ -94,7 +94,6 @@ export type Variant = {
     prefix: string;
     suffix: string;
     crop: boolean;
-    overWriteQuality: boolean;
     filter: PicaFilter;
     quality: number;
     sharpenAmount: number;

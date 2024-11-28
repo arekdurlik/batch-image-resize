@@ -15,7 +15,7 @@ import {
     SharpenSettings,
 } from '../utils';
 import { InputImageData, OutputImageData } from '../types';
-import { useVariants } from '../variants';
+import { useVariants } from '../variants/variants';
 import { DEFAULT_CROP_SETTINGS } from '../../lib/config';
 
 function alreadyExists(id: string, images: OutputImageData[]) {

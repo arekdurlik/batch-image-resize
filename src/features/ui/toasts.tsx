@@ -70,7 +70,7 @@ export function Toasts() {
                 >
                     <Content>
                         <Icon>{getIcon(item.type)}</Icon>
-                        {item.message}
+                        <Text>{item.message}</Text>
                         <Close
                             onClick={e => {
                                 e.stopPropagation();
@@ -101,18 +101,12 @@ const Wrapper = styled.div`
     z-index: 200;
 `;
 
-const Icon = styled.span`
-    display: flex;
-    font-size: 16px;
-    color: #238d27;
-    padding-right: var(--spacing-large);
-`;
-
 const StyledToast = styled.div<{ $type: ToastType }>`
     display: flex;
     position: relative;
     pointer-events: all;
-    height: 50px;
+    max-height: 100px;
+    max-width: 500px;
     margin-bottom: var(--spacing-large);
 
     background-color: var(--bgColor-default);
@@ -123,14 +117,14 @@ const StyledToast = styled.div<{ $type: ToastType }>`
         0% {
             margin-bottom: 0px;
             opacity: 0;
-            height: 0px;
+            max-height: 0px;
             transform: translateY(-45%);
         }
         25% {
             opacity: 0;
         }
         75% {
-            height: 50px;
+            max-height: 100px;
         }
         100% {
             opacity: 1;
@@ -147,7 +141,7 @@ const StyledToast = styled.div<{ $type: ToastType }>`
         }
         100% {
             opacity: 0;
-            height: 0px;
+            max-height: 0px;
             margin-bottom: 0px;
         }
     }
@@ -184,12 +178,24 @@ const StyledToast = styled.div<{ $type: ToastType }>`
     }}
 `;
 
+const Icon = styled.span`
+    display: flex;
+    font-size: 16px;
+    color: #238d27;
+    padding-right: var(--spacing-large);
+`;
+
+const Text = styled.p`
+    white-space: pre-wrap;
+    word-break: break-word;
+    flex: 1;
+`
+
 const Content = styled.div`
     position: relative;
     padding: var(--spacing-large);
     border-radius: var(--borderRadius-default);
     overflow: hidden;
-    white-space: pre-wrap;
 
     display: flex;
     align-items: center;
@@ -230,6 +236,7 @@ const Life = styled.div`
     bottom: 0;
     left: 0px;
     height: 6px;
+    width: 0%;
     background-color: var(--borderColor-default);
     opacity: 0.25;
 

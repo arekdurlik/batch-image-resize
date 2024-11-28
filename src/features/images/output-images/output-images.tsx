@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { compare, getFileNameWithoutExtension } from '../../../lib/helpers';
 import { useOutputImages } from '../../../store/output-images';
 import { OutputImageData } from '../../../store/types';
-import { useVariants } from '../../../store/variants';
+import { useVariants } from '../../../store/variants/variants';
 import { SectionHeader, SectionTitle } from '../../layout/styled';
 import { ProgressBar } from '../../ui/progress-bar';
 import { ImageList } from '../image-list';

@@ -72,6 +72,7 @@ background-color: var(--control-default-bgColor-rest);
     padding: 0 6px;
 
     display: flex;
+    width: 100%;
     align-items: center;
     gap: var(--spacing-default);
 `;

@@ -41,46 +41,58 @@ export function FilterAndSort({
 
     return (
         <>
-            <span>Filter by:</span>
-            <TextInput
-                value={filter}
-                onChange={handleFilterChange}
-                suffix={filter.length ? <ClearFilter onClick={() => onFilter?.('')} /> : undefined}
-                style={{ width: 137 }}
-            />
-            <span style={{ marginLeft: 8 }}>Sort by:</span>
-            <ButtonGroup>
-                <SelectInput
-                    value={sortOption}
-                    onChange={handleSortOptionChange}
-                    options={[
-                        { label: 'File name', value: SortOption.FILENAME },
-                        { label: 'File size', value: SortOption.FILESIZE },
-                        { label: 'Variant', value: SortOption.VARIANT },
-                    ]}
-                    style={{ width: 110 }}
-                />
-                <Tooltip
-                    content={
-                        <TooltipContent>
-                            {sortDirection === SortDirection.ASC
-                                ? 'Sort order (Ascending)'
-                                : 'Sort order (Descending)'}
-                        </TooltipContent>
+            <FieldWrapper>
+                <span>Filter by:</span>
+                <TextInput
+                    value={filter}
+                    onChange={handleFilterChange}
+                    suffix={
+                        filter.length ? <ClearFilter onClick={() => onFilter?.('')} /> : undefined
                     }
-                >
-                    <Button onClick={handleSortDirectionFlip}>
-                        {sortDirection === SortDirection.ASC ? (
-                            <MdArrowUpward />
-                        ) : (
-                            <MdArrowDownward />
-                        )}
-                    </Button>
-                </Tooltip>
-            </ButtonGroup>
+                    style={{ width: 137 }}
+                />
+            </FieldWrapper>
+            <FieldWrapper>
+                <span>Sort by:</span>
+                <ButtonGroup>
+                    <SelectInput
+                        value={sortOption}
+                        onChange={handleSortOptionChange}
+                        options={[
+                            { label: 'File name', value: SortOption.FILENAME },
+                            { label: 'File size', value: SortOption.FILESIZE },
+                            { label: 'Variant', value: SortOption.VARIANT },
+                        ]}
+                        style={{ width: 110 }}
+                    />
+                    <Tooltip
+                        content={
+                            <TooltipContent>
+                                {sortDirection === SortDirection.ASC
+                                    ? 'Sort order (Ascending)'
+                                    : 'Sort order (Descending)'}
+                            </TooltipContent>
+                        }
+                    >
+                        <Button onClick={handleSortDirectionFlip} slim>
+                            {sortDirection === SortDirection.ASC ? (
+                                <MdArrowUpward />
+                            ) : (
+                                <MdArrowDownward />
+                            )}
+                        </Button>
+                    </Tooltip>
+                </ButtonGroup>
+            </FieldWrapper>
         </>
     );
 }
+
+const FieldWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-default);
+`;
 
 const ClearFilter = styled(MdClose)`
     cursor: pointer;

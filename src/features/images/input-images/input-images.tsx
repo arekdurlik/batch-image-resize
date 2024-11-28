@@ -8,6 +8,7 @@ import { HeaderOptions, ImageListWrapper, ProgressBarWrapper, Wrapper } from '..
 import { ImageList } from '../image-list';
 import { MoreOptions } from './more-options';
 import { UploadButton } from './upload-button';
+import { ButtonGroup } from '../../ui/inputs/styled';
 
 const collator = new Intl.Collator(undefined, {
     numeric: true,
@@ -34,8 +35,10 @@ export function InputImages() {
             <SectionHeader>
                 <SectionTitle>Input images</SectionTitle>
                 <HeaderOptions>
-                    <UploadButton />
-                    <MoreOptions />
+                    <ButtonGroup>
+                        <UploadButton />
+                        <MoreOptions />
+                    </ButtonGroup>
                 </HeaderOptions>
             </SectionHeader>
             <ImageListWrapper>

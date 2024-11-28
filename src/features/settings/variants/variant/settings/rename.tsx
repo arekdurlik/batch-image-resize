@@ -1,5 +1,5 @@
 import { ChangeEvent, KeyboardEvent, PointerEvent, useRef, useState } from 'react';
-import { useVariants } from '../../../../../store/variants';
+import { useVariants } from '../../../../../store/variants/variants';
 import { TextInput } from '../../../../ui/inputs/text-input';
 import styled, { css } from 'styled-components';
 import { Variant } from '../../../../../store/types';

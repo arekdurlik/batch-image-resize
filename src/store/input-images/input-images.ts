@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { InputImageData, SelectedItem, UploadedImage } from '../types';
 import { useOutputImages } from '../output-images';
-import { useVariants } from '../variants';
+import { useVariants } from '../variants/variants';
 import { Log } from '../../lib/log';
 import { initialProgress, Progress, startProgress } from '../utils';
 import { generateInputImage } from './utils';

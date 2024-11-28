@@ -1,6 +1,6 @@
 import { useOutputImages } from '../output-images';
 import { SelectedItem } from '../types';
-import { useVariants } from '../variants';
+import { useVariants } from '../variants/variants';
 
 export * from './progress';
 export * from './process-image';

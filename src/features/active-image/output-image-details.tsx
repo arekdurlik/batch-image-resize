@@ -4,7 +4,7 @@ import { Details, Field, Filename, Header, Label, Value } from './styled';
 import styled from 'styled-components';
 import { bytesToSizeFormatted } from '../../lib/helpers';
 import { Button } from '../ui/inputs/button';
-import { useVariants } from '../../store/variants';
+import { useVariants } from '../../store/variants/variants';
 import { picaFilters } from '../../lib/constants';
 
 export function OutputImageDetails({

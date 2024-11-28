@@ -4,7 +4,7 @@ import { ButtonGroup } from '../ui/inputs/styled';
 import { Details, Filename, Header } from './styled';
 import { Resampling } from '../settings/variants/variant/settings/resampling';
 import { OutputImageData } from '../../store/types';
-import { useVariants } from '../../store/variants';
+import { useVariants } from '../../store/variants/variants';
 import { Sharpening } from '../settings/variants/variant/settings/sharpening';
 import { useOutputImages } from '../../store/output-images';
 import { useEffect, useRef } from 'react';

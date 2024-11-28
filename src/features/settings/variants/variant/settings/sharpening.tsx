@@ -5,6 +5,7 @@ import { RangeInput } from '../../../../ui/inputs/range-input';
 import { MdRefresh } from 'react-icons/md';
 import { Button } from '../../../../ui/inputs/button';
 import { CSSProperties } from 'react';
+import { SHARPEN_AMOUNT_MAX, SHARPEN_AMOUNT_MIN, SHARPEN_RADIUS_MAX, SHARPEN_RADIUS_MIN, SHARPEN_THRESHOLD_MAX, SHARPEN_THRESHOLD_MIN } from '../../../../../store/variants/utils';
 
 type Props = {
     enabled?: boolean;
@@ -56,8 +57,8 @@ export function Sharpening({
             <VerticalInputGroup>
                 <Setting label="Amount" unit="%" style={amountStyle}>
                     <RangeInput
-                        min={0}
-                        max={500}
+                        min={SHARPEN_AMOUNT_MIN}
+                        max={SHARPEN_AMOUNT_MAX}
                         step={1}
                         value={amount}
                         onRangeChange={onAmountChange}
@@ -72,8 +73,8 @@ export function Sharpening({
 
                 <Setting label="Radius" unit="px" style={radiusStyle}>
                     <RangeInput
-                        min={0.5}
-                        max={2}
+                        min={SHARPEN_RADIUS_MIN}
+                        max={SHARPEN_RADIUS_MAX}
                         step={0.1}
                         value={radius}
                         onRangeChange={onRadiusChange}
@@ -88,8 +89,8 @@ export function Sharpening({
 
                 <Setting label="Threshold" unit="lvls" style={thresholdStyle}>
                     <RangeInput
-                        min={0}
-                        max={255}
+                        min={SHARPEN_THRESHOLD_MIN}
+                        max={SHARPEN_THRESHOLD_MAX}
                         step={1}
                         value={threshold}
                         onRangeChange={onThresholdChange}
