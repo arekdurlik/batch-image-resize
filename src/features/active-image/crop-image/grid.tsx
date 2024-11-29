@@ -32,8 +32,6 @@ const Container = styled.div`
     grid-gap: 1px;
     box-sizing: border-box;
     pointer-events: none;
-    box-shadow: inset 0 0 0 1px var(--borderColor-default);
-    padding: 1px;
     opacity: 1;
 
     div {

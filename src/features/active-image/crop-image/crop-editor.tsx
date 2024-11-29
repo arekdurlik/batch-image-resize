@@ -356,7 +356,9 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
     return (
         <>
             <StyledImageWrapper>
-                <OuterWrapper>
+                <OuterWrapper
+                    style={{ aspectRatio: `${image.dimensions.width}/${image.dimensions.height}` }}
+                >
                     <Image ref={helperImageRef} src={image.image.full.src} draggable={false} />
                     <Wrapper
                         ref={containerRef}
@@ -375,6 +377,9 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
                             ref={editorRef}
                             $height={image.inputImage.dimensions.height}
                             $width={image.inputImage.dimensions.width}
+                            style={{
+                                aspectRatio: `${image.dimensions.width}/${image.dimensions.height}`,
+                            }}
                         >
                             <StyledImage
                                 draggable={false}
@@ -385,8 +390,6 @@ export function CropEditor({ thumbnailSrc, inputImageData, outputImageData: imag
                                 src={inputImageData.image.full.src}
                                 height={image.inputImage.dimensions.height}
                                 width={image.inputImage.dimensions.width}
-                                $height={image.inputImage.dimensions.height}
-                                $width={image.inputImage.dimensions.width}
                             />
                         </EditorWrapper>
                     </Wrapper>

@@ -50,6 +50,7 @@ const Wrapper = styled.div`
     position: relative;
     max-height: 100%;
     display: flex;
+    justify-content: center;
     align-items: center;
     height: 100%;
     overflow: hidden;
