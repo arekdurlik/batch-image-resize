@@ -5,18 +5,23 @@ import { AddVariant } from './add-variant';
 import { Variant } from './variant';
 import { ButtonGroup } from '../../ui/inputs/styled';
 import { MoreOptions } from './more-options';
+import { useStorage } from '../../../store/storage';
 
 export function Variants() {
-    const api = useVariants(state => state.api);
+    const variantsApi = useVariants(state => state.api);
     const variants = useVariants(state => state.variants);
     const activeVariantId = useVariants(state => state.activeVariantId);
+    const storeVariants = useStorage(state => state.settings.storeVariants);
+    const storageApi = useStorage(state => state.api);
 
     useEffect(() => {
-    
-    }, [variants]);
+        if (storeVariants) {
+            storageApi.setVariants(variants);
+        }
+    }, [variants, storeVariants]);
 
     function handleActivate(variantId: string) {
-        api.setActive(activeVariantId === variantId ? undefined : variantId);
+        variantsApi.setActive(activeVariantId === variantId ? undefined : variantId);
     }
     return (
         <>

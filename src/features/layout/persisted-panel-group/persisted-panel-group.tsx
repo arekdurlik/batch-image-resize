@@ -1,9 +1,9 @@
 import { createContext, ReactNode, useContext, useRef } from 'react';
 import { PanelGroup, ImperativePanelGroupHandle } from 'react-resizable-panels';
-import { useSettings, type Settings } from '../../../store/settings';
+import { useStorage, type Storage } from '../../../store/storage';
 
 type Props = {
-    id: keyof Settings['panelGroups'];
+    id: keyof Storage['panelGroups'];
     direction: 'horizontal' | 'vertical';
     defaultLayout?: number[];
     children: ReactNode;
@@ -29,7 +29,7 @@ export const usePanelGroup = () => {
 
 export function PersistedPanelGroup({ id, direction, defaultLayout = [50, 50], children }: Props) {
     const ref = useRef<ImperativePanelGroupHandle>(null!);
-    const settings = useSettings();
+    const settings = useStorage();
 
     function handleSetLayout(newLayout: number[]) {
         ref.current.setLayout(newLayout);

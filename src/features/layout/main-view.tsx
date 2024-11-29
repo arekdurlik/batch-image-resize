@@ -2,11 +2,11 @@ import { Panel } from 'react-resizable-panels';
 import styled from 'styled-components';
 import { InputImages } from '../images/input-images';
 import { OutputImages } from '../images/output-images';
-import { useSettings } from '../../store/settings';
+import { useStorage } from '../../store/storage';
 import { PersistedPanelGroup, Resizer } from './persisted-panel-group';
 
 export function MainView() {
-    const { imageList } = useSettings(state => state.panelGroups);
+    const { imageList } = useStorage(state => state.panelGroups);
 
     return (
         <Wrapper>

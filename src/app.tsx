@@ -5,13 +5,13 @@ import { RightSidebar } from './features/layout/right-sidebar';
 import { AppWrapper, AppContent } from './features/layout/styled';
 import { Toasts } from './features/ui/toasts';
 import { GlobalStyles } from './styles/global-styles';
-import { useSettings } from './store/settings';
+import { useStorage } from './store/storage';
 import { PersistedPanelGroup, Resizer } from './features/layout/persisted-panel-group';
 
 const defaultLayout = [85, 15];
 
 function App() {
-    const { rightSidebar } = useSettings(state => state.panelGroups);
+    const { rightSidebar } = useStorage(state => state.panelGroups);
 
     return (
         <>

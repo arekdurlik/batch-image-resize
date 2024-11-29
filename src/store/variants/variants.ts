@@ -6,6 +6,7 @@ import { DimensionMode } from '../../types';
 import { Log } from '../../lib/log';
 import { getVariantsWithIdCheck } from '../utils';
 import { regenerateVariant } from '../utils/regenerate';
+import { useStorage } from '../storage';
 
 type Variants = {
     activeVariantId: string | undefined;
@@ -16,6 +17,7 @@ type Variants = {
         add: (variant: Variant) => void;
         regenerate: (variantId: string) => void;
         delete: (variantId: string) => void;
+        deleteAll: () => void;
         rename: (variantId: string, name: string) => void;
         setFilenamePart: (part: 'prefix' | 'suffix', variantId: string, value: string) => void;
         setFilter: (variantId: string, filter: PicaFilter) => void;
@@ -49,34 +51,38 @@ type Variants = {
 const defaultVariantId = nanoid();
 
 export const useVariants = create<Variants>((set, get) => ({
-    activeVariantId: defaultVariantId,
-    variants: [
-        {
-            id: defaultVariantId,
-            index: 0,
-            name: '400w',
-            width: {
-                mode: 'exact',
-                value: 400,
-            },
-            height: {
-                mode: 'exact',
-                value: undefined,
-            },
-            prefix: '',
-            suffix: '_400w',
-            filter: 'mks2013',
-            quality: 1,
-            sharpenAmount: 0,
-            sharpenRadius: 0.5,
-            sharpenThreshold: 0,
-            crop: false,
-            aspectRatio: {
-                enabled: false,
-                value: '1:1',
-            },
-        },
-    ],
+    activeVariantId: useStorage.getState().settings.storeVariants
+        ? useStorage.getState().variants[0].id
+        : defaultVariantId,
+    variants: useStorage.getState().settings.storeVariants
+        ? useStorage.getState().variants
+        : [
+              {
+                  id: defaultVariantId,
+                  index: 0,
+                  name: '400w',
+                  width: {
+                      mode: 'exact',
+                      value: 400,
+                  },
+                  height: {
+                      mode: 'exact',
+                      value: undefined,
+                  },
+                  prefix: '',
+                  suffix: '_400w',
+                  filter: 'mks2013',
+                  quality: 1,
+                  sharpenAmount: 0,
+                  sharpenRadius: 0.5,
+                  sharpenThreshold: 0,
+                  crop: false,
+                  aspectRatio: {
+                      enabled: false,
+                      value: '1:1',
+                  },
+              },
+          ],
     api: {
         set(variants: Variant[]) {
             set({ variants, activeVariantId: variants[0].id });
@@ -108,6 +114,10 @@ export const useVariants = create<Variants>((set, get) => ({
             variants.splice(index, 1);
 
             set({ variants });
+        },
+        deleteAll() {
+            set({ variants: [] });
+            useOutputImages.setState({ images: [] });
         },
         rename(variantId, name) {
             const { variants, variant } = getVariantsWithIdCheck(variantId);
