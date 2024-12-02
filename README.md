@@ -8,6 +8,7 @@ A React application for processing images in bulk. It offers a clear interface f
 
 - **Multiple Image Variants**:
   - Define multiple variants for images, each with its own dimensions, aspect ratio, quality, and sharpening settings.
+  - Save variant settings to a file or store them automatically in the browser.
   - Add prefixes or suffixes to filenames for better organization.
 
 - **Image Editing**:

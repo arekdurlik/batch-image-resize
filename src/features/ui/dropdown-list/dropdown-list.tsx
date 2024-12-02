@@ -44,9 +44,11 @@ export function DropdownList({
     const runItemCallback = useCallback(
         async (index: number, event?: Event) => {
             const item = reactElemRefArray[index];
-            if (item) {
-                (item as ReactElement).props?.onClick?.(event);
-                onClose?.();
+            if (item as ReactElement) {
+                item.props?.onClick?.(event);
+                if (item.props?.check === undefined) {
+                    onClose?.();
+                }
             }
         },
         [onClose, reactElemRefArray]

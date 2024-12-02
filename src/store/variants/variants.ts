@@ -52,7 +52,7 @@ const defaultVariantId = nanoid();
 
 export const useVariants = create<Variants>((set, get) => ({
     activeVariantId: useStorage.getState().settings.storeVariants
-        ? useStorage.getState().variants[0].id
+        ? useStorage.getState().variants[0]?.id
         : defaultVariantId,
     variants: useStorage.getState().settings.storeVariants
         ? useStorage.getState().variants
@@ -85,7 +85,7 @@ export const useVariants = create<Variants>((set, get) => ({
           ],
     api: {
         set(variants: Variant[]) {
-            set({ variants, activeVariantId: variants[0].id });
+            set({ variants, activeVariantId: variants[0]?.id });
 
             useOutputImages.getState().api.deleteAll();
             variants.forEach(v => useOutputImages.getState().api.generateVariant(v.id));
@@ -116,7 +116,7 @@ export const useVariants = create<Variants>((set, get) => ({
             set({ variants });
         },
         deleteAll() {
-            set({ variants: [] });
+            set({ variants: [], activeVariantId: undefined });
             useOutputImages.setState({ images: [] });
         },
         rename(variantId, name) {

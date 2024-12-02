@@ -1,16 +1,21 @@
-import { MdDownload, MdMoreHoriz, MdUpload } from 'react-icons/md';
+import { MdDownload, MdMoreHoriz, MdStorage, MdUpload } from 'react-icons/md';
 import { Button } from '../../ui/inputs/button';
 import { Tooltip } from '../../ui/tooltip';
 import { useRef, useState } from 'react';
 import { ActionMenu } from '../../ui/action-menu';
+import { useStorage } from '../../../store/storage';
 import { useVariants } from '../../../store/variants/variants';
 import { mapToFullVariant, validateJSONVariants, validateVariants } from './utils';
 import { openToast, ToastType } from '../../../store/toasts';
+import { IoMdTrash } from 'react-icons/io';
 
 export function MoreOptions() {
     const [actionMenuOpened, setActionMenuOpened] = useState(false);
     const button = useRef<HTMLButtonElement>(null!);
+    const storeVariants = useStorage(state => state.settings.storeVariants);
+    const storageApi = useStorage(state => state.api);
     const variantsApi = useVariants(state => state.api);
+    const variants = useVariants(state => state.variants);
 
     async function handleSave() {
         const variants = useVariants.getState().variants;
@@ -118,6 +123,22 @@ export function MoreOptions() {
             >
                 <ActionMenu.Item label="Save to file" icon={MdDownload} onClick={handleSave} />
                 <ActionMenu.Item label="Load from file" icon={MdUpload} onClick={handleLoad} />
+                <ActionMenu.Divider />
+                <ActionMenu.Item
+                    label="Store in browser"
+                    icon={MdStorage}
+                    check={storeVariants}
+                    onClick={storageApi.toggleStoreVariants}
+                />
+                {variants.length > 0 && <ActionMenu.Divider />}
+                {variants.length > 0 && (
+                    <ActionMenu.Item
+                        label="Delete all"
+                        dangerous
+                        icon={IoMdTrash}
+                        onClick={variantsApi.deleteAll}
+                    />
+                )}
             </ActionMenu>
         </>
     );

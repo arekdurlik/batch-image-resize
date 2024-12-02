@@ -12,12 +12,12 @@ type Props = {
     onClick?: (event: MouseEvent) => void;
 };
 
-export function Item({ check, icon, label, dangerous, onClick }: Props) {
+export function Item({ check, icon, label, dangerous }: Props) {
     return (
-        <Wrapper onClick={onClick} tabIndex={-1} $dangerous={dangerous}>
-            {check !== undefined && <Check $visible={check} />}
+        <Wrapper tabIndex={-1} $dangerous={dangerous}>
             {icon !== undefined && <Icon $visible={icon !== null}>{icon?.({})}</Icon>}
             {label}
+            {check !== undefined && <Check $visible={check} />}
         </Wrapper>
     );
 }
