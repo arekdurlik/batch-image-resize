@@ -17,7 +17,7 @@ type App = {
     suffix: string;
     api: {
         selectItems: (items: SelectedItem[], modifiers?: { control?: boolean }) => void;
-        selectItemsWithShift: (item: SelectedItem, allItems: SelectedItem[]) => void;
+        selectItemWithShift: (item: SelectedItem, allItems: SelectedItem[]) => void;
         selectItemsByDrag: (
             items: SelectedItem[],
             added: SelectedItem[],
@@ -64,7 +64,7 @@ export const useApp = create<App>()(
                     set({ selectedItems: inverted });
                 }
             },
-            selectItemsWithShift: (item, allItems) => {
+            selectItemWithShift: (item, allItems) => {
                 const clickIndex = allItems.findIndex(i => i.id === item.id);
                 let otherEndIndex = allItems.findIndex(i => i.id === get().latestSelectedItem?.id);
 

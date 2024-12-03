@@ -1,8 +1,9 @@
 import {
-    Children,
-    isValidElement,
-    ReactElement,
-    useCallback,
+    createContext,
+    Dispatch,
+    MouseEvent,
+    SetStateAction,
+    useContext,
     useEffect,
     useRef,
     useState,
@@ -16,112 +17,62 @@ import { Props, RenderParams } from './types';
 import { getAlignment } from './utils';
 import { Divider } from './children/divider';
 
+export type DropdownContextType = {
+    items: HTMLElement[];
+};
+
+export type DropdownContextValueType = [
+    DropdownContextType,
+    {
+        set: Dispatch<SetStateAction<DropdownContextType>>;
+        close: () => void;
+    }
+];
+
+const DropdownContext = createContext<DropdownContextValueType>(null!);
+export const useDropdownContext = () => useContext(DropdownContext);
+
 export function DropdownList({
     children,
     actuator,
-    initialHighlightIndex = 0,
     floating = false,
     align = 'left',
     slideIn = false,
     margin = 4,
     onClose,
 }: Props) {
-    const [highlightedIndex, setHighlightedIndex] = useState(initialHighlightIndex);
-    const [reactElemRefArray, setReactElemRefArray] = useState<ReactElement[]>([]);
-    const [tabbableArray, setTabbableArray] = useState<(HTMLElement | null)[]>([]);
+    const [state, setState] = useState<DropdownContextType>({
+        items: [],
+    });
     const [renderParams, setRenderParams] = useState<RenderParams>({
         x: 0,
         y: 0,
         placement: Placement.BOTTOM,
         width: 'auto',
     });
-
     const overlay = useRef<HTMLDivElement>(document.querySelector(`#${OVERLAY_ID}`)!);
     const list = useRef<HTMLUListElement>(null!);
 
-    const tabbableLength = tabbableArray.length;
-
-    const runItemCallback = useCallback(
-        async (index: number, event?: Event) => {
-            const item = reactElemRefArray[index];
-            if (item as ReactElement) {
-                item.props?.onClick?.(event);
-                if (item.props?.check === undefined) {
-                    onClose?.();
-                }
-            }
-        },
-        [onClose, reactElemRefArray]
-    );
-
-    // fill dom and react elem refs arrays
     useEffect(() => {
-        const reactArray = Children.map(children, child => {
-            if (isValidElement(child)) {
-                return child;
-            }
-        });
-
-        if (!reactArray) return;
-
-        setTabbableArray(
-            Array.from(list.current.children).filter((child, index) => {
-                if (child.hasAttribute('tabindex')) {
-                    setReactElemRefArray(v => [...v, reactArray[index]]);
-                    return true;
-                } else {
-                    return false;
-                }
-            }) as (HTMLElement | null)[]
-        );
-    }, [children]);
-
-    // focus on highlighted item
-    useEffect(() => {
-        tabbableArray[highlightedIndex]?.focus();
-    }, [tabbableArray, highlightedIndex]);
-
-    // run onClick cb on item click and close list
-    useEffect(() => {
-        function handler(event: MouseEvent) {
-            const clickedOnOption = list.current.contains(event.target as HTMLElement);
-
-            if (clickedOnOption) {
-                const index = tabbableArray.findIndex(el => el === event.target);
-                runItemCallback(index, event);
-            }
-        }
-
-        function handleMouseDown(event: MouseEvent) {
-            event.stopPropagation();
-        }
-
-        const ref = list.current;
-
-        ref.addEventListener('mousedown', handleMouseDown);
-        ref.addEventListener('click', handler);
-        return () => {
-            ref.removeEventListener('mousedown', handleMouseDown);
-            ref.removeEventListener('click', handler);
-        };
-    }, [onClose, tabbableArray, runItemCallback]);
-
+        state.items[0]?.focus();
+    }, [state.items]);
     // click away listener
     // pointer down with useCapture, otherwise clicking on panel resizer doesn't close dropdown
     useEffect(() => {
         function handler(event: MouseEvent) {
+            event.stopPropagation();
             const clickedOnActuator = actuator?.current?.contains(event.target as HTMLElement);
             const clickedOnList = event.target === list.current;
             const clickedOnOption = list.current.contains(event.target as HTMLElement);
 
             if (!clickedOnActuator && !clickedOnOption && !clickedOnList) {
-                onClose?.();
+                handleClose();
             }
         }
 
         document.addEventListener('pointerdown', handler, true);
         return () => document.removeEventListener('pointerdown', handler, true);
-    }, [actuator, onClose]);
+    }, [actuator]);
 
     // set list placement based on screen bounds
     useEffect(() => {
@@ -160,41 +111,28 @@ export function DropdownList({
         return () => window.removeEventListener('resize', calculatePosition);
     }, [actuator, align, margin]);
 
-    // keyboard navigation
-    useEffect(() => {
-        function handler(event: KeyboardEvent) {
-            event.stopPropagation();
-            switch (event.key) {
-                case 'Tab':
-                case 'Escape':
-                    onClose?.();
-                    break;
-                case 'Enter':
-                case ' ': {
-                    runItemCallback(highlightedIndex, event);
-                    break;
-                }
-                case 'ArrowUp':
-                case 'ArrowDown': {
-                    const newValue = highlightedIndex + (event.key === 'ArrowDown' ? 1 : -1);
+    function handleClose() {
+        onClose?.();
+    }
 
-                    if (newValue >= 0 && newValue < tabbableLength) {
-                        setHighlightedIndex(newValue);
-                    }
-                }
-            }
-        }
-
-        const ref = list.current;
-
-        ref.addEventListener('keydown', handler);
-        return () => ref.removeEventListener('keydown', handler);
-    }, [highlightedIndex, tabbableLength, onClose, runItemCallback]);
+    function stopPropagation(event: MouseEvent) {
+        event.stopPropagation();
+    }
 
     return createPortal(
-        <Container ref={list} $floating={floating} $slideIn={slideIn} $renderParams={renderParams}>
-            {children}
-        </Container>,
+        <DropdownContext.Provider value={[state, { set: setState, close: handleClose }]}>
+            <Container
+                ref={list}
+                $floating={floating}
+                $slideIn={slideIn}
+                $renderParams={renderParams}
+                onMouseDown={stopPropagation}
+                onClick={stopPropagation}
+            >
+                {children}
+            </Container>
+        </DropdownContext.Provider>,
+
         overlay.current
     );
 }

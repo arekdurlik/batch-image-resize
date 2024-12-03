@@ -28,7 +28,7 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
     const itemRefMap = useMemo(() => new Map<string, HTMLDivElement>(), []);
 
     const grid = useRef<HTMLDivElement>(null!);
-    const list = useRef<HTMLDivElement>(null!);
+    const wrapper = useRef<HTMLDivElement>(null!);
     const selected = useRef<SelectedItem[]>([]);
     const latestSelectedItem = useRef<SelectedItem>();
     const inputtingTimeout = useRef<NodeJS.Timeout>();
@@ -39,39 +39,30 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
     const modifiers = useModifiersRef();
 
     const selectables = Array.from(itemRefMap).map(i => i[1]);
-    const dragSelectBind = useDragSelect(list, selectables, {
-        onStart: () => setIsActive(true),
+    const dragSelectBind = useDragSelect(wrapper, selectables, {
+        onStart: data => {
+            setIsActive(true);
+            if (data) {
+                const item = toSelectedItems([data], type)[0];
+    
+                if (modifiers.shift) {
+                    api.selectItemWithShift(
+                        item,
+                        images.map(({ id }) => ({ type, id }))
+                    );
+                } else {
+                    api.selectItems([item], modifiers);
+                }
+            }
+        },
         onChange: data => {
-            // drag select
             const i = allToSelectedItems(data, type);
             api.selectItemsByDrag(i.selected, i.added, i.removed, modifiers);
-        },
-        onEnd: (data, dragged) => {
-            // click select
-            if (dragged) return;
-
-            if (data.length === 0) {
-                if (modifiers.none) {
-                    api.setSelectedItems([], !selected.current.length);
-                }
-                return;
-            }
-
-            const items = toSelectedItems(data, type);
-
-            if (modifiers.shift) {
-                api.selectItemsWithShift(
-                    items[0],
-                    images.map(({ id }) => ({ type, id }))
-                );
-            } else {
-                api.selectItems(items, modifiers);
-            }
         },
     });
 
     useForceUpdate([images.length]); // fixes drag selecting before images are loaded in
-    useOutsideClick(list, handleBlur, { cancelOnDrag: true });
+    useOutsideClick(wrapper, handleBlur, { cancelOnDrag: true });
 
     // jump to new active item if out of view
     useEffect(() => {
@@ -89,7 +80,7 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
 
                 if (!mouse.lmb && item) {
                     const el = itemRefMap.get(item.id);
-                    el && jumpToElement(list.current, el);
+                    el && jumpToElement(wrapper.current, el);
                 }
             }
         );
@@ -208,7 +199,7 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
 
     return (
         <ImageListWrapper
-            ref={list}
+            ref={wrapper}
             $focused={isActive}
             tabIndex={0}
             onFocus={handleKeyboardFocus}

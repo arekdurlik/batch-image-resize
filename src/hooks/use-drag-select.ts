@@ -30,9 +30,9 @@ export function useDragSelect(
     container: RefObject<HTMLElement>,
     selectables: HTMLElement[],
     callbacks: {
-        onStart?: (selected: HTMLElement | undefined) => void;
+        onStart?: (selected: HTMLElement | undefined, target?: EventTarget | null) => void;
         onChange?: (data: OnChangeData) => void;
-        onEnd?: (selected: HTMLElement[], dragged: boolean) => void;
+        onEnd?: (selected: HTMLElement[], dragged: boolean, target?: EventTarget | null) => void;
     },
     options?: Options
 ) {
@@ -128,7 +128,7 @@ export function useDragSelect(
             drawSelectionBox(boxElement.current, drawArea.current.start!, drawArea.current.end!);
             const selected = getSelectedItems();
             if (selected.length === selectedLength.current) return;
-            callbacks.onStart?.(selected[0]);
+            callbacks.onStart?.(selected[0], event.target);
         }
 
         document.addEventListener('mousemove', handleMouseMove);
@@ -185,7 +185,7 @@ export function useDragSelect(
                 dragged.current = true;
             }
 
-            callbacks.onEnd(selected, dragged.current);
+            callbacks.onEnd(selected, dragged.current, event.target);
         }
 
         removeBox();
