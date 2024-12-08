@@ -34,3 +34,31 @@ export const defaultVariantSettings: Omit<Variant, 'id' | 'index' | 'name'> = {
         value: '1:1',
     },
 };
+
+export function getDefaultVariant(id: string): Variant {
+    return {
+        id,
+        index: 0,
+        name: 'Variant 1',
+        width: {
+            mode: 'exact',
+            value: undefined,
+        },
+        height: {
+            mode: 'exact',
+            value: undefined,
+        },
+        prefix: '',
+        suffix: '',
+        filter: 'mks2013',
+        quality: 1,
+        sharpenAmount: 0,
+        sharpenRadius: 0.5,
+        sharpenThreshold: 0,
+        crop: false,
+        aspectRatio: {
+            enabled: false,
+            value: '1:1',
+        },
+    };
+}

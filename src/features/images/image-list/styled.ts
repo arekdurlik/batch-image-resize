@@ -1,14 +1,5 @@
 import styled, { css } from 'styled-components';
 
-export const ImageWrapper = styled.div`
-    height: 100px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    user-select: none;
-    pointer-events: all;
-`;
-
 export const ImageListWrapper = styled.div<{ $focused: boolean }>`
     position: relative;
     z-index: 3;
@@ -68,7 +59,12 @@ export const Grid = styled.div`
     }
 `;
 
-export const Item = styled.div<{ $previousActive?: boolean }>`
+export const DragOverlay = styled.div`
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+`;
+export const StyledItem = styled.div<{ $previousActive?: boolean }>`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -124,10 +120,19 @@ export const Item = styled.div<{ $previousActive?: boolean }>`
     }
 `;
 
+export const ImageWrapper = styled.div`
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    user-select: none;
+    pointer-events: all;
+`;
+
 export const Image = styled.img`
     max-height: 100%;
     border-radius: var(--borderRadius-small);
-    z-index: 1;
+    z-index: 3;
     overflow-clip-margin: none;
     object-fit: cover;
 `;

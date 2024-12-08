@@ -1,11 +1,12 @@
 import { RefObject, useEffect, useState } from 'react';
-import { useApp } from '../../../store/app';
-import { ImageData } from '../../../store/types';
-import { ContextMenu } from '../../ui/context-menu';
+import { useApp } from '../../../../../store/app';
+import { ImageData } from '../../../../../store/types';
+import { ContextMenu } from '../../../../ui/context-menu';
 import { IoMdTrash } from 'react-icons/io';
 import { MdFileCopy, MdImage, MdSaveAs } from 'react-icons/md';
-import { openToast, ToastType } from '../../../store/toasts';
-import { getFileExtension } from '../../../lib/helpers';
+import { openToast, ToastType } from '../../../../../store/toasts';
+import { getFileExtension } from '../../../../../lib/helpers';
+import { ChangeOrder } from './change-order';
 
 type Props = {
     actuator: RefObject<HTMLElement>;
@@ -13,13 +14,21 @@ type Props = {
     image: ImageData;
     lastSelected: boolean;
     listFocused: boolean;
+    onClose?: () => void;
 };
 
-export function ItemContextMenu({ actuator, type, image, lastSelected, listFocused }: Props) {
+export function ItemContextMenu({
+    actuator,
+    type,
+    image,
+    lastSelected,
+    listFocused,
+    onClose,
+}: Props) {
+    const [isOpen, setIsOpen] = useState(false);
     const appApi = useApp(state => state.api);
     const selectedItems = useApp(state => state.selectedItems);
     const active = selectedItems.map(i => i.id).some(i => i === image.id);
-    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         if (!lastSelected || !listFocused) return;
@@ -112,13 +121,18 @@ export function ItemContextMenu({ actuator, type, image, lastSelected, listFocus
             actuator={actuator}
             open={isOpen}
             onOpen={handleContextMenuOpen}
-            onClose={() => setIsOpen(false)}
+            onClose={() => {
+                setIsOpen(false);
+                onClose?.();
+            }}
         >
             {selectedItems.length === 1 && (
                 <ContextMenu.Item
                     label="Open image in a new tab"
                     icon={MdImage}
-                    onClick={() => window.open(image.image.full.src)}
+                    onClick={() => {
+                        window.open(image.image.full.src);
+                    }}
                 />
             )}
             {type === 'output' && selectedItems.length === 1 && (
@@ -127,7 +141,9 @@ export function ItemContextMenu({ actuator, type, image, lastSelected, listFocus
             {selectedItems.length === 1 && (
                 <ContextMenu.Item label="Copy image" icon={MdFileCopy} onClick={handleCopyImage} />
             )}
-            {selectedItems.length < 2 && <ContextMenu.Divider />}
+            {type === 'input' && <ChangeOrder />}
+
+            {selectedItems.length === 1 && <ContextMenu.Divider />}
             <ContextMenu.Item
                 label="Delete"
                 icon={IoMdTrash}

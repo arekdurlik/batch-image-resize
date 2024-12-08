@@ -17,6 +17,7 @@ type InputImagesState = {
         deleteByIds: (ids: string[]) => void;
         deleteAll: () => void;
         selectAll: () => void;
+        shiftOrderByIds: (ids: string[], offset: number) => void;
     };
 };
 
@@ -40,7 +41,6 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
                     }
 
                     const inputImages = [...get().images];
-                    inputImage.index = inputImages.length;
                     inputImages.push(inputImage);
                     newImages.push(inputImage);
 
@@ -112,6 +112,42 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
                 id: i.id,
             })) as SelectedItem[];
             useApp.setState({ selectedItems: toSelect });
+        },
+        shiftOrderByIds(ids, offset) {
+            set(state => {
+                const images = [...state.images];
+
+                const indexesToShift = images
+                    .map((image, index) => ({ id: image.id, index }))
+                    .filter(image => ids.includes(image.id))
+                    .map(image => image.index);
+
+                const sortedIndexes =
+                    offset > 0
+                        ? indexesToShift.sort((a, b) => b - a)
+                        : indexesToShift.sort((a, b) => a - b);
+
+                const firstIndex = Math.min(...sortedIndexes);
+
+                const newFirstIndex = Math.max(
+                    0,
+                    Math.min(firstIndex + offset, images.length - sortedIndexes.length)
+                );
+
+                const clampedOffset = newFirstIndex - firstIndex;
+
+                sortedIndexes.forEach(oldIndex => {
+                    const newIndex = oldIndex + clampedOffset;
+
+                    if (newIndex !== oldIndex) {
+                        const image = images[oldIndex];
+                        images.splice(oldIndex, 1);
+                        images.splice(newIndex, 0, image);
+                    }
+                });
+
+                return { images };
+            });
         },
     },
 }));

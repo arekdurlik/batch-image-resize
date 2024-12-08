@@ -4,7 +4,6 @@ export type UploadedImage = { file: File; width: number; height: number };
 
 export type InputImageData = {
     id: string;
-    index: number;
 
     image: {
         full: {

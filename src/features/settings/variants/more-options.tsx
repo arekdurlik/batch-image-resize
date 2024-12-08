@@ -51,34 +51,38 @@ export function MoreOptions() {
     }
 
     async function handleLoad() {
-        function readFile(file: File) {
-            const fileReader = new FileReader();
+        async function readFile(file: File) {
+            return new Promise<void>(resolve => {
+                const fileReader = new FileReader();
 
-            fileReader.onload = function (e: ProgressEvent<FileReader>) {
-                try {
-                    if (e.target === null) {
-                        throw new Error('Error reading file.');
+                fileReader.onload = function (e: ProgressEvent<FileReader>) {
+                    try {
+                        if (e.target === null) {
+                            throw new Error('Error reading file.');
+                        }
+
+                        const result = e.target.result;
+
+                        if (typeof result !== 'string') {
+                            throw new Error('Invalid file format.');
+                        }
+
+                        const variants = validateJSONVariants(result);
+                        validateVariants(variants);
+                        const fullVariants = variants.map(variant => mapToFullVariant(variant));
+                        variantsApi.set(fullVariants);
+
+                        openToast(ToastType.SUCCESS, 'Variants loaded successfully.');
+                    } catch (error) {
+                        if (error instanceof Error) {
+                            openToast(ToastType.ERROR, error.message);
+                        }
+                    } finally {
+                        resolve();
                     }
-
-                    const result = e.target.result;
-
-                    if (typeof result !== 'string') {
-                        throw new Error('Invalid file format.');
-                    }
-
-                    const variants = validateJSONVariants(result);
-                    validateVariants(variants);
-                    const fullVariants = variants.map(variant => mapToFullVariant(variant));
-                    variantsApi.set(fullVariants);
-
-                    openToast(ToastType.SUCCESS, 'Variants loaded successfully.');
-                } catch (error) {
-                    if (error instanceof Error) {
-                        openToast(ToastType.ERROR, error.message);
-                    }
-                }
-            };
-            fileReader.readAsText(file);
+                };
+                fileReader.readAsText(file);
+            });
         }
 
         if ('showSaveFilePicker' in window) {

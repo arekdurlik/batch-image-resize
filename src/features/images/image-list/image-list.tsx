@@ -3,7 +3,6 @@ import { clamp } from '../../../lib/helpers';
 import { useApp } from '../../../store/app';
 import { ImageData, SelectedItem } from '../../../store/types';
 import { SortOption } from '../types';
-import { ListItem } from './item';
 import { ImageListWrapper, Grid } from './styled';
 import { allToSelectedItems, toSelectedItems, jumpToElement } from './utils';
 import {
@@ -14,6 +13,7 @@ import {
     useOutsideClick,
     useKeyDownEvents,
 } from '../../../hooks';
+import { Item } from './item';
 
 const INPUT_TIMEOUT = 500;
 
@@ -39,27 +39,38 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
     const modifiers = useModifiersRef();
 
     const selectables = Array.from(itemRefMap).map(i => i[1]);
-    const dragSelectBind = useDragSelect(wrapper, selectables, {
-        onStart: data => {
-            setIsActive(true);
-            if (data) {
-                const item = toSelectedItems([data], type)[0];
-    
-                if (modifiers.shift) {
-                    api.selectItemWithShift(
-                        item,
-                        images.map(({ id }) => ({ type, id }))
-                    );
-                } else {
-                    api.selectItems([item], modifiers);
+    const dragSelectBind = useDragSelect(
+        wrapper,
+        selectables,
+        {
+            onStart: data => {
+                setIsActive(true);
+
+                if (data) {
+                    const item = toSelectedItems([data], type)[0];
+
+                    if (modifiers.shift) {
+                        api.selectItemWithShift(
+                            item,
+                            images.map(({ id }) => ({ type, id }))
+                        );
+                    } else {
+                        api.selectItems([item], modifiers);
+                    }
                 }
-            }
+            },
+            onChange: data => {
+                const i = allToSelectedItems(data, type);
+                api.selectItemsByDrag(i.selected, i.added, i.removed, modifiers);
+            },
+            onEnd: (_, dragged, target) => {
+                if (!dragged && target === wrapper.current) {
+                    api.setSelectedItems([], !selected.current.length);
+                }
+            },
         },
-        onChange: data => {
-            const i = allToSelectedItems(data, type);
-            api.selectItemsByDrag(i.selected, i.added, i.removed, modifiers);
-        },
-    });
+        { ignoreChildren: true }
+    );
 
     useForceUpdate([images.length]); // fixes drag selecting before images are loaded in
     useOutsideClick(wrapper, handleBlur, { cancelOnDrag: true });
@@ -197,6 +208,31 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
         latestSelectedItem.current = selected.current[selected.current.length - 1];
     }
 
+    function handleMouseDown(id: string) {
+        return () => {
+            if (modifiers.shift) {
+                api.selectItemWithShift(
+                    { type, id },
+                    images.map(({ id }) => ({ type, id }))
+                );
+            } else if (modifiers.control) {
+                api.selectItems([{ type, id }], modifiers);
+            } else {
+                if (!selected.current.map(i => i.id).includes(id)) {
+                    api.selectItems([{ type, id }], modifiers);
+                }
+            }
+        };
+    }
+
+    function handleClick(id: string) {
+        return () => {
+            if (modifiers.none) {
+                api.setSelectedItems([{ type, id }], true);
+            }
+        };
+    }
+
     return (
         <ImageListWrapper
             ref={wrapper}
@@ -209,16 +245,20 @@ export function ImageList({ type, images, sortBy = SortOption.FILENAME }: Props)
         >
             {images.length > 0 && (
                 <Grid ref={grid}>
-                    {images.map(image => (
-                        <ListItem
+                    {images.map((image, index) => (
+                        <Item
                             ref={node =>
                                 node ? itemRefMap.set(image.id, node) : itemRefMap.delete(image.id)
                             }
                             key={image.id}
+                            index={index}
                             type={type}
                             image={image}
                             sortBy={sortBy}
                             listFocused={isActive}
+                            onMouseDown={handleMouseDown(image.id)}
+                            onClick={handleClick(image.id)}
+                            toFocusOnClose={wrapper}
                         />
                     ))}
                 </Grid>

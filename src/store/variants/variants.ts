@@ -7,6 +7,7 @@ import { Log } from '../../lib/log';
 import { getVariantsWithIdCheck } from '../utils';
 import { regenerateVariant } from '../utils/regenerate';
 import { useStorage } from '../storage';
+import { getDefaultVariant } from './utils';
 
 type Variants = {
     activeVariantId: string | undefined;
@@ -56,33 +57,7 @@ export const useVariants = create<Variants>((set, get) => ({
         : defaultVariantId,
     variants: useStorage.getState().settings.storeVariants
         ? useStorage.getState().variants
-        : [
-              {
-                  id: defaultVariantId,
-                  index: 0,
-                  name: '400w',
-                  width: {
-                      mode: 'exact',
-                      value: 400,
-                  },
-                  height: {
-                      mode: 'exact',
-                      value: undefined,
-                  },
-                  prefix: '',
-                  suffix: '_400w',
-                  filter: 'mks2013',
-                  quality: 1,
-                  sharpenAmount: 0,
-                  sharpenRadius: 0.5,
-                  sharpenThreshold: 0,
-                  crop: false,
-                  aspectRatio: {
-                      enabled: false,
-                      value: '1:1',
-                  },
-              },
-          ],
+        : [getDefaultVariant(defaultVariantId)],
     api: {
         set(variants: Variant[]) {
             set({ variants, activeVariantId: variants[0]?.id });

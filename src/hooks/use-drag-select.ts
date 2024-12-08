@@ -105,6 +105,7 @@ export function useDragSelect(
         if (!container.current) return;
 
         if (opts.ignoreChildren) {
+            document.addEventListener('mouseup', handleMouseUp);
             if (event.target !== container.current) return;
         }
 
