@@ -38,7 +38,6 @@ export const defaultVariantSettings: Omit<Variant, 'id' | 'index' | 'name'> = {
 export function getDefaultVariant(id: string): Variant {
     return {
         id,
-        index: 0,
         name: 'Variant 1',
         width: {
             mode: 'exact',

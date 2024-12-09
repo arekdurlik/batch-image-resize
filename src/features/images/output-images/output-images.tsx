@@ -29,29 +29,33 @@ export function OutputImages() {
             switch (sortOption) {
                 case SortOption.VARIANT: {
                     // VARIANT
-                    const variantA = variants.find(v => v.id === a.variantId)!;
-                    const variantB = variants.find(v => v.id === b.variantId)!;
+                    const variantA = variants.findIndex(v => v.id === a.variantId);
+                    const variantB = variants.findIndex(v => v.id === b.variantId)!;
 
                     return sortDirection === SortDirection.ASC
-                        ? compare(variantA.index, variantB.index) ||
-                              collator.compare(a.filename, b.filename)
-                        : compare(variantB.index, variantA.index) ||
-                              collator.compare(a.filename, b.filename);
+                        ? compare(variantA, variantB) || collator.compare(a.filename, b.filename)
+                        : compare(variantB, variantA) || collator.compare(a.filename, b.filename);
                 }
-                case SortOption.FILESIZE: // FILESIZE
+                case SortOption.FILESIZE:
+                    // FILESIZE
                     return sortDirection === SortDirection.ASC
                         ? compare(a.image.full.file.size, b.image.full.file.size)
                         : compare(b.image.full.file.size, a.image.full.file.size);
-                default: // FILENAME
+                default: {
+                    // FILENAME
+                    const variantA = variants.findIndex(v => v.id === a.variantId);
+                    const variantB = variants.findIndex(v => v.id === b.variantId)!;
+
                     return sortDirection === SortDirection.ASC
                         ? collator.compare(
                               getFileNameWithoutExtension(a.filename),
                               getFileNameWithoutExtension(b.filename)
-                          )
+                          ) || compare(variantA, variantB)
                         : collator.compare(
                               getFileNameWithoutExtension(b.filename),
                               getFileNameWithoutExtension(a.filename)
-                          );
+                          ) || compare(variantA, variantB);
+                }
             }
         },
         [sortOption, sortDirection, variants]

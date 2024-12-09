@@ -46,7 +46,6 @@ function isVariant(obj: Record<string, unknown>): obj is Variant {
         obj !== null &&
         typeof obj === 'object' &&
         typeof obj.id === 'string' &&
-        typeof obj.index === 'number' &&
         typeof obj.name === 'string' &&
         (obj.width === undefined || isDimension(obj.width)) &&
         (obj.height === undefined || isDimension(obj.height)) &&
@@ -88,10 +87,6 @@ export function validateVariants(variants: Variant[]): boolean {
 
         if (hasDuplicate(variants, 'id')) {
             throw new Error(intro + 'Variant IDs must be unique.');
-        }
-
-        if (hasDuplicate(variants, 'index')) {
-            throw new Error(intro + 'Variant indexes must be unique.');
         }
 
         if (variant.quality && (variant.quality < 0 || variant.quality > 1)) {
@@ -168,7 +163,6 @@ export function mapToFullVariant(variant: Variant): Variant {
         ...defaultVariantSettings,
         ...variant,
         id: variant.id,
-        index: variant.index,
         name: variant.name,
     };
 }

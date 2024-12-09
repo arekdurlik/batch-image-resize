@@ -80,7 +80,6 @@ export type PicaFilter = 'box' | 'hamming' | 'lanczos2' | 'lanczos3' | 'mks2013'
 
 export type Variant = {
     id: string;
-    index: number;
     name: string;
     width: {
         mode: DimensionMode;

@@ -128,10 +128,11 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
                         : indexesToShift.sort((a, b) => a - b);
 
                 const firstIndex = Math.min(...sortedIndexes);
+                const lastIndex = Math.max(...sortedIndexes);
 
                 const newFirstIndex = Math.max(
                     0,
-                    Math.min(firstIndex + offset, images.length - sortedIndexes.length)
+                    Math.min(firstIndex + offset, images.length - (lastIndex - firstIndex + 1))
                 );
 
                 const clampedOffset = newFirstIndex - firstIndex;

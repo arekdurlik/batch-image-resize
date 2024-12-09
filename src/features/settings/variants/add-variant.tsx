@@ -4,8 +4,6 @@ import { Button } from '../../ui/inputs/button';
 import { defaultVariantSettings } from '../../../store/variants/utils';
 import { Variant } from '../../../store/types';
 
-let index = 1;
-
 function getNextVariantName(variants: Variant[]) {
     const defaultNameRegex = /^Variant (\d+)$/;
 
@@ -30,13 +28,11 @@ export function AddVariant({ onAdd }: { onAdd?: (variantId: string) => void }) {
     const variants = useVariants(state => state.variants);
 
     function handleAdd() {
-        index++;
 
         const id = `v-${Date.now()}`;
 
         api.add({
             id,
-            index,
             name: getNextVariantName(variants),
             ...defaultVariantSettings,
         });
