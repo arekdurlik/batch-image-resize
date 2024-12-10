@@ -28,6 +28,7 @@ export type OutputImageData = {
     filename: string;
     inputImage: {
         id: string;
+        index: number;
         filename: string;
         size: number;
         dimensions: {

@@ -17,6 +17,7 @@ import {
 import { InputImageData, OutputImageData } from '../types';
 import { useVariants } from '../variants/variants';
 import { DEFAULT_CROP_SETTINGS } from '../../lib/config';
+import { useInputImages } from '../input-images';
 
 function alreadyExists(id: string, images: OutputImageData[]) {
     const alreadyExists = images.findIndex(i => i.id === id) > -1;
@@ -193,10 +194,13 @@ export async function generateOutputImage(
 
     const fullSrc = URL.createObjectURL(processedFull.blob);
 
+    const index = useInputImages.getState().images.findIndex(i => i.id === inputImage.id);
+
     return {
         id,
         inputImage: {
             id: inputImage.id,
+            index: index,
             filename: inputImage.filename,
             size: inputImage.image.full.file.size,
             dimensions: {

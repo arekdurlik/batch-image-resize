@@ -7,13 +7,14 @@ import { useDropdownContext } from '../dropdown-list';
 
 type Props = {
     check?: boolean;
+    closeOnSelect?: boolean;
     icon?: IconType | null;
     label: string;
     dangerous?: boolean;
     onClick?: (event?: MouseEvent) => void | Promise<void>;
 };
 
-export function Item({ check, icon, label, dangerous, onClick }: Props) {
+export function Item({ check, closeOnSelect, icon, label, dangerous, onClick }: Props) {
     const itemRef = useRef<HTMLLIElement>(null!);
     const [{ items }, { close, set }] = useDropdownContext();
 
@@ -61,12 +62,14 @@ export function Item({ check, icon, label, dangerous, onClick }: Props) {
         event?.stopPropagation();
         const result = onClick?.(event);
 
-        if (check == undefined && !(result instanceof Promise)) {
-            close();
-        }
+        if (check == undefined || closeOnSelect) {
+            if (!(result instanceof Promise)) {
+                close();
+            }
 
-        if (result instanceof Promise) {
-            result.finally(close);
+            if (result instanceof Promise) {
+                result.finally(close);
+            }
         }
     }
 

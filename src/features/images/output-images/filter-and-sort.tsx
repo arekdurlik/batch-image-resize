@@ -62,6 +62,7 @@ export function FilterAndSort({
                             { label: 'File name', value: SortOption.FILENAME },
                             { label: 'File size', value: SortOption.FILESIZE },
                             { label: 'Variant', value: SortOption.VARIANT },
+                            { label: 'Input order', value: SortOption.INPUT_ORDER },
                         ]}
                         style={{ width: 110 }}
                     />

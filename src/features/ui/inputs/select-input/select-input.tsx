@@ -34,6 +34,7 @@ export function SelectInput({ value, options, align, style, onChange }: Props) {
                         label={option.label}
                         onClick={handleSelect(option.value)}
                         check={option.value === value}
+                        closeOnSelect
                     />
                 ))}
             </ActionMenu>

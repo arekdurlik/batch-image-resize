@@ -41,6 +41,12 @@ export function OutputImages() {
                     return sortDirection === SortDirection.ASC
                         ? compare(a.image.full.file.size, b.image.full.file.size)
                         : compare(b.image.full.file.size, a.image.full.file.size);
+                case SortOption.INPUT_ORDER: {
+                    // INPUT ORDER
+                    return sortDirection === SortDirection.ASC
+                        ? compare(a.inputImage.index, b.inputImage.index)
+                        : compare(b.inputImage.index, a.inputImage.index);
+                }
                 default: {
                     // FILENAME
                     const variantA = variants.findIndex(v => v.id === a.variantId);

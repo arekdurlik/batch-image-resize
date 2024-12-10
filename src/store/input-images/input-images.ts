@@ -82,7 +82,7 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
                 useOutputImages.getState().api.generateVariant(v.id);
             });
         },
-        deleteByIds: ids => {
+        deleteByIds(ids) {
             const inputImages = [...get().images];
             let totalSize = get().totalSize;
 
@@ -101,11 +101,11 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
 
             set({ images: inputImages, totalSize });
         },
-        deleteAll: () => {
+        deleteAll() {
             set({ images: [] });
             useOutputImages.setState({ images: [] });
         },
-        selectAll: () => {
+        selectAll() {
             const images = get().images;
             const toSelect = images.map(i => ({
                 type: 'input',
@@ -114,41 +114,57 @@ export const useInputImages = create<InputImagesState>((set, get) => ({
             useApp.setState({ selectedItems: toSelect });
         },
         shiftOrderByIds(ids, offset) {
-            set(state => {
-                const images = [...state.images];
+            const images = [...useInputImages.getState().images];
+            const indexesToShift = [];
+            const idsToUpdate = [];
 
-                const indexesToShift = images
-                    .map((image, index) => ({ id: image.id, index }))
-                    .filter(image => ids.includes(image.id))
-                    .map(image => image.index);
+            for (let i = 0; i < images.length; i++) {
+                const image = images[i];
+                if (ids.includes(image.id)) {
+                    indexesToShift.push(i);
+                }
+            }
 
-                const sortedIndexes =
-                    offset > 0
-                        ? indexesToShift.sort((a, b) => b - a)
-                        : indexesToShift.sort((a, b) => a - b);
+            const sortedIndexes =
+                offset > 0
+                    ? indexesToShift.sort((a, b) => b - a)
+                    : indexesToShift.sort((a, b) => a - b);
 
-                const firstIndex = Math.min(...sortedIndexes);
-                const lastIndex = Math.max(...sortedIndexes);
+            const firstIndex = Math.min(...sortedIndexes);
+            const lastIndex = Math.max(...sortedIndexes);
 
-                const newFirstIndex = Math.max(
-                    0,
-                    Math.min(firstIndex + offset, images.length - (lastIndex - firstIndex + 1))
-                );
+            const newFirstIndex = Math.max(
+                0,
+                Math.min(firstIndex + offset, images.length - (lastIndex - firstIndex + 1))
+            );
 
-                const clampedOffset = newFirstIndex - firstIndex;
+            const clampedOffset = newFirstIndex - firstIndex;
 
-                sortedIndexes.forEach(oldIndex => {
-                    const newIndex = oldIndex + clampedOffset;
+            if (!clampedOffset) return;
 
-                    if (newIndex !== oldIndex) {
-                        const image = images[oldIndex];
-                        images.splice(oldIndex, 1);
-                        images.splice(newIndex, 0, image);
-                    }
-                });
+            // shift indexes
+            for (let i = 0; i < sortedIndexes.length; i++) {
+                const oldIndex = sortedIndexes[i];
+                const newIndex = oldIndex + clampedOffset;
 
-                return { images };
-            });
+                if (newIndex !== oldIndex) {
+                    const image = images[oldIndex];
+                    images.splice(oldIndex, 1);
+                    images.splice(newIndex, 0, image);
+                }
+            }
+
+            // get only the ids affected during the shift
+            const left = offset > 0 ? firstIndex : newFirstIndex;
+            const right = offset > 0 ? newFirstIndex + ids.length - 1 : lastIndex;
+
+            for (let i = left; i <= right; i++) {
+                idsToUpdate.push(images[i].id);
+            }
+
+            useOutputImages.getState().api.updateInputImageIndexesByIds(idsToUpdate, images);
+
+            set({ images });
         },
     },
 }));

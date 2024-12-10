@@ -28,6 +28,7 @@ type OutputImagesState = {
         regenerateAll: () => void;
         regenerateVariant: (variantId: string) => void;
         updateVariantData: (variant: Variant) => void;
+        updateInputImageIndexesByIds: (ids: string[], newIndexImages: InputImageData[]) => void;
         setCropData: (imageId: string, cropData: CropSettings) => void;
         setResamplingData: (
             imageId: string,
@@ -68,6 +69,10 @@ export const useOutputImages = create<OutputImagesState>()(
 
                         const outputImages = [...get().images];
                         outputImages.push(...newImages);
+                        get().api.updateInputImageIndexesByIds(
+                            images.map(i => i.id),
+                            images
+                        );
                         set({ images: outputImages });
 
                         progress.advance();
@@ -302,7 +307,25 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 set({ images });
             },
-            setCropData: (imageId, cropData) => {
+            updateInputImageIndexesByIds(ids, newIndexImages) {
+                const images = [...get().images];
+
+                for (let i = 0; i < ids.length; i++) {
+                    const id = ids[i];
+                    const index = newIndexImages.findIndex(img => img.id === id);
+
+                    for (let j = 0; j < images.length; j++) {
+                        const image = images[j];
+
+                        if (image.inputImage.id === id) {
+                            image.inputImage.index = index;
+                        }
+                    }
+                }
+
+                set({ images });
+            },
+            setCropData(imageId, cropData) {
                 const outputImages = [...get().images];
                 const index = outputImages.findIndex(i => i.id === imageId);
 
@@ -328,7 +351,7 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 regenerate && get().api.regenerate(imageId);
             },
-            setResamplingEnabled: (imageId, enabled, regenerate = true) => {
+            setResamplingEnabled(imageId, enabled, regenerate = true) {
                 const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
 
                 image.resampling.enabled = enabled;
@@ -337,7 +360,7 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 regenerate && get().api.regenerate(imageId);
             },
-            setFilter: (imageId, filter, regenerate = true) => {
+            setFilter(imageId, filter, regenerate = true) {
                 const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
 
                 if (!image.resampling.enabled) {
@@ -353,7 +376,7 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 regenerate && get().api.regenerate(imageId);
             },
-            setQuality: (imageId, quality, regenerate = true) => {
+            setQuality(imageId, quality, regenerate = true) {
                 const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
 
                 if (!image.resampling.enabled) {
@@ -369,7 +392,7 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 regenerate && get().api.regenerate(imageId);
             },
-            setSharpenData: (imageId, data, regenerate = true) => {
+            setSharpenData(imageId, data, regenerate = true) {
                 const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
 
                 image.sharpening.enabled = data.enabled;
@@ -381,7 +404,7 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 regenerate && get().api.regenerate(imageId);
             },
-            setSharpenEnabled: (imageId, enabled, regenerate = true) => {
+            setSharpenEnabled(imageId, enabled, regenerate = true) {
                 const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
 
                 image.sharpening.enabled = enabled;
@@ -390,7 +413,7 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 regenerate && get().api.regenerate(imageId);
             },
-            setSharpenAmount: (imageId, amount, regenerate = true) => {
+            setSharpenAmount(imageId, amount, regenerate = true) {
                 const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
 
                 if (!image.sharpening.enabled) {
@@ -407,7 +430,7 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 regenerate && get().api.regenerate(imageId);
             },
-            setSharpenRadius: (imageId, radius, regenerate = true) => {
+            setSharpenRadius(imageId, radius, regenerate = true) {
                 const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
 
                 if (!image.sharpening.enabled) {
@@ -424,7 +447,7 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 regenerate && get().api.regenerate(imageId);
             },
-            setSharpenThreshold: (imageId, threshold, regenerate = true) => {
+            setSharpenThreshold(imageId, threshold, regenerate = true) {
                 const { outputImages, image } = getOutputImagesWithIdCheck(imageId);
 
                 if (!image.sharpening.enabled) {
@@ -450,10 +473,10 @@ export const useOutputImages = create<OutputImagesState>()(
 
                 set({ images: outputImages });
             },
-            deleteAll: () => {
+            deleteAll() {
                 set({ images: [] });
             },
-            selectAll: () => {
+            selectAll() {
                 const images = get().images;
                 const toSelect = images.map(i => ({
                     type: 'output',
