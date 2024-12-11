@@ -3,32 +3,37 @@ import { useVariants } from '../../../../../store/variants/variants';
 import { TextInput } from '../../../../ui/inputs/text-input';
 import styled, { css } from 'styled-components';
 import { Variant } from '../../../../../store/types';
-import { useOutsideClick } from '../../../../../hooks';
 import { useDidUpdateEffect } from '../../../../../hooks/use-did-update-effect';
 import { outline } from '../../../../../styles/mixins';
 import { Tooltip } from '../../../../ui/tooltip';
 
 export function Rename({ variant, active }: { variant: Variant; active: boolean }) {
+    const [internalValue, setInternalValue] = useState(variant.name);
     const [editing, setEditing] = useState(false);
     const api = useVariants(state => state.api);
     const labelRef = useRef<HTMLHeadingElement>(null!);
-    const titleRef = useRef<HTMLInputElement>(null!);
+    const inputRef = useRef<HTMLInputElement>(null!);
     const handleFocus = useRef(false);
 
-    useOutsideClick(titleRef, () => setEditing(false));
     useDidUpdateEffect(() => {
         if (editing) {
-            titleRef.current.focus();
+            inputRef.current.focus();
         } else {
             if (handleFocus.current) {
                 handleFocus.current = false;
                 labelRef.current.focus();
             }
+
+            if (internalValue.trim() === '') {
+                setInternalValue(variant.name);
+            } else {
+                api.rename(variant.id, internalValue);
+            }
         }
     }, [editing]);
 
     function handleRename(event: ChangeEvent<HTMLInputElement>) {
-        api.rename(variant.id, event.target.value);
+        setInternalValue(event.target.value);
     }
 
     function handleLabelKey(event: KeyboardEvent) {
@@ -64,10 +69,11 @@ export function Rename({ variant, active }: { variant: Variant; active: boolean 
 
     return editing ? (
         <TextInput
-            ref={titleRef}
-            value={variant.name}
+            ref={inputRef}
+            value={internalValue}
             onChange={handleRename}
             onKeyDown={handleInputKey}
+            onMouseDown={event => event.stopPropagation()}
             spellCheck={false}
             onBlur={() => setEditing(false)}
             style={{ justifyContent: 'flex-start' }}
@@ -82,7 +88,7 @@ export function Rename({ variant, active }: { variant: Variant; active: boolean 
                 tabIndex={0}
                 onKeyDown={handleLabelKey}
                 onDoubleClick={handleDoubleClick}
-                onClick={handleClick}
+                onMouseDown={handleClick}
                 $active={active}
             >
                 {variant.name}
@@ -98,6 +104,7 @@ const VariantName = styled.h3<{ $active: boolean }>`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    min-width: 30px;
     ${props =>
         props.$active &&
         css`

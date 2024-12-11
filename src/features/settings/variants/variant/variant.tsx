@@ -21,10 +21,13 @@ export function Variant({ active, onActivate, ...variant }: Props) {
 
     return (
         <SectionGroup>
-            <VariantHeader onClick={onActivate} $active={active}>
+            <VariantHeader onMouseDown={onActivate} $active={active}>
                 <Rename variant={variant} active={active} />
                 {active && (
-                    <Button onClick={() => api.delete(variant.id)}>
+                    <Button
+                        onClick={() => api.delete(variant.id)}
+                        onMouseDown={event => event.stopPropagation()}
+                    >
                         <IoMdTrash />
                         Delete
                     </Button>

@@ -88,6 +88,10 @@ export function validateVariants(variants: Variant[]): boolean {
         if (hasDuplicate(variants, 'id')) {
             throw new Error(intro + 'Variant IDs must be unique.');
         }
+        
+        if (variant.name.trim() === '') {
+            throw new Error(intro + 'Variant name cannot be empty.');
+        }
 
         if (variant.quality && (variant.quality < 0 || variant.quality > 1)) {
             throw new Error(intro + 'Quality must be between 0 and 1.');
