@@ -1,13 +1,15 @@
 import { create } from 'zustand';
 import { PicaFilter, Variant } from '../types';
 import { useOutputImages } from '../output-images';
-import { nanoid } from 'nanoid';
 import { DimensionMode } from '../../types';
 import { Log } from '../../lib/log';
 import { getVariantsWithIdCheck } from '../utils';
 import { regenerateVariant } from '../utils/regenerate';
+import { defaultVariantSettings } from './utils';
+import { nanoid } from 'nanoid';
+import { openToast, ToastType } from '../toasts';
+import { validateVariants } from '../../features/settings/variants/utils';
 import { useStorage } from '../storage';
-import { getDefaultVariant } from './utils';
 
 type Variants = {
     activeVariantId: string | undefined;
@@ -49,15 +51,8 @@ type Variants = {
     };
 };
 
-const defaultVariantId = nanoid();
-
 export const useVariants = create<Variants>((set, get) => ({
-    activeVariantId: useStorage.getState().settings.storeVariants
-        ? useStorage.getState().variants[0]?.id
-        : defaultVariantId,
-    variants: useStorage.getState().settings.storeVariants
-        ? useStorage.getState().variants
-        : [getDefaultVariant(defaultVariantId)],
+    ...getInitialVariants(),
     api: {
         set(variants: Variant[]) {
             set({ variants, activeVariantId: variants[0]?.id });
@@ -312,6 +307,36 @@ export const useVariants = create<Variants>((set, get) => ({
         },
     },
 }));
+
+function getInitialVariants() {
+    const storage = useStorage.getState();
+
+    if (storage.settings.storeVariants) {
+        try {
+            validateVariants(storage.variants);
+
+            return {
+                activeVariantId: storage.variants[0]?.id,
+                variants: storage.variants,
+            };
+        } catch {
+            openToast(ToastType.ERROR, 'Invalid variant data. Using default settings.');
+        }
+    }
+
+    const id = nanoid();
+
+    return {
+        activeVariantId: id,
+        variants: [
+            {
+                id,
+                name: 'Variant 1',
+                ...defaultVariantSettings,
+            },
+        ],
+    };
+}
 
 function handleAspectRatioChange(newVariants: Variant[], variant: Variant) {
     if (variant.aspectRatio.enabled) {

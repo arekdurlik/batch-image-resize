@@ -47,17 +47,17 @@ function isVariant(obj: Record<string, unknown>): obj is Variant {
         typeof obj === 'object' &&
         typeof obj.id === 'string' &&
         typeof obj.name === 'string' &&
-        (obj.width === undefined || isDimension(obj.width)) &&
-        (obj.height === undefined || isDimension(obj.height)) &&
+        (obj.width === undefined || typeof obj.width === 'object') &&
+        (obj.height === undefined || typeof obj.width === 'object') &&
         (obj.prefix === undefined || typeof obj.prefix === 'string') &&
         (obj.suffix === undefined || typeof obj.suffix === 'string') &&
         (obj.crop === undefined || typeof obj.crop === 'boolean') &&
-        (obj.filter === undefined || isPicaFilter(obj.filter)) &&
+        (obj.filter === undefined || typeof obj.filter === 'string') &&
         (obj.quality === undefined || typeof obj.quality === 'number') &&
         (obj.sharpenAmount === undefined || typeof obj.sharpenAmount === 'number') &&
         (obj.sharpenRadius === undefined || typeof obj.sharpenRadius === 'number') &&
         (obj.sharpenThreshold === undefined || typeof obj.sharpenThreshold === 'number') &&
-        (obj.aspectRatio === undefined || isAspectRatio(obj.aspectRatio))
+        (obj.aspectRatio === undefined || typeof obj.aspectRatio === 'object')
     );
 }
 
@@ -88,17 +88,24 @@ export function validateVariants(variants: Variant[]): boolean {
         if (hasDuplicate(variants, 'id')) {
             throw new Error(intro + 'Variant IDs must be unique.');
         }
-        
+
         if (variant.name.trim() === '') {
             throw new Error(intro + 'Variant name cannot be empty.');
         }
 
-        if (variant.quality && (variant.quality < 0 || variant.quality > 1)) {
+        if (variant.filter !== undefined && !isPicaFilter(variant.filter)) {
+            throw new Error(
+                intro +
+                    'Filter must be one of the following: lanczos3, box, hamming, lanczos2, mks2013.'
+            );
+        }
+
+        if (variant.quality !== undefined && (variant.quality < 0 || variant.quality > 1)) {
             throw new Error(intro + 'Quality must be between 0 and 1.');
         }
 
         if (
-            variant.sharpenAmount &&
+            variant.sharpenAmount !== undefined &&
             (variant.sharpenAmount < SHARPEN_AMOUNT_MIN ||
                 variant.sharpenAmount > SHARPEN_AMOUNT_MAX)
         ) {
@@ -109,7 +116,7 @@ export function validateVariants(variants: Variant[]): boolean {
         }
 
         if (
-            variant.sharpenRadius &&
+            variant.sharpenRadius !== undefined &&
             (variant.sharpenRadius < SHARPEN_RADIUS_MIN ||
                 variant.sharpenRadius > SHARPEN_RADIUS_MAX)
         ) {
@@ -120,7 +127,7 @@ export function validateVariants(variants: Variant[]): boolean {
         }
 
         if (
-            variant.sharpenThreshold &&
+            variant.sharpenThreshold !== undefined &&
             (variant.sharpenThreshold < SHARPEN_THRESHOLD_MIN ||
                 variant.sharpenThreshold > SHARPEN_THRESHOLD_MAX)
         ) {
@@ -130,12 +137,24 @@ export function validateVariants(variants: Variant[]): boolean {
             );
         }
 
+        if (variant.width && !isDimension(variant.width)) {
+            throw new Error(intro + 'Invalid width parameters.');
+        }
+
+        if (variant.height && !isDimension(variant.height)) {
+            throw new Error(intro + 'Invalid height parameters.');
+        }
+
         if (variant.width?.value !== undefined && variant.width.value < 0) {
             throw new Error(intro + 'Width must be greater than or equal to 0.');
         }
 
         if (variant.height?.value !== undefined && variant.height.value < 0) {
             throw new Error(intro + 'Height must be greater than or equal to 0.');
+        }
+
+        if (variant.aspectRatio && !isAspectRatio(variant.aspectRatio)) {
+            throw new Error(intro + 'Invalid aspect ratio parameters.');
         }
 
         if (variant.aspectRatio?.value && !isValidAspectRatio(variant.aspectRatio.value)) {

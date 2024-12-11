@@ -15,13 +15,12 @@ import {
 
 const minRequired = {
     id: '1',
-    index: 0,
     name: 'Variant A',
 };
 
 describe('validate variants json', () => {
     it('should validate a minimum valid variant JSON', () => {
-        const json = JSON.stringify([{ id: '1', index: 0, name: 'Variant A' }]);
+        const json = JSON.stringify([{ id: '1', name: 'Variant A' }]);
 
         expect(() => validateJSONVariants(json)).not.toThrow();
     });
@@ -50,7 +49,7 @@ describe('validate variants json', () => {
     });
 
     it('should throw an error for missing required fields', () => {
-        const json = JSON.stringify([{ index: 0, name: 'Variant A' }]);
+        const json = JSON.stringify([{ name: 'Variant A' }]);
 
         expect(() => validateJSONVariants(json)).toThrow();
     });
@@ -59,8 +58,8 @@ describe('validate variants json', () => {
 describe('validate variants', () => {
     it('should throw an error if there are duplicate IDs in the array of variants', () => {
         const variants = [
-            { id: 'duplicateId1', index: 0, name: 'Variant 1' },
-            { id: 'duplicateId1', index: 1, name: 'Variant 2' },
+            { id: 'duplicateId1', name: 'Variant 1' },
+            { id: 'duplicateId1', name: 'Variant 2' },
         ] as Variant[];
 
         expect(() => validateVariants(variants)).toThrow();
@@ -68,26 +67,8 @@ describe('validate variants', () => {
 
     it('should validate if all IDs in the array are unique', () => {
         const variants = [
-            { id: 'uniqueId1', index: 0, name: 'Variant 1' },
-            { id: 'uniqueId2', index: 1, name: 'Variant 2' },
-        ] as Variant[];
-
-        expect(() => validateVariants(variants)).not.toThrow();
-    });
-
-    it('should throw an error if there are duplicate indexes in the array of variants', () => {
-        const variants = [
-            { id: 'uniqueId1', index: 1, name: 'Variant 1' },
-            { id: 'uniqueId2', index: 1, name: 'Variant 2' },
-        ] as Variant[];
-
-        expect(() => validateVariants(variants)).toThrow();
-    });
-
-    it('should validate if all indexes in the array are unique', () => {
-        const variants = [
-            { id: 'uniqueId1', index: 0, name: 'Variant 1' },
-            { id: 'uniqueId2', index: 1, name: 'Variant 2' },
+            { id: 'uniqueId1', name: 'Variant 1' },
+            { id: 'uniqueId2', name: 'Variant 2' },
         ] as Variant[];
 
         expect(() => validateVariants(variants)).not.toThrow();
