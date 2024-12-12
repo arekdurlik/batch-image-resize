@@ -1,7 +1,7 @@
 import { IoMdAdd } from 'react-icons/io';
 import { useVariants } from '../../../store/variants/variants';
 import { Button } from '../../ui/inputs/button';
-import { defaultVariantSettings } from '../../../store/variants/utils';
+import { getDefaultVariantSettings } from '../../../store/variants/utils';
 import { Variant } from '../../../store/types';
 
 function getNextVariantName(variants: Variant[]) {
@@ -28,13 +28,12 @@ export function AddVariant({ onAdd }: { onAdd?: (variantId: string) => void }) {
     const variants = useVariants(state => state.variants);
 
     function handleAdd() {
-
         const id = `v-${Date.now()}`;
 
         api.add({
             id,
             name: getNextVariantName(variants),
-            ...defaultVariantSettings,
+            ...getDefaultVariantSettings(),
         });
 
         onAdd?.(id);

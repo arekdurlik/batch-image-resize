@@ -1,7 +1,7 @@
 import { hasDuplicate } from '../../../helpers';
 import { PicaFilter, Variant } from '../../../store/types';
 import {
-    defaultVariantSettings,
+    getDefaultVariantSettings,
     SHARPEN_AMOUNT_MAX,
     SHARPEN_AMOUNT_MIN,
     SHARPEN_RADIUS_MAX,
@@ -183,7 +183,7 @@ export function validateVariants(variants: Variant[]): boolean {
 
 export function mapToFullVariant(variant: Variant): Variant {
     return {
-        ...defaultVariantSettings,
+        ...getDefaultVariantSettings(),
         ...variant,
         id: variant.id,
         name: variant.name,

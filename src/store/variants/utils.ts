@@ -12,7 +12,7 @@ export const SHARPEN_RADIUS_MAX = 2;
 export const SHARPEN_THRESHOLD_MIN = 0;
 export const SHARPEN_THRESHOLD_MAX = 255;
 
-export const defaultVariantSettings: Omit<Variant, 'id' | 'index' | 'name'> = {
+const defaultVariantSettings: Omit<Variant, 'id' | 'index' | 'name'> = {
     width: {
         mode: 'exact',
         value: undefined,
@@ -34,3 +34,7 @@ export const defaultVariantSettings: Omit<Variant, 'id' | 'index' | 'name'> = {
         value: '1:1',
     },
 };
+
+export function getDefaultVariantSettings() {
+    return structuredClone(defaultVariantSettings);
+}

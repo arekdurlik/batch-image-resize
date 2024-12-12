@@ -5,7 +5,7 @@ import { DimensionMode } from '../../types';
 import { Log } from '../../lib/log';
 import { getVariantsWithIdCheck } from '../utils';
 import { regenerateVariant } from '../utils/regenerate';
-import { defaultVariantSettings } from './utils';
+import { getDefaultVariantSettings } from './utils';
 import { nanoid } from 'nanoid';
 import { openToast, ToastType } from '../toasts';
 import { validateVariants } from '../../features/settings/variants/utils';
@@ -332,7 +332,7 @@ function getInitialVariants() {
             {
                 id,
                 name: 'Variant 1',
-                ...defaultVariantSettings,
+                ...getDefaultVariantSettings(),
             },
         ],
     };

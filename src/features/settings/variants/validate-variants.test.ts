@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { validateJSONVariants, validateVariants } from './utils';
 import { Variant } from '../../../store/types';
 import {
-    defaultVariantSettings,
+    getDefaultVariantSettings,
     QUALITY_MAX,
     QUALITY_MIN,
     SHARPEN_AMOUNT_MAX,
@@ -29,7 +29,7 @@ describe('validate variants json', () => {
         const json = JSON.stringify([
             {
                 ...minRequired,
-                ...defaultVariantSettings,
+                ...getDefaultVariantSettings(),
             },
         ]);
 
@@ -40,7 +40,7 @@ describe('validate variants json', () => {
         const json = JSON.stringify([
             {
                 ...minRequired,
-                ...defaultVariantSettings,
+                ...getDefaultVariantSettings(),
                 extraField: 'ignored',
             },
         ]);
