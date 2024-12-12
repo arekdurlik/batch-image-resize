@@ -14,7 +14,7 @@ export function Dimensions({ variant }: { variant: Variant }) {
         <>
             <Bold>Dimensions</Bold>
             <VerticalInputGroup>
-                <Setting label="Width" unit="px">
+                <Setting label="Width" suffix="px">
                     <SelectInput
                         options={[
                             { label: 'exactly', value: 'exact' },
@@ -33,7 +33,7 @@ export function Dimensions({ variant }: { variant: Variant }) {
                         style={{ maxWidth: 81 }}
                     />
                 </Setting>
-                <Setting label="Height" unit="px">
+                <Setting label="Height" suffix="px">
                     <SelectInput
                         options={[
                             { label: 'exactly', value: 'exact' },

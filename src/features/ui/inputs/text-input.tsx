@@ -1,5 +1,5 @@
 import { ReactNode, useState, forwardRef, InputHTMLAttributes, FocusEvent } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { outlineRest, outlineActive } from '../../../styles/mixins';
 
 type Props = {
@@ -23,7 +23,7 @@ export const TextInput = forwardRef<HTMLInputElement, Props>((props, ref) => {
     return (
         <TextInputWrapper style={style}>
             {label && <TextInputLabel htmlFor={label}>{label}:</TextInputLabel>}
-            <TextInputContainer $focused={isFocused}>
+            <TextInputContainer $focused={isFocused} $disabled={rest.disabled}>
                 {prefix && <Icon>{prefix}</Icon>}
                 <Input
                     ref={ref}
@@ -61,15 +61,24 @@ export const TextInputLabel = styled.label`
     font-weight: 600;
 `;
 
-export const TextInputContainer = styled.div<{ $focused: boolean }>`
+export const TextInputContainer = styled.div<{ $focused: boolean, $disabled?: boolean }>`
     ${outlineRest}
     ${props => props.$focused && outlineActive}
-background-color: var(--control-default-bgColor-rest);
+    background-color: var(--control-default-bgColor-rest);
     border: 1px solid var(--borderColor-default);
     border-radius: var(--borderRadius-default);
     transition: border-color var(--transition-default);
     overflow: hidden;
     padding: 0 6px;
+    
+    ${props => props.$disabled && css`
+        background-color: var(--control-default-bgColor-disabled);
+        border-color: var(--control-default-borderColor-disabled);
+        
+        input {
+            color: var(--control-default-fgColor-disabled);
+        }
+    `}
 
     display: flex;
     width: 100%;
@@ -84,6 +93,7 @@ const Input = styled.input`
     outline: none;
     border: none;
     background-color: transparent;
+    transition: color var(--transition-default);
 `;
 
 const Icon = styled.div`

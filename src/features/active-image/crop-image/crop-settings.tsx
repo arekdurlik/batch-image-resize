@@ -44,7 +44,7 @@ export function CropSettings({
                                 value={cropState.x}
                                 min={0}
                                 max={1}
-                                onChange={api.setX}
+                                onChange={v => v && api.setX(v)}
                                 align="end"
                             />
                         </Setting>
@@ -55,7 +55,7 @@ export function CropSettings({
                                 value={cropState.y}
                                 min={0}
                                 max={1}
-                                onChange={api.setY}
+                                onChange={v => v && api.setY(v)}
                                 align="end"
                             />
                         </Setting>
@@ -70,7 +70,7 @@ export function CropSettings({
                     </ButtonGroup>
                 </HorizontalInputGroup>
                 <VerticalInputGroup>
-                    <Setting label="Zoom" unit="x" unitWidth={7}>
+                    <Setting label="Zoom" suffix="x" unitWidth={7}>
                         <input
                             type="range"
                             style={{ width: '100%' }}

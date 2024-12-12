@@ -1,26 +1,48 @@
-import { CSSProperties, ReactNode } from 'react';
+import {
+    Children,
+    cloneElement,
+    CSSProperties,
+    isValidElement,
+    ReactElement,
+    ReactNode,
+} from 'react';
 import styled from 'styled-components';
 
 export function Setting({
     label,
-    unit,
+    suffix,
     noUnitSpace,
     unitWidth = 17,
+    disabled,
     style,
     children,
 }: {
     label?: string;
-    unit?: string;
+    suffix?: ReactNode;
     noUnitSpace?: boolean;
     unitWidth?: number;
+    disabled?: boolean;
     style?: CSSProperties;
     children: ReactNode;
 }) {
+    const clonedChildren =
+        disabled !== undefined
+            ? Children.map(children, child => {
+                  if (isValidElement(child)) {
+                      return cloneElement(child as ReactElement<{ disabled?: boolean }>, {
+                          disabled,
+                      });
+                  } else {
+                      return child;
+                  }
+              })
+            : children;
+
     return (
         <Wrapper style={style}>
-            {label && <Label>{label}:</Label>}
-            {children}
-            {!noUnitSpace && <Unit $width={unitWidth}>{unit}</Unit>}
+            {label && <Label $disabled={disabled}>{label}:</Label>}
+            {clonedChildren}
+            {!noUnitSpace && <Unit $width={unitWidth}>{suffix}</Unit>}
         </Wrapper>
     );
 }
@@ -33,11 +55,13 @@ const Wrapper = styled.div`
     width: 100%;
 `;
 
-const Label = styled.span`
+const Label = styled.span<{ $disabled?: boolean }>`
     cursor: default;
     position: relative;
     bottom: 2px;
     font-weight: 600;
+    transition: color var(--transition-default);
+    ${props => props.$disabled && 'color: var(--control-default-fgColor-disabled) !important;'}
 `;
 
 const Unit = styled.span<{ $width: number }>`

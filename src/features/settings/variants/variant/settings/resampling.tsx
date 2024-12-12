@@ -64,7 +64,7 @@ export function Resampling({
                         style={{ maxWidth: filterWidth }}
                     />
                 </Setting>
-                <Setting label="Quality" unit="%" style={qualityStyle}>
+                <Setting label="Quality" suffix="%" style={qualityStyle}>
                     <RangeInput
                         value={qualityPercentage}
                         min={QUALITY_MIN * 100}

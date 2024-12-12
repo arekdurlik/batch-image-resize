@@ -56,7 +56,9 @@
     --control-default-bgColor-hover: hsl(218, 65%, 94%);
     --control-default-bgColor-active: hsl(218, 65%, 90%);
     --control-default-bgColor-selected: var(--control-default-bgColor-active);
+    --control-default-bgColor-disabled: hsl(218, 45%, 95%);
     --control-default-borderColor: var(--borderColor-default);
+    --control-default-borderColor-disabled: color-mix(in srgb, var(--borderColor-default), transparent 50%);
 
     --control-danger-fgColor-rest: var(--color-red-5);
     --control-danger-bgColor-hover: color-mix(in hsl, var(--color-red-5), transparent 85%);

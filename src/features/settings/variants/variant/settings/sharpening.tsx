@@ -55,7 +55,7 @@ export function Sharpening({
                 )}
             </Bold>
             <VerticalInputGroup>
-                <Setting label="Amount" unit="%" style={amountStyle}>
+                <Setting label="Amount" suffix="%" style={amountStyle}>
                     <RangeInput
                         min={SHARPEN_AMOUNT_MIN}
                         max={SHARPEN_AMOUNT_MAX}
@@ -71,7 +71,7 @@ export function Sharpening({
                     />
                 </Setting>
 
-                <Setting label="Radius" unit="px" style={radiusStyle}>
+                <Setting label="Radius" suffix="px" style={radiusStyle}>
                     <RangeInput
                         min={SHARPEN_RADIUS_MIN}
                         max={SHARPEN_RADIUS_MAX}
@@ -87,7 +87,7 @@ export function Sharpening({
                     />
                 </Setting>
 
-                <Setting label="Threshold" unit="lvls" style={thresholdStyle}>
+                <Setting label="Threshold" suffix="lvls" style={thresholdStyle}>
                     <RangeInput
                         min={SHARPEN_THRESHOLD_MIN}
                         max={SHARPEN_THRESHOLD_MAX}
